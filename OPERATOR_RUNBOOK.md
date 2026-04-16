@@ -20,6 +20,7 @@ Use this runbook for paper burn-in operations and as the baseline for any future
 4. Start the daily workflow:
    ```bash
    make burnin-day
+   make burnin-day STRATEGY=breakout
    ```
 5. If needed, open the dashboard:
    ```bash

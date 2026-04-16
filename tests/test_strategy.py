@@ -41,6 +41,7 @@ def test_parser_accepts_strategy_argument() -> None:
 
 def test_strategy_registry_lists_second_example_strategy() -> None:
     assert "mean_reversion" in strategy_names()
+    assert "breakout" in strategy_names()
 
 
 def test_mean_reversion_strategy_generates_entry_and_exit_signals() -> None:
@@ -145,6 +146,116 @@ def test_mean_reversion_strategy_uses_dedicated_settings_not_momentum_windows() 
     signal_frame = strategy.generate_signals(bars, settings)
 
     assert signal_frame.iloc[2]["signal"] == "long"
+
+
+def test_breakout_strategy_generates_entry_signal() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=0.5,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 102.0,
+                "low": 100.0,
+                "close": 101.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 103.0,
+                "low": 101.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 106.0,
+                "low": 102.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "long"
+
+
+def test_breakout_strategy_generates_exit_signal() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=0.5,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 104.0,
+                "low": 100.0,
+                "close": 103.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 105.0,
+                "low": 101.0,
+                "close": 104.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 98.0,
+                "high": 99.0,
+                "low": 95.0,
+                "close": 96.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "exit"
 
 
 def test_filter_exit_candidates_uses_existing_positions() -> None:
