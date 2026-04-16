@@ -67,6 +67,29 @@ Before starting the burn-in, verify Alpaca trading auth and market-data auth sep
 .venv/bin/python scripts/check_alpaca_auth.py --symbol SPY
 ```
 
+For the full daily burn-in workflow:
+
+```bash
+chmod +x scripts/run_burnin_day.sh
+./scripts/run_burnin_day.sh
+```
+
+For end-of-day review with archived summaries:
+
+```bash
+chmod +x scripts/review_burnin_day.sh
+./scripts/review_burnin_day.sh
+```
+
+Operator procedures for startup, restart, stale data, broker outage, emergency flatten, and end-of-day signoff are in [OPERATOR_RUNBOOK.md](/Users/jurekolar/Code/simple-ai-trading/OPERATOR_RUNBOOK.md).
+
+Or use `make` targets:
+
+```bash
+make burnin-day
+make burnin-review
+```
+
 ## Current scope
 
 Version `0.1.0` is intentionally narrow:
