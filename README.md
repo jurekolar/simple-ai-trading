@@ -61,6 +61,12 @@ For a structured 2-4 week paper burn-in:
 .venv/bin/python scripts/burnin_report.py --days 7
 ```
 
+Before starting the burn-in, verify Alpaca trading auth and market-data auth separately:
+
+```bash
+.venv/bin/python scripts/check_alpaca_auth.py --symbol SPY
+```
+
 ## Current scope
 
 Version `0.1.0` is intentionally narrow:

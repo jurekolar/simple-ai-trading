@@ -354,6 +354,33 @@ class AlpacaTradingAdapter:
             next_close=clock.next_close,
         )
 
+    @staticmethod
+    def _activity_value(activity: object, key: str) -> object:
+        if isinstance(activity, dict):
+            return activity.get(key)
+        return getattr(activity, key, None)
+
+    @staticmethod
+    def _coerce_datetime(value: object) -> datetime | None:
+        if value is None:
+            return None
+        if isinstance(value, datetime):
+            return value if value.tzinfo is not None else value.replace(tzinfo=timezone.utc)
+        if isinstance(value, str):
+            normalized = value.replace("Z", "+00:00")
+            parsed = datetime.fromisoformat(normalized)
+            return parsed if parsed.tzinfo is not None else parsed.replace(tzinfo=timezone.utc)
+        return None
+
+    @staticmethod
+    def _coerce_date(value: object) -> date | None:
+        if value is None:
+            return None
+        if isinstance(value, date) and not isinstance(value, datetime):
+            return value
+        parsed = AlpacaTradingAdapter._coerce_datetime(value)
+        return parsed.date() if parsed is not None else None
+
     def list_trade_activities(self, days: int = 30) -> list[TradeActivitySnapshot]:
         if self._client is None or ActivityType is None or TradeActivity is None:
             return []
@@ -364,18 +391,40 @@ class AlpacaTradingAdapter:
                 "after": (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(),
             },
         )
-        return [
-            TradeActivitySnapshot(
-                activity_id=str(activity.id),
-                order_id=str(activity.order_id),
-                symbol=str(activity.symbol),
-                side=str(activity.side),
-                qty=float(activity.qty),
-                price=float(activity.price),
-                transaction_time=activity.transaction_time,
+        snapshots: list[TradeActivitySnapshot] = []
+        for raw_activity in raw_activities:
+            transaction_time = self._coerce_datetime(
+                self._activity_value(raw_activity, "transaction_time")
+                or self._activity_value(raw_activity, "date")
             )
-            for activity in [TradeActivity(**raw_activity) for raw_activity in raw_activities]
-        ]
+            order_id = self._activity_value(raw_activity, "order_id")
+            symbol = self._activity_value(raw_activity, "symbol")
+            side = self._activity_value(raw_activity, "side")
+            qty = self._activity_value(raw_activity, "qty")
+            price = self._activity_value(raw_activity, "price")
+            activity_id = self._activity_value(raw_activity, "id")
+            if (
+                transaction_time is None
+                or order_id in (None, "")
+                or symbol in (None, "")
+                or side in (None, "")
+                or qty in (None, "")
+                or price in (None, "")
+            ):
+                LOGGER.warning("skipping malformed trade activity payload: %s", raw_activity)
+                continue
+            snapshots.append(
+                TradeActivitySnapshot(
+                    activity_id=str(activity_id or ""),
+                    order_id=str(order_id),
+                    symbol=str(symbol),
+                    side=str(side),
+                    qty=float(qty),
+                    price=float(price),
+                    transaction_time=transaction_time,
+                )
+            )
+        return snapshots
 
     def list_fee_activities(self, days: int = 30) -> list[FeeActivitySnapshot]:
         if self._client is None or ActivityType is None or NonTradeActivity is None:
@@ -387,16 +436,29 @@ class AlpacaTradingAdapter:
                 "after": (datetime.now(timezone.utc) - timedelta(days=days)).isoformat(),
             },
         )
-        return [
-            FeeActivitySnapshot(
-                activity_id=str(activity.id),
-                activity_type=str(activity.activity_type),
-                net_amount=float(activity.net_amount),
-                activity_date=activity.date,
-                symbol=str(activity.symbol) if activity.symbol else None,
+        snapshots: list[FeeActivitySnapshot] = []
+        for raw_activity in raw_activities:
+            activity_date = self._coerce_date(
+                self._activity_value(raw_activity, "date")
+                or self._activity_value(raw_activity, "transaction_time")
             )
-            for activity in [NonTradeActivity(**raw_activity) for raw_activity in raw_activities]
-        ]
+            activity_type = self._activity_value(raw_activity, "activity_type")
+            net_amount = self._activity_value(raw_activity, "net_amount")
+            if activity_date is None or activity_type in (None, "") or net_amount in (None, ""):
+                LOGGER.warning("skipping malformed fee activity payload: %s", raw_activity)
+                continue
+            symbol = self._activity_value(raw_activity, "symbol")
+            activity_id = self._activity_value(raw_activity, "id")
+            snapshots.append(
+                FeeActivitySnapshot(
+                    activity_id=str(activity_id or ""),
+                    activity_type=str(activity_type),
+                    net_amount=float(net_amount),
+                    activity_date=activity_date,
+                    symbol=str(symbol) if symbol else None,
+                )
+            )
+        return snapshots
 
     def list_execution_fills(self, limit: int = 200) -> list[dict[str, object]]:
         recent_orders = self.list_recent_orders(limit=limit)
