@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     dry_run: bool = Field(default=True, alias="DRY_RUN")
     paper_only: bool = Field(default=True, alias="PAPER_ONLY")
     allow_live: bool = Field(default=False, alias="ALLOW_LIVE")
+    live_config_profile: str = Field(default="", alias="LIVE_CONFIG_PROFILE")
+    live_deployment_ack: str = Field(default="", alias="LIVE_DEPLOYMENT_ACK")
     database_url: str = Field(default="sqlite:///trading.db", alias="DATABASE_URL")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     symbols: str = Field(default="SPY,QQQ,IWM,AAPL,MSFT", alias="SYMBOLS")
@@ -55,6 +57,8 @@ class Settings(BaseSettings):
     alert_on_reconciliation_drift: bool = Field(default=True, alias="ALERT_ON_RECONCILIATION_DRIFT")
     alert_on_drawdown_breach: bool = Field(default=True, alias="ALERT_ON_DRAWDOWN_BREACH")
     alert_on_stale_data: bool = Field(default=True, alias="ALERT_ON_STALE_DATA")
+    alert_webhook_url: str = Field(default="", alias="ALERT_WEBHOOK_URL")
+    alert_webhook_timeout_seconds: float = Field(default=5.0, alias="ALERT_WEBHOOK_TIMEOUT_SECONDS")
 
     @property
     def symbol_list(self) -> list[str]:
@@ -71,6 +75,10 @@ class Settings(BaseSettings):
     @property
     def trading_mode_enabled(self) -> bool:
         return not self.dry_run
+
+    @property
+    def live_trading_enabled(self) -> bool:
+        return not self.alpaca_paper
 
 
 @lru_cache(maxsize=1)

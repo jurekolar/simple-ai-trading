@@ -118,6 +118,7 @@ class ReconciliationSnapshot:
     local_position_qty_by_symbol: dict[str, float]
     broker_position_qty_by_symbol: dict[str, float]
     open_order_symbols: set[str]
+    unresolved_order_symbols: set[str]
 
 
 class AlpacaTradingAdapter:
@@ -168,6 +169,42 @@ class AlpacaTradingAdapter:
             submitted_at=getattr(order, "submitted_at", None),
             filled_at=getattr(order, "filled_at", None),
         )
+
+    @staticmethod
+    def normalize_order_status(status: str) -> str:
+        raw = (status or "").lower()
+        status_map = {
+            "new": "new",
+            "accepted": "accepted",
+            "pending_new": "pending_new",
+            "accepted_for_bidding": "accepted_for_bidding",
+            "partially_filled": "partially_filled",
+            "filled": "filled",
+            "done_for_day": "done_for_day",
+            "canceled": "canceled",
+            "cancelled": "canceled",
+            "pending_cancel": "pending_cancel",
+            "pending_replace": "pending_replace",
+            "replaced": "replaced",
+            "expired": "expired",
+            "rejected": "rejected",
+            "stopped": "stopped",
+            "suspended": "suspended",
+            "calculated": "calculated",
+        }
+        return status_map.get(raw, raw or "unknown")
+
+    @classmethod
+    def is_unresolved_order_status(cls, status: str) -> bool:
+        return cls.normalize_order_status(status) in {
+            "new",
+            "accepted",
+            "pending_new",
+            "accepted_for_bidding",
+            "partially_filled",
+            "pending_cancel",
+            "pending_replace",
+        }
 
     def submit_market_order(
         self,
@@ -270,6 +307,11 @@ class AlpacaTradingAdapter:
             local_position_qty_by_symbol=local_position_qty_by_symbol,
             broker_position_qty_by_symbol={position.symbol: float(position.qty) for position in positions},
             open_order_symbols={order.symbol for order in open_orders},
+            unresolved_order_symbols={
+                order.symbol
+                for order in self.list_recent_orders(limit=50)
+                if self.is_unresolved_order_status(order.status)
+            },
         )
 
     def get_portfolio_pnl_history(

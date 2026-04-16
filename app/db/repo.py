@@ -211,12 +211,20 @@ class JournalRepo:
     def unresolved_orders(self) -> list[OrderRecord]:
         unresolved_states = ("intent", "submitted", "pending", "open", "partially_filled")
         with self._session_factory() as session:
-            return list(
+            records = list(
                 session.query(OrderRecord)
                 .filter(OrderRecord.lifecycle_state.in_(unresolved_states))
                 .order_by(OrderRecord.submitted_at.desc(), OrderRecord.id.desc())
                 .all()
             )
+        return [
+            record
+            for record in records
+            if self._lifecycle_state_for_status(record.status) in unresolved_states
+        ]
+
+    def unresolved_order_symbols(self) -> set[str]:
+        return {order.symbol for order in self.unresolved_orders()}
 
     def recent_order_failures(self, limit: int = 20) -> list[OrderRecord]:
         with self._session_factory() as session:
@@ -425,13 +433,32 @@ class JournalRepo:
     @staticmethod
     def _lifecycle_state_for_status(status: str) -> str:
         normalized = (status or "").lower()
+        if "." in normalized:
+            normalized = normalized.rsplit(".", maxsplit=1)[-1]
         if normalized in {"intent"}:
             return "intent"
-        if normalized in {"new", "accepted", "pending_new", "pending_replace", "accepted_for_bidding"}:
+        if normalized in {
+            "new",
+            "accepted",
+            "pending_new",
+            "pending_replace",
+            "pending_cancel",
+            "accepted_for_bidding",
+        }:
             return "submitted"
         if normalized in {"partially_filled"}:
             return "partially_filled"
-        if normalized in {"filled", "done_for_day", "canceled", "cancelled", "expired", "replaced"}:
+        if normalized in {
+            "filled",
+            "done_for_day",
+            "canceled",
+            "cancelled",
+            "expired",
+            "replaced",
+            "stopped",
+            "suspended",
+            "calculated",
+        }:
             return "resolved"
         if normalized in {"blocked", "error", "rejected", "skipped_existing", "skipped_open_order", "dry_run"}:
             return "resolved"

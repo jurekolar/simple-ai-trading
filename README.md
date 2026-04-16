@@ -49,6 +49,18 @@ python -m app.main reconcile
 streamlit run app/monitoring/dashboard.py
 ```
 
+## Paper Burn-In
+
+For a structured 2-4 week paper burn-in:
+
+1. Start from [.env.paper_burnin.example](/Users/jurekolar/Code/simple-ai-trading/.env.paper_burnin.example).
+2. Review [PAPER_BURNIN_CHECKLIST.md](/Users/jurekolar/Code/simple-ai-trading/PAPER_BURNIN_CHECKLIST.md).
+3. Run the burn-in summary script daily:
+
+```bash
+.venv/bin/python scripts/burnin_report.py --days 7
+```
+
 ## Current scope
 
 Version `0.1.0` is intentionally narrow:

@@ -266,6 +266,19 @@ def _load_and_validate_data(settings) -> tuple[object, object, bool]:
     return loaded, validation, stale
 
 
+def _enforce_live_mode_gate(settings) -> None:
+    if not settings.live_trading_enabled:
+        return
+    if settings.paper_only or not settings.allow_live:
+        raise RuntimeError("live trading blocked: PAPER_ONLY must be false and ALLOW_LIVE must be true")
+    if settings.live_config_profile.strip().lower() != "live":
+        raise RuntimeError("live trading blocked: LIVE_CONFIG_PROFILE must be set to 'live'")
+    if settings.live_deployment_ack.strip() != "I_ACKNOWLEDGE_LIVE_TRADING":
+        raise RuntimeError(
+            "live trading blocked: LIVE_DEPLOYMENT_ACK must equal I_ACKNOWLEDGE_LIVE_TRADING"
+        )
+
+
 def _compute_reconciliation_state(
     repo: JournalRepo,
     broker: AlpacaTradingAdapter,
@@ -285,6 +298,7 @@ def _compute_reconciliation_state(
             local_position_qty_by_symbol=local_position_qty_by_symbol,
             broker_position_qty_by_symbol={position.symbol: float(position.qty) for position in positions},
             open_order_symbols={order.symbol for order in open_orders},
+            unresolved_order_symbols={order.symbol for order in open_orders},
         )
     state = assess_reconciliation_health(
         snapshot.local_position_qty_by_symbol,
@@ -374,8 +388,7 @@ def run_backtest_command() -> None:
 
 def run_paper_command() -> None:
     settings = get_settings()
-    if not settings.alpaca_paper and settings.paper_only and not settings.allow_live:
-        raise RuntimeError("live trading blocked: set ALLOW_LIVE=true to disable PAPER_ONLY safeguard")
+    _enforce_live_mode_gate(settings)
     repo = JournalRepo(create_session_factory(settings.database_url))
     broker = AlpacaTradingAdapter(settings)
     repo.create_run("paper", "started")
@@ -439,7 +452,9 @@ def run_paper_command() -> None:
 
     executor = PaperExecutor(repo, settings, broker=broker)
     open_order_symbols = {order.symbol for order in open_orders}
-    unresolved_order_symbols = {order.symbol for order in repo.unresolved_orders()}
+    unresolved_order_symbols = repo.unresolved_order_symbols() | set(
+        getattr(reconciliation_snapshot, "unresolved_order_symbols", set())
+    )
     position_qty_by_symbol = {position.symbol: float(position.qty) for position in open_positions}
     position_price_by_symbol = {
         position.symbol: float(position.current_price) for position in open_positions
@@ -567,6 +582,8 @@ def run_paper_command() -> None:
                     broker_order_id=result.broker_order_id,
                     filled_avg_price=result.filled_avg_price,
                 )
+                reconcile_broker_state(repo, broker)
+                unresolved_order_symbols = repo.unresolved_order_symbols()
             else:
                 blocked_orders += 1
                 LOGGER.warning(
@@ -681,6 +698,8 @@ def run_paper_command() -> None:
                 broker_order_id=result.broker_order_id,
                 filled_avg_price=result.filled_avg_price,
             )
+            reconcile_broker_state(repo, broker)
+            unresolved_order_symbols = repo.unresolved_order_symbols()
         else:
             blocked_orders += 1
             LOGGER.warning(

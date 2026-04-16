@@ -469,6 +469,11 @@ def test_list_execution_fills_uses_trade_activities_and_allocates_fees() -> None
     assert fills[0]["fees"] < fills[1]["fees"]
 
 
+def test_adapter_treats_partially_filled_as_unresolved_status() -> None:
+    assert AlpacaTradingAdapter.is_unresolved_order_status("partially_filled")
+    assert AlpacaTradingAdapter.normalize_order_status("cancelled") == "canceled"
+
+
 def test_executor_allows_large_exit_orders_above_entry_qty_limit(tmp_path) -> None:
     settings = Settings(MAX_ORDER_QTY=25, DRY_RUN=True)
     repo = JournalRepo(create_session_factory(f"sqlite:///{tmp_path / 'journal.db'}"))
@@ -480,6 +485,20 @@ def test_executor_allows_large_exit_orders_above_entry_qty_limit(tmp_path) -> No
     orders = repo.recent_orders(limit=5)
     assert any(order.status == "dry_run" and order.qty == 40.0 for order in orders)
     assert any(order.status == "intent" and order.qty == 40.0 for order in orders)
+
+
+def test_repo_tracks_partially_filled_order_as_unresolved(tmp_path) -> None:
+    repo = JournalRepo(create_session_factory(f"sqlite:///{tmp_path / 'journal.db'}"))
+    repo.log_order(
+        "SPY",
+        "buy",
+        5.0,
+        "partially_filled",
+        client_order_id="client-1",
+        broker_order_id="broker-1",
+    )
+
+    assert repo.unresolved_order_symbols() == {"SPY"}
 
 
 def test_executor_returns_error_result_when_broker_submit_fails(tmp_path) -> None:
@@ -1193,6 +1212,21 @@ def test_run_paper_command_blocks_synthetic_data_in_trading_mode(tmp_path, monke
     monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
 
     with pytest.raises(RuntimeError, match="unsafe market data source=synthetic blocked in trading mode"):
+        run_paper_command()
+
+
+def test_run_paper_command_blocks_live_mode_without_ack(monkeypatch) -> None:
+    settings = Settings(
+        DRY_RUN=False,
+        ALPACA_PAPER=False,
+        PAPER_ONLY=False,
+        ALLOW_LIVE=True,
+        LIVE_CONFIG_PROFILE="live",
+        LIVE_DEPLOYMENT_ACK="wrong",
+    )
+    monkeypatch.setattr("app.main.get_settings", lambda: settings)
+
+    with pytest.raises(RuntimeError, match="LIVE_DEPLOYMENT_ACK"):
         run_paper_command()
 
 
