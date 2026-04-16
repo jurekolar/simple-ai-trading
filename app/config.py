@@ -42,12 +42,19 @@ class Settings(BaseSettings):
     atr_window: int = Field(default=14, alias="ATR_WINDOW")
     atr_risk_budget: float = Field(default=100, alias="ATR_RISK_BUDGET")
     risk_per_trade_fraction: float = Field(default=0.01, alias="RISK_PER_TRADE_FRACTION")
+    min_average_daily_volume: float = Field(default=500_000, alias="MIN_AVERAGE_DAILY_VOLUME")
+    max_atr_ratio: float = Field(default=0.12, alias="MAX_ATR_RATIO")
     lookback_days: int = Field(default=400, alias="LOOKBACK_DAYS")
     min_history_days: int = Field(default=120, alias="MIN_HISTORY_DAYS")
     allow_unsafe_data_fallback: bool = Field(default=False, alias="ALLOW_UNSAFE_DATA_FALLBACK")
+    allow_partial_market_data: bool = Field(default=False, alias="ALLOW_PARTIAL_MARKET_DATA")
     force_exit_symbols: str = Field(default="", alias="FORCE_EXIT_SYMBOLS")
     emergency_flatten: bool = Field(default=False, alias="EMERGENCY_FLATTEN")
     deny_new_entries: bool = Field(default=False, alias="DENY_NEW_ENTRIES")
+    alert_on_blocked_orders: bool = Field(default=True, alias="ALERT_ON_BLOCKED_ORDERS")
+    alert_on_reconciliation_drift: bool = Field(default=True, alias="ALERT_ON_RECONCILIATION_DRIFT")
+    alert_on_drawdown_breach: bool = Field(default=True, alias="ALERT_ON_DRAWDOWN_BREACH")
+    alert_on_stale_data: bool = Field(default=True, alias="ALERT_ON_STALE_DATA")
 
     @property
     def symbol_list(self) -> list[str]:

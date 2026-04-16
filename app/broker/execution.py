@@ -56,6 +56,31 @@ class PaperExecutor:
         if order.qty <= 0:
             raise ValueError("order qty must be positive")
 
+    def submit_orders(self, order: OrderIntent) -> list[ExecutionResult]:
+        orders = self.split_order_for_submit(order)
+        return [self.submit(chunk) for chunk in orders]
+
+    def split_order_for_submit(self, order: OrderIntent) -> list[OrderIntent]:
+        return self._chunk_exit_order(order) if order.side.lower() == "sell" else [order]
+
+    def _chunk_exit_order(self, order: OrderIntent) -> list[OrderIntent]:
+        if order.qty <= self._settings.max_order_qty or self._settings.max_order_qty <= 0:
+            return [order]
+        remaining = int(order.qty)
+        chunks: list[OrderIntent] = []
+        while remaining > 0:
+            chunk_qty = min(remaining, self._settings.max_order_qty)
+            chunks.append(
+                OrderIntent(
+                    symbol=order.symbol,
+                    qty=chunk_qty,
+                    side=order.side,
+                    close=order.close,
+                )
+            )
+            remaining -= chunk_qty
+        return chunks
+
     def submit(self, order: OrderIntent) -> ExecutionResult:
         intent_id = f"intent-{uuid.uuid4().hex[:20]}"
         client_order_id = f"codex-{uuid.uuid4().hex[:20]}"

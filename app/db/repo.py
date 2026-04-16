@@ -91,6 +91,11 @@ class JournalRepo:
                 session.query(OrderRecord).order_by(OrderRecord.submitted_at.desc()).limit(limit).all()
             )
 
+    def blocked_orders_count(self) -> int:
+        with self._session_factory() as session:
+            total = session.query(func.count(OrderRecord.id)).filter(OrderRecord.status == "blocked").scalar()
+            return int(total or 0)
+
     def log_reconciliation_event(self, *, severity: str, reason: str, details: str = "") -> None:
         with self._session_factory() as session:
             session.add(

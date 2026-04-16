@@ -223,25 +223,6 @@ def reconcile_broker_state(repo: JournalRepo, broker: AlpacaTradingAdapter) -> d
     }
 
 
-def _chunk_order(order: OrderIntent, max_qty: int) -> list[OrderIntent]:
-    if order.qty <= max_qty or max_qty <= 0:
-        return [order]
-    remaining = int(order.qty)
-    chunks: list[OrderIntent] = []
-    while remaining > 0:
-        chunk_qty = min(remaining, max_qty)
-        chunks.append(
-            OrderIntent(
-                symbol=order.symbol,
-                qty=chunk_qty,
-                side=order.side,
-                close=order.close,
-            )
-        )
-        remaining -= chunk_qty
-    return chunks
-
-
 def _has_stuck_orders(open_orders: list[object], max_stuck_order_minutes: int) -> bool:
     if max_stuck_order_minutes <= 0:
         return False
@@ -258,11 +239,29 @@ def _has_stuck_orders(open_orders: list[object], max_stuck_order_minutes: int) -
     return False
 
 
+def _fallback_split_exit_order(order: OrderIntent, max_qty: int) -> list[OrderIntent]:
+    if order.qty <= max_qty or max_qty <= 0:
+        return [order]
+    remaining = int(order.qty)
+    chunks: list[OrderIntent] = []
+    while remaining > 0:
+        chunk_qty = min(remaining, max_qty)
+        chunks.append(OrderIntent(symbol=order.symbol, qty=chunk_qty, side=order.side, close=order.close))
+        remaining -= chunk_qty
+    return chunks
+
+
 def _load_and_validate_data(settings) -> tuple[object, object, bool]:
     loaded = load_bars_with_source(settings)
     if settings.trading_mode_enabled and not settings.allow_unsafe_data_fallback and not loaded.production_safe:
         raise RuntimeError(f"unsafe market data source={loaded.source} blocked in trading mode")
     validation = validate_bars(loaded.bars, settings)
+    if (
+        settings.trading_mode_enabled
+        and validation.failed_symbols
+        and not settings.allow_partial_market_data
+    ):
+        raise RuntimeError(f"required market data validation failed: {validation.failed_symbols}")
     stale = data_is_stale(validation.valid_bars, source=loaded.source)
     return loaded, validation, stale
 
@@ -542,8 +541,17 @@ def run_paper_command() -> None:
                 requested_price=base_order.close,
             )
             continue
-        for order in _chunk_order(base_order, settings.max_order_qty):
-            result = executor.submit(order)
+        split_exit_orders = (
+            executor.split_order_for_submit(base_order)
+            if hasattr(executor, "split_order_for_submit")
+            else _fallback_split_exit_order(base_order, settings.max_order_qty)
+        )
+        execution_results = (
+            executor.submit_orders(base_order)
+            if hasattr(executor, "submit_orders")
+            else [executor.submit(order) for order in split_exit_orders]
+        )
+        for result, order in zip(execution_results, split_exit_orders, strict=False):
             if result.accepted:
                 exit_orders += 1
                 open_order_symbols.add(order.symbol)
@@ -693,7 +701,7 @@ def run_paper_command() -> None:
 
     sync_summary = reconcile_broker_state(repo, broker)
     report = build_daily_report(repo)
-    send_alerts(dict.fromkeys(alert_messages))
+    send_alerts(dict.fromkeys(alert_messages), settings)
     repo.create_run(
         "paper",
         "completed",

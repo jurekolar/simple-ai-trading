@@ -14,6 +14,9 @@ def build_daily_report(repo: JournalRepo) -> str:
     fills = repo.execution_fills()
     lot_matches = repo.realized_lot_matches()
     realized = repo.realized_pnl()
+    blocked_orders = [order for order in orders if order.status == "blocked"]
+    kill_switch_events = repo.recent_kill_switch_events(limit=1)
+    reconciliation_events = repo.recent_reconciliation_events(limit=1)
     gross_exposure = float(sum(abs(position.market_value) for position in positions))
     unrealized_pnl = float(sum(position.unrealized_pl for position in positions))
     return (
@@ -21,11 +24,14 @@ def build_daily_report(repo: JournalRepo) -> str:
         f"recent_orders={len(orders)}\n"
         f"positions={len(positions)}\n"
         f"unresolved_orders={len(unresolved_orders)}\n"
+        f"blocked_orders={len(blocked_orders)}\n"
         f"latest_equity={account.equity if account else 0}\n"
         f"gross_exposure={gross_exposure}\n"
         f"unrealized_pnl={unrealized_pnl}\n"
         f"buying_power={account.buying_power if account else 0}\n"
         f"cash={account.cash if account else 0}\n"
+        f"kill_switch_state={kill_switch_events[0].reason if kill_switch_events else 'none'}\n"
+        f"reconciliation_summary={reconciliation_events[0].reason if reconciliation_events else 'none'}\n"
         f"portfolio_profit_loss={latest_pnl.profit_loss if latest_pnl else 0}\n"
         "fee_model=estimated_activity_allocation\n"
         f"execution_fills={len(fills)}\n"

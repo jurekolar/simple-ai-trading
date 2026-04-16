@@ -25,7 +25,20 @@ def generate_signals(bars: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     frame["atr"] = true_range.groupby(frame["symbol"]).transform(
         lambda series: series.rolling(settings.atr_window, min_periods=settings.atr_window).mean()
     )
+    frame["avg_volume"] = frame.groupby("symbol")["volume"].transform(
+        lambda series: series.rolling(settings.atr_window, min_periods=settings.atr_window).mean()
+    )
+    frame["atr_ratio"] = frame["atr"] / frame["close"]
+    frame["liquidity_ok"] = frame["avg_volume"] >= settings.min_average_daily_volume
+    frame["volatility_ok"] = frame["atr_ratio"] <= settings.max_atr_ratio
+    frame["score"] = (
+        ((frame["close"] - frame["trend_ma"]) / frame["atr"]).fillna(0.0)
+        + 0.5 * ((frame["close"] - frame["exit_ma"]) / frame["atr"]).fillna(0.0)
+    )
     frame["signal"] = "flat"
-    frame.loc[frame["close"] > frame["trend_ma"], "signal"] = "long"
+    frame.loc[
+        (frame["close"] > frame["trend_ma"]) & frame["liquidity_ok"] & frame["volatility_ok"],
+        "signal",
+    ] = "long"
     frame.loc[frame["close"] < frame["exit_ma"], "signal"] = "exit"
     return frame

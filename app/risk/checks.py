@@ -16,27 +16,48 @@ class EntryRiskDecision:
 
 def filter_trade_candidates(signal_frame: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     candidates = signal_frame[signal_frame["signal"] == "long"].copy()
-    candidates = candidates[candidates["atr"].notna() & (candidates["atr"] > 0)]
+    candidates = candidates[candidates["atr"].notna() & (candidates["atr"] > 0)].copy()
+    if "liquidity_ok" in candidates.columns:
+        candidates = candidates[candidates["liquidity_ok"]]
+    if "volatility_ok" in candidates.columns:
+        candidates = candidates[candidates["volatility_ok"]]
     if candidates.empty:
         candidates["qty"] = pd.Series(dtype=int)
         return candidates
-    account_equity = float(candidates["account_equity"].iloc[0]) if "account_equity" in candidates.columns else 0.0
-    risk_budget = max(settings.atr_risk_budget, account_equity * settings.risk_per_trade_fraction)
-    trend_ma = candidates["trend_ma"] if "trend_ma" in candidates.columns else candidates["close"]
-    exit_ma = candidates["exit_ma"] if "exit_ma" in candidates.columns else candidates["close"]
-    candidates["score"] = (
-        ((candidates["close"] - trend_ma) / candidates["atr"]).fillna(0.0)
-        + 0.5 * ((candidates["close"] - exit_ma) / candidates["atr"]).fillna(0.0)
-    )
     candidates["qty"] = candidates.apply(
-        lambda row: min(
-            math.floor(risk_budget / row["atr"]),
-            math.floor(settings.max_position_notional / row["close"]),
-        ),
+        lambda row: compute_entry_qty(row=row, settings=settings),
         axis=1,
     )
     candidates = candidates[candidates["qty"] > 0]
-    return candidates.nlargest(settings.max_symbols_per_run, "score")
+    return rank_trade_candidates(candidates, settings)
+
+
+def compute_entry_qty(*, row: pd.Series, settings: Settings) -> int:
+    account_equity = float(row.get("account_equity", 0.0))
+    risk_budget = max(settings.atr_risk_budget, account_equity * settings.risk_per_trade_fraction)
+    atr = float(row.get("atr", 0.0))
+    close = float(row.get("close", 0.0))
+    if atr <= 0 or close <= 0:
+        return 0
+    return min(
+        math.floor(risk_budget / atr),
+        math.floor(settings.max_position_notional / close),
+    )
+
+
+def rank_trade_candidates(candidates: pd.DataFrame, settings: Settings) -> pd.DataFrame:
+    if candidates.empty:
+        candidates["qty"] = pd.Series(dtype=int)
+        return candidates
+    ranked = candidates.copy()
+    if "score" not in ranked.columns:
+        trend_ma = ranked["trend_ma"] if "trend_ma" in ranked.columns else ranked["close"]
+        exit_ma = ranked["exit_ma"] if "exit_ma" in ranked.columns else ranked["close"]
+        ranked["score"] = (
+            ((ranked["close"] - trend_ma) / ranked["atr"]).fillna(0.0)
+            + 0.5 * ((ranked["close"] - exit_ma) / ranked["atr"]).fillna(0.0)
+        )
+    return ranked.nlargest(settings.max_symbols_per_run, "score")
 
 
 def filter_exit_candidates(
@@ -94,6 +115,48 @@ def total_unrealized_pnl(position_unrealized_pnl: list[float]) -> float:
     return float(sum(position_unrealized_pnl))
 
 
+def enforce_portfolio_limits(
+    *,
+    active_symbols: set[str],
+    gross_exposure: float,
+    reserved_gross_exposure: float,
+    order_notional: float,
+    settings: Settings,
+) -> EntryRiskDecision:
+    if len(active_symbols) >= settings.max_positions:
+        return EntryRiskDecision(False, "max_positions")
+    if gross_exposure + reserved_gross_exposure + order_notional > settings.max_gross_exposure:
+        return EntryRiskDecision(False, "max_gross_exposure")
+    return EntryRiskDecision(True, "")
+
+
+def enforce_buying_power_limit(
+    *,
+    order_notional: float,
+    buying_power: float,
+    reserved_buying_power: float,
+    cash: float,
+    reserved_cash: float,
+    settings: Settings,
+) -> EntryRiskDecision:
+    if order_notional > max(buying_power - reserved_buying_power, 0.0):
+        return EntryRiskDecision(False, "insufficient_buying_power")
+    if cash - reserved_cash - order_notional < settings.min_cash_buffer:
+        return EntryRiskDecision(False, "min_cash_buffer")
+    return EntryRiskDecision(True, "")
+
+
+def enforce_symbol_exposure_limit(
+    *,
+    symbol_exposure: float,
+    order_notional: float,
+    settings: Settings,
+) -> EntryRiskDecision:
+    if symbol_exposure + order_notional > settings.max_symbol_exposure:
+        return EntryRiskDecision(False, "max_symbol_exposure")
+    return EntryRiskDecision(True, "")
+
+
 def entry_risk_decision(
     *,
     symbol: str,
@@ -110,14 +173,28 @@ def entry_risk_decision(
     settings: Settings,
 ) -> EntryRiskDecision:
     order_notional = qty * close
-    if len(active_symbols) >= settings.max_positions:
-        return EntryRiskDecision(False, "max_positions")
-    if gross_exposure + reserved_gross_exposure + order_notional > settings.max_gross_exposure:
-        return EntryRiskDecision(False, "max_gross_exposure")
-    if symbol_exposure + order_notional > settings.max_symbol_exposure:
-        return EntryRiskDecision(False, "max_symbol_exposure")
-    if order_notional > max(buying_power - reserved_buying_power, 0.0):
-        return EntryRiskDecision(False, "insufficient_buying_power")
-    if cash - reserved_cash - order_notional < settings.min_cash_buffer:
-        return EntryRiskDecision(False, "min_cash_buffer")
+    for decision in (
+        enforce_portfolio_limits(
+            active_symbols=active_symbols,
+            gross_exposure=gross_exposure,
+            reserved_gross_exposure=reserved_gross_exposure,
+            order_notional=order_notional,
+            settings=settings,
+        ),
+        enforce_symbol_exposure_limit(
+            symbol_exposure=symbol_exposure,
+            order_notional=order_notional,
+            settings=settings,
+        ),
+        enforce_buying_power_limit(
+            order_notional=order_notional,
+            buying_power=buying_power,
+            reserved_buying_power=reserved_buying_power,
+            cash=cash,
+            reserved_cash=reserved_cash,
+            settings=settings,
+        ),
+    ):
+        if not decision.allowed:
+            return decision
     return EntryRiskDecision(True, "")

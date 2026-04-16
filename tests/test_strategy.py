@@ -505,7 +505,7 @@ def test_executor_returns_error_result_when_broker_submit_fails(tmp_path) -> Non
 
 
 def test_run_paper_command_skips_entry_when_symbol_has_open_order(tmp_path, monkeypatch) -> None:
-    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1)
+    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1, SYMBOLS="SPY")
     bars = pd.DataFrame(
         [
             {
@@ -605,6 +605,7 @@ def test_run_paper_command_emergency_drawdown_forces_exit(tmp_path, monkeypatch)
         MAX_UNREALIZED_DRAWDOWN=1_500.0,
         EMERGENCY_UNREALIZED_DRAWDOWN=2_500.0,
         MIN_HISTORY_DAYS=1,
+        SYMBOLS="SPY",
     )
     bars = pd.DataFrame(
         [
@@ -726,7 +727,7 @@ def test_run_paper_command_emergency_drawdown_forces_exit(tmp_path, monkeypatch)
 
 
 def test_run_paper_command_stale_data_still_allows_exit(tmp_path, monkeypatch) -> None:
-    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1)
+    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1, SYMBOLS="SPY")
     bars = pd.DataFrame(
         [
             {
@@ -847,6 +848,7 @@ def test_run_paper_command_daily_loss_limit_still_allows_exit(tmp_path, monkeypa
         DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}",
         MAX_DAILY_LOSS=1_000.0,
         MIN_HISTORY_DAYS=1,
+        SYMBOLS="SPY",
     )
     repo = JournalRepo(create_session_factory(settings.database_url))
     now = datetime(2026, 4, 16, 20, 0, tzinfo=UTC)
@@ -1054,7 +1056,7 @@ def test_entry_risk_decision_blocks_on_reserved_buying_power() -> None:
 
 
 def test_run_paper_command_chunks_oversized_exits(tmp_path, monkeypatch) -> None:
-    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MAX_ORDER_QTY=25, MIN_HISTORY_DAYS=1)
+    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MAX_ORDER_QTY=25, MIN_HISTORY_DAYS=1, SYMBOLS="SPY")
     bars = pd.DataFrame(
         [
             {
@@ -1195,7 +1197,7 @@ def test_run_paper_command_blocks_synthetic_data_in_trading_mode(tmp_path, monke
 
 
 def test_run_paper_command_skips_entry_when_unresolved_order_exists_locally(tmp_path, monkeypatch) -> None:
-    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1)
+    settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1, SYMBOLS="SPY")
     repo = JournalRepo(create_session_factory(settings.database_url))
     repo.log_order(
         "SPY",
