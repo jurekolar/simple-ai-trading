@@ -12,7 +12,7 @@ from app.data.historical_loader import load_bars, validate_bars
 from app.data.market_calendar import market_day_window, market_is_open
 from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
-from app.main import compute_realized_pnl_records, run_paper_command
+from app.main import build_parser, compute_realized_pnl_records, run_paper_command
 from app.risk.checks import entry_risk_decision, filter_exit_candidates, protective_exit_candidates
 from app.risk.kill_switch import (
     assess_reconciliation_health,
@@ -20,6 +20,7 @@ from app.risk.kill_switch import (
     evaluate_kill_switch,
     merge_kill_switch_states,
 )
+from app.strategy import get_strategy, strategy_names
 
 
 def test_backtest_produces_trade_candidates() -> None:
@@ -29,6 +30,121 @@ def test_backtest_produces_trade_candidates() -> None:
 
     assert not trades.empty
     assert metrics["trades"] >= 1
+
+
+def test_parser_accepts_strategy_argument() -> None:
+    args = build_parser().parse_args(["--strategy", "momentum", "backtest"])
+
+    assert args.strategy == "momentum"
+    assert args.command == "backtest"
+
+
+def test_strategy_registry_lists_second_example_strategy() -> None:
+    assert "mean_reversion" in strategy_names()
+
+
+def test_mean_reversion_strategy_generates_entry_and_exit_signals() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_VOLATILITY_WINDOW=3,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_EXIT_ZSCORE=0.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 95.0,
+                "high": 96.0,
+                "low": 94.0,
+                "close": 95.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[2]["signal"] == "long"
+    assert signal_frame.iloc[3]["signal"] == "exit"
+
+
+def test_mean_reversion_strategy_uses_dedicated_settings_not_momentum_windows() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        EXIT_WINDOW=50,
+        ATR_WINDOW=14,
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_VOLATILITY_WINDOW=3,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_EXIT_ZSCORE=0.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 95.0,
+                "high": 96.0,
+                "low": 94.0,
+                "close": 95.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[2]["signal"] == "long"
 
 
 def test_filter_exit_candidates_uses_existing_positions() -> None:

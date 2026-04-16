@@ -25,6 +25,16 @@ pip install -e .[dev]
 python -m app.main backtest
 ```
 
+To run a specific strategy explicitly:
+
+```bash
+python -m app.main --strategy momentum backtest
+python -m app.main --strategy mean_reversion backtest
+```
+
+Registered strategies live under [app/strategy](/Users/jurekolar/Code/simple-ai-trading/app/strategy). To add a new one, create a module that exposes a strategy object with `name` and `generate_signals(...)`, then register it in [app/strategy/__init__.py](/Users/jurekolar/Code/simple-ai-trading/app/strategy/__init__.py).
+Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; the example mean-reversion strategy uses its own `MEAN_REVERSION_*` settings.
+
 5. Run the paper-trading loop:
 
 ```bash

@@ -1,6 +1,6 @@
 # Strategy
 
-This repository currently implements a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs.
+This repository currently defaults to a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs.
 
 ## Scope
 
@@ -227,6 +227,10 @@ Held positions
 - `TREND_WINDOW = 100`
 - `EXIT_WINDOW = 50`
 - `ATR_WINDOW = 14`
+- `MEAN_REVERSION_WINDOW = 20`
+- `MEAN_REVERSION_VOLATILITY_WINDOW = 20`
+- `MEAN_REVERSION_ENTRY_ZSCORE = -1.0`
+- `MEAN_REVERSION_EXIT_ZSCORE = 0.0`
 - `MIN_AVERAGE_DAILY_VOLUME = 500000`
 - `MAX_ATR_RATIO = 0.12`
 

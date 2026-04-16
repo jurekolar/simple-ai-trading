@@ -32,6 +32,8 @@ from app.risk.checks import (
 from app.risk.kill_switch import data_is_stale, evaluate_kill_switch
 from app.risk.kill_switch import assess_reconciliation_health, merge_kill_switch_states
 from app.scheduler import should_run_trading_loop
+from app.strategy import get_strategy, strategy_names
+from app.strategy.base import TradingStrategy
 from app.strategy.momentum import generate_signals
 from app.strategy.signals import latest_signals
 
@@ -374,20 +376,26 @@ def _process_flatten_with_close_position(
     return closed_positions
 
 
-def run_backtest_command() -> None:
+def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     settings = get_settings()
+    active_strategy = strategy or get_strategy("momentum")
     repo = JournalRepo(create_session_factory(settings.database_url))
     repo.create_run("backtest", "started")
     loaded = load_bars_with_source(settings)
-    trades, metrics = run_backtest(loaded.bars, settings)
+    trades, metrics = run_backtest(loaded.bars, settings, strategy=active_strategy)
     for _, trade in trades.iterrows():
         repo.log_signal(str(trade["symbol"]), "long", float(trade["close"]))
-    repo.create_run("backtest", "completed", details=f"source={loaded.source} metrics={metrics}")
+    repo.create_run(
+        "backtest",
+        "completed",
+        details=f"strategy={active_strategy.name} source={loaded.source} metrics={metrics}",
+    )
     LOGGER.info("backtest metrics %s", metrics)
 
 
-def run_paper_command() -> None:
+def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     settings = get_settings()
+    active_strategy = strategy or get_strategy("momentum")
     _enforce_live_mode_gate(settings)
     repo = JournalRepo(create_session_factory(settings.database_url))
     broker = AlpacaTradingAdapter(settings)
@@ -490,11 +498,18 @@ def run_paper_command() -> None:
     trades = pd.DataFrame()
     metrics: dict[str, float] = {"trades": 0.0}
     if not stale_data:
-        signal_frame = generate_signals(validation.valid_bars, settings)
+        signal_frame = (
+            active_strategy.generate_signals(validation.valid_bars, settings)
+            if strategy is not None
+            else generate_signals(validation.valid_bars, settings)
+        )
         latest = latest_signals(signal_frame)
         latest["account_equity"] = account_equity
         trades = filter_trade_candidates(latest, settings)
-        _, metrics = run_backtest(validation.valid_bars, settings)
+        if strategy is not None:
+            _, metrics = run_backtest(validation.valid_bars, settings, strategy=active_strategy)
+        else:
+            _, metrics = run_backtest(validation.valid_bars, settings)
 
     for order in open_orders:
         repo.sync_broker_order(
@@ -725,7 +740,7 @@ def run_paper_command() -> None:
         "paper",
         "completed",
         details=(
-            f"source={loaded.source} fee_model={FEE_MODEL_LABEL} dry_run={settings.dry_run} "
+            f"strategy={active_strategy.name} source={loaded.source} fee_model={FEE_MODEL_LABEL} dry_run={settings.dry_run} "
             f"paper_only={settings.paper_only} allow_live={settings.allow_live} "
             f"kill_switch_severity={kill_switch.severity} "
             f"kill_switch={kill_switch.reason or 'none'} "
@@ -770,6 +785,12 @@ def run_reconcile_command() -> None:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Trading bot entrypoint")
     parser.add_argument("command", choices=["backtest", "paper", "reconcile", "report"])
+    parser.add_argument(
+        "--strategy",
+        choices=strategy_names(),
+        default="momentum",
+        help="Strategy to run for backtest and paper commands.",
+    )
     return parser
 
 
@@ -777,11 +798,12 @@ def main() -> None:
     settings = get_settings()
     configure_logging(settings.log_level)
     args = build_parser().parse_args()
+    strategy = get_strategy(args.strategy)
 
     if args.command == "backtest":
-        run_backtest_command()
+        run_backtest_command(strategy)
     elif args.command == "paper":
-        run_paper_command()
+        run_paper_command(strategy)
     elif args.command == "reconcile":
         run_reconcile_command()
     else:
