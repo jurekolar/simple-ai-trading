@@ -1,0 +1,48 @@
+===== Burn-In Review 2026-04-16 =====
+
+[1/2] 1-day summary
+Burn-In Summary (1d)
+Window start: 2026-04-15T15:36:51.482206+00:00
+Paper runs: 7
+Orders: 10
+Blocked orders: 3
+Error orders: 0
+Skipped existing/open-order events: 0
+Unresolved orders now: 0
+Duplicate client_order_ids: 0
+Duplicate broker_order_ids: 0
+Reconciliation events: 0
+Kill-switch events: 0
+Broker error events: 0
+Latest equity: 100403.88
+Latest buying power: 174870.42
+Latest cash: 74466.54
+Gross exposure now: 25941.41
+Unrealized PnL now: 280.61
+
+Assessment
+- no immediate red flags in the selected window
+
+[2/2] 7-day summary
+Burn-In Summary (7d)
+Window start: 2026-04-09T15:36:51.793571+00:00
+Paper runs: 7
+Orders: 10
+Blocked orders: 3
+Error orders: 0
+Skipped existing/open-order events: 0
+Unresolved orders now: 0
+Duplicate client_order_ids: 0
+Duplicate broker_order_ids: 0
+Reconciliation events: 0
+Kill-switch events: 0
+Broker error events: 0
+Latest equity: 100403.88
+Latest buying power: 174870.42
+Latest cash: 74466.54
+Gross exposure now: 25941.41
+Unrealized PnL now: 280.61
+
+Assessment
+- no immediate red flags in the selected window
+

@@ -82,6 +82,8 @@ chmod +x scripts/review_burnin_day.sh
 ```
 
 Operator procedures for startup, restart, stale data, broker outage, emergency flatten, and end-of-day signoff are in [OPERATOR_RUNBOOK.md](/Users/jurekolar/Code/simple-ai-trading/OPERATOR_RUNBOOK.md).
+Use [logs/burnin/INCIDENT_TEMPLATE.md](/Users/jurekolar/Code/simple-ai-trading/logs/burnin/INCIDENT_TEMPLATE.md) to record each drill or incident consistently.
+Manual close and partial-close expectations are documented in [MANUAL_POSITION_INTERVENTIONS.md](/Users/jurekolar/Code/simple-ai-trading/MANUAL_POSITION_INTERVENTIONS.md).
 
 Or use `make` targets:
 
