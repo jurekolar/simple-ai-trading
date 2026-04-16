@@ -24,6 +24,7 @@ except ImportError:  # pragma: no cover - dependency may not be installed yet
 class DataLoadResult:
     bars: pd.DataFrame
     source: str
+    production_safe: bool
 
 
 class AlpacaDataClient:
@@ -39,7 +40,11 @@ class AlpacaDataClient:
 
         if self._client is None or StockBarsRequest is None or TimeFrame is None:
             LOGGER.warning("alpaca-py is unavailable; generating synthetic bars")
-            return DataLoadResult(bars=self._synthetic_bars(symbols, start, end), source="synthetic")
+            return DataLoadResult(
+                bars=self._synthetic_bars(symbols, start, end),
+                source="synthetic",
+                production_safe=False,
+            )
 
         request = StockBarsRequest(
             symbol_or_symbols=symbols,
@@ -52,10 +57,23 @@ class AlpacaDataClient:
             bars = self._client.get_stock_bars(request).df.reset_index()
         except Exception as exc:  # pragma: no cover - depends on external service state
             LOGGER.warning("alpaca request failed (%s); generating synthetic bars", exc)
-            return DataLoadResult(bars=self._synthetic_bars(symbols, start, end), source="fallback")
+            return DataLoadResult(
+                bars=self._synthetic_bars(symbols, start, end),
+                source="fallback",
+                production_safe=False,
+            )
 
         bars["timestamp"] = pd.to_datetime(bars["timestamp"], utc=True)
-        return DataLoadResult(bars=bars, source="alpaca")
+        returned_symbols = sorted(set(bars["symbol"].astype(str).str.upper()))
+        expected_symbols = sorted(set(symbol.upper() for symbol in symbols))
+        missing_symbols = sorted(set(expected_symbols) - set(returned_symbols))
+        if missing_symbols:
+            LOGGER.warning("alpaca returned partial symbol set; missing symbols=%s", missing_symbols)
+        return DataLoadResult(
+            bars=bars,
+            source="alpaca",
+            production_safe=not bool(missing_symbols),
+        )
 
     def _synthetic_bars(self, symbols: list[str], start: datetime, end: datetime) -> pd.DataFrame:
         index = pd.date_range(start=start, end=end, freq="B", tz="UTC")

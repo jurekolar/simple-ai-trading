@@ -7,15 +7,21 @@ from app.config import Settings
 
 def generate_signals(bars: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     frame = bars.copy()
+    frame["prev_close"] = frame.groupby("symbol")["close"].shift(1)
     frame["trend_ma"] = frame.groupby("symbol")["close"].transform(
         lambda series: series.rolling(settings.trend_window, min_periods=settings.trend_window).mean()
     )
     frame["exit_ma"] = frame.groupby("symbol")["close"].transform(
         lambda series: series.rolling(settings.exit_window, min_periods=settings.exit_window).mean()
     )
-    true_range = (
-        frame[["high", "close"]].max(axis=1) - frame[["low", "close"]].min(axis=1)
-    )
+    true_range = pd.concat(
+        [
+            frame["high"] - frame["low"],
+            (frame["high"] - frame["prev_close"]).abs(),
+            (frame["low"] - frame["prev_close"]).abs(),
+        ],
+        axis=1,
+    ).max(axis=1)
     frame["atr"] = true_range.groupby(frame["symbol"]).transform(
         lambda series: series.rolling(settings.atr_window, min_periods=settings.atr_window).mean()
     )

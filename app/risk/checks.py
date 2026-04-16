@@ -20,15 +20,23 @@ def filter_trade_candidates(signal_frame: pd.DataFrame, settings: Settings) -> p
     if candidates.empty:
         candidates["qty"] = pd.Series(dtype=int)
         return candidates
+    account_equity = float(candidates["account_equity"].iloc[0]) if "account_equity" in candidates.columns else 0.0
+    risk_budget = max(settings.atr_risk_budget, account_equity * settings.risk_per_trade_fraction)
+    trend_ma = candidates["trend_ma"] if "trend_ma" in candidates.columns else candidates["close"]
+    exit_ma = candidates["exit_ma"] if "exit_ma" in candidates.columns else candidates["close"]
+    candidates["score"] = (
+        ((candidates["close"] - trend_ma) / candidates["atr"]).fillna(0.0)
+        + 0.5 * ((candidates["close"] - exit_ma) / candidates["atr"]).fillna(0.0)
+    )
     candidates["qty"] = candidates.apply(
         lambda row: min(
-            math.floor(settings.atr_risk_budget / row["atr"]),
+            math.floor(risk_budget / row["atr"]),
             math.floor(settings.max_position_notional / row["close"]),
         ),
         axis=1,
     )
     candidates = candidates[candidates["qty"] > 0]
-    return candidates.nlargest(settings.max_positions, "close")
+    return candidates.nlargest(settings.max_symbols_per_run, "score")
 
 
 def filter_exit_candidates(
@@ -94,19 +102,22 @@ def entry_risk_decision(
     active_symbols: set[str],
     symbol_exposure: float,
     gross_exposure: float,
+    reserved_gross_exposure: float,
     buying_power: float,
     cash: float,
+    reserved_buying_power: float,
+    reserved_cash: float,
     settings: Settings,
 ) -> EntryRiskDecision:
     order_notional = qty * close
     if len(active_symbols) >= settings.max_positions:
         return EntryRiskDecision(False, "max_positions")
-    if gross_exposure + order_notional > settings.max_gross_exposure:
+    if gross_exposure + reserved_gross_exposure + order_notional > settings.max_gross_exposure:
         return EntryRiskDecision(False, "max_gross_exposure")
     if symbol_exposure + order_notional > settings.max_symbol_exposure:
         return EntryRiskDecision(False, "max_symbol_exposure")
-    if order_notional > buying_power:
+    if order_notional > max(buying_power - reserved_buying_power, 0.0):
         return EntryRiskDecision(False, "insufficient_buying_power")
-    if cash - order_notional < settings.min_cash_buffer:
+    if cash - reserved_cash - order_notional < settings.min_cash_buffer:
         return EntryRiskDecision(False, "min_cash_buffer")
     return EntryRiskDecision(True, "")

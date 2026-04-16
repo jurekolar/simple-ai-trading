@@ -36,20 +36,34 @@ class KillSwitchState:
 
 def evaluate_kill_switch(
     data_is_stale: bool,
+    partial_data_failure: bool,
     realized_pnl: float,
     unrealized_pnl: float,
+    broker_failure_count: int,
+    open_order_count: int,
+    has_stuck_orders: bool,
     max_daily_loss: float,
     max_unrealized_drawdown: float,
     emergency_unrealized_drawdown: float,
+    max_broker_failures: int,
+    max_open_orders: int,
 ) -> KillSwitchState:
     if data_is_stale:
         return KillSwitchState("reduce_only", "stale_data")
+    if partial_data_failure:
+        return KillSwitchState("reduce_only", "partial_data_failure")
     if realized_pnl <= -max_daily_loss:
         return KillSwitchState("reduce_only", "daily_loss_limit")
     if unrealized_pnl <= -emergency_unrealized_drawdown:
         return KillSwitchState("flatten", "emergency_unrealized_drawdown")
     if unrealized_pnl <= -max_unrealized_drawdown:
         return KillSwitchState("reduce_only", "max_unrealized_drawdown")
+    if broker_failure_count >= max_broker_failures:
+        return KillSwitchState("reduce_only", "broker_failures")
+    if open_order_count > max_open_orders:
+        return KillSwitchState("reduce_only", "too_many_open_orders")
+    if has_stuck_orders:
+        return KillSwitchState("reduce_only", "stuck_orders")
     return KillSwitchState("none", "")
 
 

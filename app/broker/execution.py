@@ -16,6 +16,7 @@ LOGGER = logging.getLogger(__name__)
 @dataclass(frozen=True)
 class ExecutionResult:
     status: str
+    intent_id: str
     client_order_id: str
     broker_order_id: str = ""
     filled_avg_price: float = 0.0
@@ -56,7 +57,17 @@ class PaperExecutor:
             raise ValueError("order qty must be positive")
 
     def submit(self, order: OrderIntent) -> ExecutionResult:
+        intent_id = f"intent-{uuid.uuid4().hex[:20]}"
         client_order_id = f"codex-{uuid.uuid4().hex[:20]}"
+        self._repo.log_order(
+            order.symbol,
+            order.side,
+            float(order.qty),
+            "intent",
+            intent_id=intent_id,
+            lifecycle_state="intent",
+            requested_price=order.close,
+        )
         try:
             if order.side.lower() == "buy":
                 self._validate_entry_order(order)
@@ -65,6 +76,7 @@ class PaperExecutor:
         except ValueError as exc:
             result = ExecutionResult(
                 status="blocked",
+                intent_id=intent_id,
                 client_order_id=client_order_id,
                 status_detail=str(exc),
             )
@@ -74,6 +86,7 @@ class PaperExecutor:
                 float(order.qty),
                 result.status,
                 status_detail=result.status_detail,
+                intent_id=result.intent_id,
                 client_order_id=result.client_order_id,
                 requested_price=order.close,
             )
@@ -81,13 +94,14 @@ class PaperExecutor:
 
         if self._settings.dry_run:
             LOGGER.info("dry-run paper order %s %s %s", order.side, order.qty, order.symbol)
-            result = ExecutionResult(status="dry_run", client_order_id=client_order_id)
+            result = ExecutionResult(status="dry_run", intent_id=intent_id, client_order_id=client_order_id)
             self._repo.log_order(
                 order.symbol,
                 order.side,
                 float(order.qty),
                 result.status,
                 status_detail=result.status_detail,
+                intent_id=result.intent_id,
                 client_order_id=result.client_order_id,
                 requested_price=order.close,
             )
@@ -102,8 +116,14 @@ class PaperExecutor:
             )
         except BrokerSubmitError as exc:
             LOGGER.warning("paper order submit failed for %s: %s", order.symbol, exc)
+            self._repo.log_broker_error_event(
+                symbol=order.symbol,
+                operation="submit_market_order",
+                message=str(exc),
+            )
             result = ExecutionResult(
                 status="error",
+                intent_id=intent_id,
                 client_order_id=client_order_id,
                 status_detail=str(exc),
             )
@@ -113,6 +133,7 @@ class PaperExecutor:
                 float(order.qty),
                 result.status,
                 status_detail=result.status_detail,
+                intent_id=result.intent_id,
                 client_order_id=result.client_order_id,
                 requested_price=order.close,
             )
@@ -120,6 +141,7 @@ class PaperExecutor:
 
         result = ExecutionResult(
             status=broker_order.status,
+            intent_id=intent_id,
             client_order_id=broker_order.client_order_id,
             broker_order_id=broker_order.id,
             filled_avg_price=float(broker_order.filled_avg_price or 0.0),
@@ -131,6 +153,7 @@ class PaperExecutor:
             float(order.qty),
             result.status,
             status_detail=result.status_detail,
+            intent_id=result.intent_id,
             client_order_id=result.client_order_id,
             broker_order_id=result.broker_order_id,
             requested_price=order.close,

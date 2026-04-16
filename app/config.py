@@ -16,10 +16,13 @@ class Settings(BaseSettings):
     )
     alpaca_data_feed: str = Field(default="iex", alias="ALPACA_DATA_FEED")
     dry_run: bool = Field(default=True, alias="DRY_RUN")
+    paper_only: bool = Field(default=True, alias="PAPER_ONLY")
+    allow_live: bool = Field(default=False, alias="ALLOW_LIVE")
     database_url: str = Field(default="sqlite:///trading.db", alias="DATABASE_URL")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     symbols: str = Field(default="SPY,QQQ,IWM,AAPL,MSFT", alias="SYMBOLS")
     max_positions: int = Field(default=3, alias="MAX_POSITIONS")
+    max_symbols_per_run: int = Field(default=3, alias="MAX_SYMBOLS_PER_RUN")
     max_position_notional: float = Field(default=20_000, alias="MAX_POSITION_NOTIONAL")
     max_gross_exposure: float = Field(default=50_000, alias="MAX_GROSS_EXPOSURE")
     max_symbol_exposure: float = Field(default=20_000, alias="MAX_SYMBOL_EXPOSURE")
@@ -31,12 +34,20 @@ class Settings(BaseSettings):
     )
     min_cash_buffer: float = Field(default=0.0, alias="MIN_CASH_BUFFER")
     max_order_qty: int = Field(default=25, alias="MAX_ORDER_QTY")
+    max_open_orders: int = Field(default=8, alias="MAX_OPEN_ORDERS")
+    max_stuck_order_minutes: int = Field(default=20, alias="MAX_STUCK_ORDER_MINUTES")
+    max_broker_failures: int = Field(default=3, alias="MAX_BROKER_FAILURES")
     trend_window: int = Field(default=100, alias="TREND_WINDOW")
     exit_window: int = Field(default=50, alias="EXIT_WINDOW")
     atr_window: int = Field(default=14, alias="ATR_WINDOW")
     atr_risk_budget: float = Field(default=100, alias="ATR_RISK_BUDGET")
+    risk_per_trade_fraction: float = Field(default=0.01, alias="RISK_PER_TRADE_FRACTION")
     lookback_days: int = Field(default=400, alias="LOOKBACK_DAYS")
+    min_history_days: int = Field(default=120, alias="MIN_HISTORY_DAYS")
+    allow_unsafe_data_fallback: bool = Field(default=False, alias="ALLOW_UNSAFE_DATA_FALLBACK")
     force_exit_symbols: str = Field(default="", alias="FORCE_EXIT_SYMBOLS")
+    emergency_flatten: bool = Field(default=False, alias="EMERGENCY_FLATTEN")
+    deny_new_entries: bool = Field(default=False, alias="DENY_NEW_ENTRIES")
 
     @property
     def symbol_list(self) -> list[str]:
@@ -49,6 +60,10 @@ class Settings(BaseSettings):
             for symbol in self.force_exit_symbols.split(",")
             if symbol.strip()
         ]
+
+    @property
+    def trading_mode_enabled(self) -> bool:
+        return not self.dry_run
 
 
 @lru_cache(maxsize=1)

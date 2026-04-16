@@ -7,7 +7,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.db.models import (
     AccountSnapshotRecord,
+    BrokerErrorEventRecord,
     ExecutionFillRecord,
+    KillSwitchEventRecord,
     OrderRecord,
     PortfolioPnlSnapshotRecord,
     PositionSnapshotRecord,
@@ -43,6 +45,8 @@ class JournalRepo:
         qty: float,
         status: str,
         status_detail: str = "",
+        intent_id: str = "",
+        lifecycle_state: str = "",
         client_order_id: str = "",
         broker_order_id: str = "",
         requested_price: float = 0.0,
@@ -56,6 +60,8 @@ class JournalRepo:
                     qty=qty,
                     status=status,
                     status_detail=status_detail,
+                    intent_id=intent_id,
+                    lifecycle_state=lifecycle_state or self._lifecycle_state_for_status(status),
                     client_order_id=client_order_id,
                     broker_order_id=broker_order_id,
                     requested_price=requested_price,
@@ -105,6 +111,46 @@ class JournalRepo:
                 .all()
             )
 
+    def log_broker_error_event(self, *, symbol: str = "", operation: str, message: str) -> None:
+        with self._session_factory() as session:
+            session.add(
+                BrokerErrorEventRecord(
+                    symbol=symbol,
+                    operation=operation,
+                    message=message,
+                )
+            )
+            session.commit()
+
+    def recent_broker_error_events(self, limit: int = 50) -> list[BrokerErrorEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(BrokerErrorEventRecord)
+                .order_by(BrokerErrorEventRecord.created_at.desc())
+                .limit(limit)
+                .all()
+            )
+
+    def log_kill_switch_event(self, *, severity: str, reason: str, details: str = "") -> None:
+        with self._session_factory() as session:
+            session.add(
+                KillSwitchEventRecord(
+                    severity=severity,
+                    reason=reason,
+                    details=details,
+                )
+            )
+            session.commit()
+
+    def recent_kill_switch_events(self, limit: int = 50) -> list[KillSwitchEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(KillSwitchEventRecord)
+                .order_by(KillSwitchEventRecord.created_at.desc())
+                .limit(limit)
+                .all()
+            )
+
     def sync_broker_order(
         self,
         *,
@@ -116,6 +162,7 @@ class JournalRepo:
         broker_order_id: str,
         filled_avg_price: float = 0.0,
         status_detail: str = "",
+        intent_id: str = "",
     ) -> None:
         with self._session_factory() as session:
             record = (
@@ -136,6 +183,8 @@ class JournalRepo:
                     qty=qty,
                     status=status,
                     status_detail=status_detail,
+                    intent_id=intent_id,
+                    lifecycle_state=self._lifecycle_state_for_status(status),
                     client_order_id=client_order_id,
                     broker_order_id=broker_order_id,
                     filled_avg_price=filled_avg_price,
@@ -144,12 +193,38 @@ class JournalRepo:
             else:
                 record.status = status
                 record.status_detail = status_detail
+                record.lifecycle_state = self._lifecycle_state_for_status(status)
                 record.filled_avg_price = filled_avg_price
+                if intent_id:
+                    record.intent_id = intent_id
                 if broker_order_id:
                     record.broker_order_id = broker_order_id
                 if client_order_id:
                     record.client_order_id = client_order_id
             session.commit()
+
+    def unresolved_orders(self) -> list[OrderRecord]:
+        unresolved_states = ("intent", "submitted", "pending", "open", "partially_filled")
+        with self._session_factory() as session:
+            return list(
+                session.query(OrderRecord)
+                .filter(OrderRecord.lifecycle_state.in_(unresolved_states))
+                .order_by(OrderRecord.submitted_at.desc(), OrderRecord.id.desc())
+                .all()
+            )
+
+    def recent_order_failures(self, limit: int = 20) -> list[OrderRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(OrderRecord)
+                .filter(OrderRecord.status.in_(("error", "rejected")))
+                .order_by(OrderRecord.submitted_at.desc(), OrderRecord.id.desc())
+                .limit(limit)
+                .all()
+            )
+
+    def recent_broker_failures(self, limit: int = 20) -> list[BrokerErrorEventRecord]:
+        return self.recent_broker_error_events(limit=limit)
 
     def replace_position_snapshots(self, positions: list[dict[str, float | str]]) -> None:
         with self._session_factory() as session:
@@ -341,3 +416,18 @@ class JournalRepo:
             if start_at <= fill_at < end_at:
                 total += float(record.realized_pnl)
         return total
+
+    @staticmethod
+    def _lifecycle_state_for_status(status: str) -> str:
+        normalized = (status or "").lower()
+        if normalized in {"intent"}:
+            return "intent"
+        if normalized in {"new", "accepted", "pending_new", "pending_replace", "accepted_for_bidding"}:
+            return "submitted"
+        if normalized in {"partially_filled"}:
+            return "partially_filled"
+        if normalized in {"filled", "done_for_day", "canceled", "cancelled", "expired", "replaced"}:
+            return "resolved"
+        if normalized in {"blocked", "error", "rejected", "skipped_existing", "skipped_open_order", "dry_run"}:
+            return "resolved"
+        return "pending"

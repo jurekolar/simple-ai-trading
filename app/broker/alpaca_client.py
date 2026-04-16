@@ -98,6 +98,28 @@ class BrokerSubmitError(RuntimeError):
     pass
 
 
+class BrokerCancelError(RuntimeError):
+    pass
+
+
+class BrokerClosePositionError(RuntimeError):
+    pass
+
+
+@dataclass(frozen=True)
+class BrokerExposureSnapshot:
+    gross_exposure: float
+    unrealized_pnl: float
+    position_notional_by_symbol: dict[str, float]
+
+
+@dataclass(frozen=True)
+class ReconciliationSnapshot:
+    local_position_qty_by_symbol: dict[str, float]
+    broker_position_qty_by_symbol: dict[str, float]
+    open_order_symbols: set[str]
+
+
 class AlpacaTradingAdapter:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
@@ -183,6 +205,23 @@ class AlpacaTradingAdapter:
 
         return self._to_order_snapshot(order)
 
+    def cancel_order(self, broker_order_id: str) -> None:
+        if self._client is None:
+            raise BrokerCancelError("trading client unavailable")
+        try:
+            self._client.cancel_order_by_id(broker_order_id)
+        except Exception as exc:  # pragma: no cover - depends on external service state
+            raise BrokerCancelError(str(exc)) from exc
+
+    def close_position(self, symbol: str) -> BrokerOrderSnapshot:
+        if self._client is None:
+            raise BrokerClosePositionError("trading client unavailable")
+        try:
+            order = self._client.close_position(symbol)
+        except Exception as exc:  # pragma: no cover - depends on external service state
+            raise BrokerClosePositionError(str(exc)) from exc
+        return self._to_order_snapshot(order)
+
     def list_positions(self) -> list[PositionSnapshot]:
         if self._client is None:
             return []
@@ -199,6 +238,39 @@ class AlpacaTradingAdapter:
             )
             for position in self._client.get_all_positions()
         ]
+
+    def get_buying_power(self) -> float:
+        return float(self.get_account_summary().buying_power)
+
+    def get_cash(self) -> float:
+        return float(self.get_account_summary().cash)
+
+    def get_equity(self) -> float:
+        return float(self.get_account_summary().equity)
+
+    def get_open_exposure(self) -> BrokerExposureSnapshot:
+        positions = self.list_positions()
+        position_notional_by_symbol = {
+            position.symbol: abs(float(position.market_value)) for position in positions
+        }
+        return BrokerExposureSnapshot(
+            gross_exposure=float(sum(position_notional_by_symbol.values())),
+            unrealized_pnl=float(sum(float(position.unrealized_pl) for position in positions)),
+            position_notional_by_symbol=position_notional_by_symbol,
+        )
+
+    def build_reconciliation_snapshot(
+        self,
+        *,
+        local_position_qty_by_symbol: dict[str, float],
+    ) -> ReconciliationSnapshot:
+        positions = self.list_positions()
+        open_orders = self.list_open_orders(limit=50)
+        return ReconciliationSnapshot(
+            local_position_qty_by_symbol=local_position_qty_by_symbol,
+            broker_position_qty_by_symbol={position.symbol: float(position.qty) for position in positions},
+            open_order_symbols={order.symbol for order in open_orders},
+        )
 
     def get_portfolio_pnl_history(
         self,

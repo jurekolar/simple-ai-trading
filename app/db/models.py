@@ -43,6 +43,8 @@ class OrderRecord(Base):
     qty: Mapped[float] = mapped_column(Float)
     status: Mapped[str] = mapped_column(String(32), index=True)
     status_detail: Mapped[str] = mapped_column(String(256), default="")
+    intent_id: Mapped[str] = mapped_column(String(64), default="", index=True)
+    lifecycle_state: Mapped[str] = mapped_column(String(32), default="pending", index=True)
     client_order_id: Mapped[str] = mapped_column(String(64), default="", index=True)
     broker_order_id: Mapped[str] = mapped_column(String(64), default="", index=True)
     requested_price: Mapped[float] = mapped_column(Float, default=0.0)
@@ -142,6 +144,26 @@ class ReconciliationEventRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
 
 
+class BrokerErrorEventRecord(Base):
+    __tablename__ = "broker_error_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    symbol: Mapped[str] = mapped_column(String(16), default="", index=True)
+    operation: Mapped[str] = mapped_column(String(32), index=True)
+    message: Mapped[str] = mapped_column(String(512), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
+class KillSwitchEventRecord(Base):
+    __tablename__ = "kill_switch_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    severity: Mapped[str] = mapped_column(String(32), index=True)
+    reason: Mapped[str] = mapped_column(String(64), index=True)
+    details: Mapped[str] = mapped_column(String(512), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
 def _upgrade_orders_table(engine) -> None:
     inspector = inspect(engine)
     if "orders" not in inspector.get_table_names():
@@ -154,11 +176,39 @@ def _upgrade_orders_table(engine) -> None:
         "requested_price": "ALTER TABLE orders ADD COLUMN requested_price FLOAT DEFAULT 0",
         "filled_avg_price": "ALTER TABLE orders ADD COLUMN filled_avg_price FLOAT DEFAULT 0",
         "status_detail": "ALTER TABLE orders ADD COLUMN status_detail VARCHAR(256) DEFAULT ''",
+        "intent_id": "ALTER TABLE orders ADD COLUMN intent_id VARCHAR(64) DEFAULT ''",
+        "lifecycle_state": "ALTER TABLE orders ADD COLUMN lifecycle_state VARCHAR(32) DEFAULT 'pending'",
     }
     with engine.begin() as connection:
         for column_name, ddl in expected_columns.items():
             if column_name not in existing_columns:
                 connection.execute(text(ddl))
+        duplicate_client_ids = connection.execute(
+            text(
+                "SELECT client_order_id FROM orders "
+                "WHERE client_order_id != '' GROUP BY client_order_id HAVING COUNT(*) > 1"
+            )
+        ).fetchone()
+        duplicate_broker_ids = connection.execute(
+            text(
+                "SELECT broker_order_id FROM orders "
+                "WHERE broker_order_id != '' GROUP BY broker_order_id HAVING COUNT(*) > 1"
+            )
+        ).fetchone()
+        if duplicate_client_ids is None:
+            connection.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_client_order_id_nonempty "
+                    "ON orders(client_order_id) WHERE client_order_id != ''"
+                )
+            )
+        if duplicate_broker_ids is None:
+            connection.execute(
+                text(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS uq_orders_broker_order_id_nonempty "
+                    "ON orders(broker_order_id) WHERE broker_order_id != ''"
+                )
+            )
 
 
 def _upgrade_position_snapshots_table(engine) -> None:
