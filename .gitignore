@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.pytest_cache/
+.venv/
+.vscode/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+trading.db
