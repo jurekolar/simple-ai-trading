@@ -2,23 +2,85 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 
 import pandas as pd
 
 from app.data.market_calendar import previous_trading_date
 
+
+KillSwitchSeverity = Literal["none", "reduce_only", "flatten"]
+
+
 @dataclass(frozen=True)
 class KillSwitchState:
-    enabled: bool
+    severity: KillSwitchSeverity = "none"
     reason: str = ""
 
+    @property
+    def enabled(self) -> bool:
+        return self.severity != "none"
 
-def evaluate_kill_switch(data_is_stale: bool, realized_pnl: float, max_daily_loss: float) -> KillSwitchState:
+    @property
+    def block_new_entries(self) -> bool:
+        return self.severity in {"reduce_only", "flatten"}
+
+    @property
+    def allow_exits(self) -> bool:
+        return self.enabled
+
+    @property
+    def force_flatten(self) -> bool:
+        return self.severity == "flatten"
+
+
+def evaluate_kill_switch(
+    data_is_stale: bool,
+    realized_pnl: float,
+    unrealized_pnl: float,
+    max_daily_loss: float,
+    max_unrealized_drawdown: float,
+    emergency_unrealized_drawdown: float,
+) -> KillSwitchState:
     if data_is_stale:
-        return KillSwitchState(True, "stale_data")
+        return KillSwitchState("reduce_only", "stale_data")
     if realized_pnl <= -max_daily_loss:
-        return KillSwitchState(True, "daily_loss_limit")
-    return KillSwitchState(False, "")
+        return KillSwitchState("reduce_only", "daily_loss_limit")
+    if unrealized_pnl <= -emergency_unrealized_drawdown:
+        return KillSwitchState("flatten", "emergency_unrealized_drawdown")
+    if unrealized_pnl <= -max_unrealized_drawdown:
+        return KillSwitchState("reduce_only", "max_unrealized_drawdown")
+    return KillSwitchState("none", "")
+
+
+def assess_reconciliation_health(
+    local_position_qty_by_symbol: dict[str, float],
+    broker_position_qty_by_symbol: dict[str, float],
+) -> KillSwitchState:
+    local_symbols = set(local_position_qty_by_symbol)
+    broker_symbols = set(broker_position_qty_by_symbol)
+    if local_symbols != broker_symbols:
+        return KillSwitchState("flatten", "reconciliation_symbol_mismatch")
+
+    max_qty_diff = 0.0
+    for symbol in broker_symbols:
+        qty_diff = abs(local_position_qty_by_symbol.get(symbol, 0.0) - broker_position_qty_by_symbol.get(symbol, 0.0))
+        max_qty_diff = max(max_qty_diff, qty_diff)
+
+    if max_qty_diff >= 1.0:
+        return KillSwitchState("flatten", "reconciliation_qty_mismatch")
+    if max_qty_diff > 0.0:
+        return KillSwitchState("reduce_only", "reconciliation_qty_drift")
+    return KillSwitchState("none", "")
+
+
+def merge_kill_switch_states(*states: KillSwitchState) -> KillSwitchState:
+    severity_rank = {"none": 0, "reduce_only": 1, "flatten": 2}
+    strongest = KillSwitchState("none", "")
+    for state in states:
+        if severity_rank[state.severity] > severity_rank[strongest.severity]:
+            strongest = state
+    return strongest
 
 
 def data_is_stale(

@@ -21,7 +21,15 @@ class Settings(BaseSettings):
     symbols: str = Field(default="SPY,QQQ,IWM,AAPL,MSFT", alias="SYMBOLS")
     max_positions: int = Field(default=3, alias="MAX_POSITIONS")
     max_position_notional: float = Field(default=20_000, alias="MAX_POSITION_NOTIONAL")
+    max_gross_exposure: float = Field(default=50_000, alias="MAX_GROSS_EXPOSURE")
+    max_symbol_exposure: float = Field(default=20_000, alias="MAX_SYMBOL_EXPOSURE")
     max_daily_loss: float = Field(default=1_000, alias="MAX_DAILY_LOSS")
+    max_unrealized_drawdown: float = Field(default=1_500, alias="MAX_UNREALIZED_DRAWDOWN")
+    emergency_unrealized_drawdown: float = Field(
+        default=2_500,
+        alias="EMERGENCY_UNREALIZED_DRAWDOWN",
+    )
+    min_cash_buffer: float = Field(default=0.0, alias="MIN_CASH_BUFFER")
     max_order_qty: int = Field(default=25, alias="MAX_ORDER_QTY")
     trend_window: int = Field(default=100, alias="TREND_WINDOW")
     exit_window: int = Field(default=50, alias="EXIT_WINDOW")

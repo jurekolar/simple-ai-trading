@@ -132,6 +132,16 @@ class RealizedPnlRecord(Base):
     last_fill_at: Mapped[datetime] = mapped_column(DateTime, index=True)
 
 
+class ReconciliationEventRecord(Base):
+    __tablename__ = "reconciliation_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    severity: Mapped[str] = mapped_column(String(32), index=True)
+    reason: Mapped[str] = mapped_column(String(64), index=True)
+    details: Mapped[str] = mapped_column(String(512), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
 def _upgrade_orders_table(engine) -> None:
     inspector = inspect(engine)
     if "orders" not in inspector.get_table_names():

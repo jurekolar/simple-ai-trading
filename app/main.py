@@ -6,6 +6,8 @@ from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
+import pandas as pd
+
 from app.backtest.engine import run_backtest
 from app.broker.alpaca_client import AlpacaTradingAdapter
 from app.broker.execution import PaperExecutor
@@ -17,8 +19,17 @@ from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
 from app.logging_setup import configure_logging
 from app.reports.daily_report import build_daily_report
-from app.risk.checks import daily_loss_ok, filter_exit_candidates, filter_trade_candidates
+from app.risk.checks import (
+    daily_loss_ok,
+    entry_risk_decision,
+    filter_exit_candidates,
+    filter_trade_candidates,
+    protective_exit_candidates,
+    total_gross_exposure,
+    total_unrealized_pnl,
+)
 from app.risk.kill_switch import data_is_stale, evaluate_kill_switch
+from app.risk.kill_switch import assess_reconciliation_health, merge_kill_switch_states
 from app.scheduler import should_run_trading_loop
 from app.strategy.momentum import generate_signals
 from app.strategy.signals import latest_signals
@@ -236,41 +247,78 @@ def run_paper_command() -> None:
 
     loaded = load_bars_with_source(settings)
     stale_data = data_is_stale(loaded.bars, source=loaded.source)
+    local_position_snapshots = repo.current_position_snapshots()
     sync_summary = reconcile_broker_state(repo, broker)
     market_day_start, market_day_end = market_day_window()
     realized_pnl = repo.realized_pnl_total_for_window(market_day_start, market_day_end)
-    kill_switch = evaluate_kill_switch(stale_data, realized_pnl, settings.max_daily_loss)
-    if kill_switch.enabled or not daily_loss_ok(realized_pnl, settings):
-        repo.create_run(
-            "paper",
-            "blocked",
-            details=(
-                f"{kill_switch.reason or 'daily_loss_limit'} "
-                f"source={loaded.source} "
-                f"fee_model={FEE_MODEL_LABEL} "
-                f"realized_pnl={realized_pnl:.2f} "
-                f"synced_orders={sync_summary['recent_orders']} "
-                f"open_orders={sync_summary['open_orders']} positions={sync_summary['positions']} "
-                f"pnl_points={sync_summary['pnl_points']} fills={sync_summary['fills']} "
-                f"lot_matches={sync_summary['lot_matches']} "
-                f"realized_symbols={sync_summary['realized_symbols']}"
-            ),
-        )
-        LOGGER.warning("paper trading blocked: %s", kill_switch.reason)
-        return
-
-    signal_frame = generate_signals(loaded.bars, settings)
-    latest = latest_signals(signal_frame)
-    trades = filter_trade_candidates(latest, settings)
-    _, metrics = run_backtest(loaded.bars, settings)
-    executor = PaperExecutor(repo, settings, broker=broker)
+    account = broker.get_account_summary()
     open_orders = broker.list_open_orders(limit=50)
     open_positions = broker.list_positions()
+    unrealized_pnl = total_unrealized_pnl([float(position.unrealized_pl) for position in open_positions])
+    base_kill_switch = evaluate_kill_switch(
+        stale_data,
+        realized_pnl,
+        unrealized_pnl,
+        settings.max_daily_loss,
+        settings.max_unrealized_drawdown,
+        settings.emergency_unrealized_drawdown,
+    )
+    reconciliation_state = assess_reconciliation_health(
+        {position.symbol: float(position.qty) for position in local_position_snapshots},
+        {position.symbol: float(position.qty) for position in open_positions},
+    )
+    if reconciliation_state.enabled:
+        local_symbols = sorted(position.symbol for position in local_position_snapshots)
+        broker_symbols = sorted(position.symbol for position in open_positions)
+        repo.log_reconciliation_event(
+            severity=reconciliation_state.severity,
+            reason=reconciliation_state.reason,
+            details=(
+                f"local_symbols={local_symbols} "
+                f"broker_symbols={broker_symbols}"
+            ),
+        )
+    kill_switch = merge_kill_switch_states(base_kill_switch, reconciliation_state)
+    if kill_switch.enabled:
+        LOGGER.warning(
+            "paper trading risk state active severity=%s reason=%s",
+            kill_switch.severity,
+            kill_switch.reason,
+        )
+
+    executor = PaperExecutor(repo, settings, broker=broker)
     open_order_symbols = {order.symbol for order in open_orders}
     position_qty_by_symbol = {position.symbol: float(position.qty) for position in open_positions}
+    position_price_by_symbol = {
+        position.symbol: float(position.current_price) for position in open_positions
+    }
+    position_notional_by_symbol = {
+        position.symbol: abs(float(position.market_value)) for position in open_positions
+    }
+    active_symbols = set(position_qty_by_symbol) | open_order_symbols
+    gross_exposure = total_gross_exposure([float(position.market_value) for position in open_positions])
+    buying_power = float(account.buying_power)
+    cash = float(account.cash)
     forced_exit_symbols = set(settings.force_exit_symbol_list)
+    if kill_switch.force_flatten:
+        forced_exit_symbols.update(position_qty_by_symbol)
+        LOGGER.warning(
+            "emergency flatten enabled due to %s for held symbols: %s",
+            kill_switch.reason,
+            sorted(forced_exit_symbols),
+        )
     if forced_exit_symbols:
         LOGGER.info("forced exit override enabled for held symbols: %s", sorted(forced_exit_symbols))
+
+    latest = None
+    trades = pd.DataFrame()
+    metrics: dict[str, float] = {"trades": 0.0}
+    if not stale_data:
+        signal_frame = generate_signals(loaded.bars, settings)
+        latest = latest_signals(signal_frame)
+        trades = filter_trade_candidates(latest, settings)
+        _, metrics = run_backtest(loaded.bars, settings)
+
     for order in open_orders:
         repo.sync_broker_order(
             symbol=order.symbol,
@@ -284,7 +332,15 @@ def run_paper_command() -> None:
     submitted_orders = 0
     blocked_orders = 0
     skipped_existing = 0
-    exit_candidates = filter_exit_candidates(latest, position_qty_by_symbol, forced_exit_symbols)
+    if stale_data:
+        exit_candidates = protective_exit_candidates(position_qty_by_symbol, position_price_by_symbol)
+        if not exit_candidates.empty:
+            LOGGER.warning(
+                "using protective broker-state exits because market data is stale for symbols: %s",
+                sorted(exit_candidates["symbol"].tolist()),
+            )
+    else:
+        exit_candidates = filter_exit_candidates(latest, position_qty_by_symbol, forced_exit_symbols)
     exit_orders = 0
     skipped_exit = 0
 
@@ -351,11 +407,54 @@ def run_paper_command() -> None:
                 requested_price=order.close,
             )
             continue
+        if kill_switch.block_new_entries:
+            blocked_orders += 1
+            LOGGER.warning("blocking new entry for %s because kill switch is active", order.symbol)
+            repo.log_order(
+                order.symbol,
+                order.side,
+                float(order.qty),
+                "blocked",
+                status_detail=kill_switch.reason or "kill_switch",
+                requested_price=order.close,
+            )
+            continue
+        decision = entry_risk_decision(
+            symbol=order.symbol,
+            qty=int(order.qty),
+            close=float(order.close),
+            active_symbols=active_symbols,
+            symbol_exposure=position_notional_by_symbol.get(order.symbol, 0.0),
+            gross_exposure=gross_exposure,
+            buying_power=buying_power,
+            cash=cash,
+            settings=settings,
+        )
+        if not decision.allowed:
+            blocked_orders += 1
+            LOGGER.warning("blocking new entry for %s because %s", order.symbol, decision.reason)
+            repo.log_order(
+                order.symbol,
+                order.side,
+                float(order.qty),
+                "blocked",
+                status_detail=decision.reason,
+                requested_price=order.close,
+            )
+            continue
         try:
             result = executor.submit(order)
             if result.accepted:
                 submitted_orders += 1
                 open_order_symbols.add(order.symbol)
+                active_symbols.add(order.symbol)
+                order_notional = float(order.qty) * float(order.close)
+                gross_exposure += order_notional
+                buying_power = max(buying_power - order_notional, 0.0)
+                cash -= order_notional
+                position_notional_by_symbol[order.symbol] = (
+                    position_notional_by_symbol.get(order.symbol, 0.0) + order_notional
+                )
                 repo.sync_broker_order(
                     symbol=order.symbol,
                     side=order.side,
@@ -383,6 +482,10 @@ def run_paper_command() -> None:
         "completed",
         details=(
             f"source={loaded.source} fee_model={FEE_MODEL_LABEL} dry_run={settings.dry_run} "
+            f"kill_switch_severity={kill_switch.severity} "
+            f"kill_switch={kill_switch.reason or 'none'} "
+            f"reconciliation_state={reconciliation_state.reason or 'none'} "
+            f"realized_pnl={realized_pnl:.2f} unrealized_pnl={unrealized_pnl:.2f} "
             f"submitted={submitted_orders} exits={exit_orders} blocked={blocked_orders} "
             f"skipped_existing={skipped_existing} skipped_exit={skipped_exit} "
             f"synced_orders={sync_summary['recent_orders']} "

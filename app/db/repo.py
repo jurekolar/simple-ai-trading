@@ -11,6 +11,7 @@ from app.db.models import (
     OrderRecord,
     PortfolioPnlSnapshotRecord,
     PositionSnapshotRecord,
+    ReconciliationEventRecord,
     RealizedLotMatchRecord,
     RealizedPnlRecord,
     SignalRecord,
@@ -82,6 +83,26 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(OrderRecord).order_by(OrderRecord.submitted_at.desc()).limit(limit).all()
+            )
+
+    def log_reconciliation_event(self, *, severity: str, reason: str, details: str = "") -> None:
+        with self._session_factory() as session:
+            session.add(
+                ReconciliationEventRecord(
+                    severity=severity,
+                    reason=reason,
+                    details=details,
+                )
+            )
+            session.commit()
+
+    def recent_reconciliation_events(self, limit: int = 50) -> list[ReconciliationEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(ReconciliationEventRecord)
+                .order_by(ReconciliationEventRecord.created_at.desc())
+                .limit(limit)
+                .all()
             )
 
     def sync_broker_order(
