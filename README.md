@@ -9,6 +9,9 @@ Scaffold for an Alpaca-backed trading system with:
 - paper-trading orchestration
 - SQLite trade journal storage
 - Streamlit monitoring entrypoint
+- config snapshot audit logging
+- alert delivery tracking
+- operator-grade daily reporting
 
 ## Quick start
 
@@ -78,7 +81,13 @@ signals.
 python -m app.main reconcile
 ```
 
-7. Run the dashboard:
+7. Print the operator report:
+
+```bash
+python -m app.main report
+```
+
+8. Run the dashboard:
 
 ```bash
 streamlit run app/monitoring/dashboard.py
@@ -120,6 +129,7 @@ chmod +x scripts/review_burnin_day.sh
 Operator procedures for startup, restart, stale data, broker outage, emergency flatten, and end-of-day signoff are in [OPERATOR_RUNBOOK.md](/Users/jurekolar/Code/simple-ai-trading/OPERATOR_RUNBOOK.md).
 Use [logs/burnin/INCIDENT_TEMPLATE.md](/Users/jurekolar/Code/simple-ai-trading/logs/burnin/INCIDENT_TEMPLATE.md) to record each drill or incident consistently.
 Manual close and partial-close expectations are documented in [MANUAL_POSITION_INTERVENTIONS.md](/Users/jurekolar/Code/simple-ai-trading/MANUAL_POSITION_INTERVENTIONS.md).
+Live go-live gates and signoff are in [LIVE_DEPLOYMENT_CHECKLIST.md](/Users/jurekolar/Code/simple-ai-trading/LIVE_DEPLOYMENT_CHECKLIST.md), and the dedicated live profile starts from [.env.live.example](/Users/jurekolar/Code/simple-ai-trading/.env.live.example).
 
 Or use `make` targets:
 
@@ -131,10 +141,10 @@ make burnin-review
 
 ## Current scope
 
-Version `0.1.0` is intentionally narrow:
+Version `0.1.0` is intentionally narrow and should still be treated as paper-burn-in software first:
 
 - US equities / ETFs
 - long-only momentum
 - daily bars
 - SQLite persistence
-- Alpaca paper trading only
+- Alpaca paper trading first, with explicit live gates for supervised rollout

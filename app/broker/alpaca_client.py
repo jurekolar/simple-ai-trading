@@ -144,6 +144,15 @@ class AlpacaTradingAdapter:
             cash=str(account.cash),
         )
 
+    def get_account_identifiers(self) -> dict[str, str]:
+        if self._client is None:
+            return {"account_id": "stub", "account_number": "stub"}
+        account = self._client.get_account()
+        return {
+            "account_id": str(getattr(account, "id", "") or ""),
+            "account_number": str(getattr(account, "account_number", "") or ""),
+        }
+
     def list_recent_orders(self, limit: int = 20) -> list[BrokerOrderSnapshot]:
         if self._client is None or GetOrdersRequest is None or QueryOrderStatus is None:
             return []

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+import json
+from datetime import UTC, date, datetime, timedelta
 
 from sqlalchemy import func, or_
 from sqlalchemy.orm import sessionmaker
 
 from app.db.models import (
     AccountSnapshotRecord,
+    AlertEventRecord,
     BrokerErrorEventRecord,
+    ConfigSnapshotRecord,
     ExecutionFillRecord,
     KillSwitchEventRecord,
     OrderRecord,
@@ -33,10 +36,79 @@ class JournalRepo:
             session.refresh(record)
             return record
 
+    def runs_since(self, start_at: datetime, run_type: str | None = None) -> list[StrategyRun]:
+        with self._session_factory() as session:
+            query = session.query(StrategyRun).filter(StrategyRun.created_at >= start_at)
+            if run_type is not None:
+                query = query.filter(StrategyRun.run_type == run_type)
+            return list(query.order_by(StrategyRun.created_at.asc(), StrategyRun.id.asc()).all())
+
+    def recent_runs(self, limit: int = 20) -> list[StrategyRun]:
+        with self._session_factory() as session:
+            return list(
+                session.query(StrategyRun).order_by(StrategyRun.created_at.desc()).limit(limit).all()
+            )
+
+    def log_config_snapshot(
+        self,
+        *,
+        run_type: str,
+        strategy_name: str,
+        config_profile: str,
+        broker_mode: str,
+        details: dict[str, object],
+    ) -> None:
+        with self._session_factory() as session:
+            session.add(
+                ConfigSnapshotRecord(
+                    run_type=run_type,
+                    strategy_name=strategy_name,
+                    config_profile=config_profile,
+                    broker_mode=broker_mode,
+                    details=json.dumps(details, sort_keys=True),
+                )
+            )
+            session.commit()
+
+    def recent_config_snapshots(self, limit: int = 20) -> list[ConfigSnapshotRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(ConfigSnapshotRecord)
+                .order_by(ConfigSnapshotRecord.created_at.desc(), ConfigSnapshotRecord.id.desc())
+                .limit(limit)
+                .all()
+            )
+
+    def latest_config_snapshot(self, *, run_type: str | None = None) -> ConfigSnapshotRecord | None:
+        with self._session_factory() as session:
+            query = session.query(ConfigSnapshotRecord)
+            if run_type is not None:
+                query = query.filter(ConfigSnapshotRecord.run_type == run_type)
+            return query.order_by(ConfigSnapshotRecord.created_at.desc(), ConfigSnapshotRecord.id.desc()).first()
+
+    @staticmethod
+    def parse_config_snapshot(record: ConfigSnapshotRecord | None) -> dict[str, object]:
+        if record is None or not record.details:
+            return {}
+        try:
+            parsed = json.loads(record.details)
+        except json.JSONDecodeError:
+            return {}
+        return parsed if isinstance(parsed, dict) else {}
+
     def log_signal(self, symbol: str, signal: str, price: float) -> None:
         with self._session_factory() as session:
             session.add(SignalRecord(symbol=symbol, signal=signal, price=price))
             session.commit()
+
+    def recent_signals(self, limit: int = 50) -> list[SignalRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(SignalRecord)
+                .order_by(SignalRecord.created_at.desc())
+                .limit(limit)
+                .all()
+            )
 
     def log_order(
         self,
@@ -70,25 +142,22 @@ class JournalRepo:
             )
             session.commit()
 
-    def recent_runs(self, limit: int = 20) -> list[StrategyRun]:
+    def recent_orders(self, limit: int = 50) -> list[OrderRecord]:
         with self._session_factory() as session:
             return list(
-                session.query(StrategyRun).order_by(StrategyRun.created_at.desc()).limit(limit).all()
-            )
-
-    def recent_signals(self, limit: int = 50) -> list[SignalRecord]:
-        with self._session_factory() as session:
-            return list(
-                session.query(SignalRecord)
-                .order_by(SignalRecord.created_at.desc())
+                session.query(OrderRecord)
+                .order_by(OrderRecord.submitted_at.desc(), OrderRecord.id.desc())
                 .limit(limit)
                 .all()
             )
 
-    def recent_orders(self, limit: int = 50) -> list[OrderRecord]:
+    def orders_since(self, start_at: datetime) -> list[OrderRecord]:
         with self._session_factory() as session:
             return list(
-                session.query(OrderRecord).order_by(OrderRecord.submitted_at.desc()).limit(limit).all()
+                session.query(OrderRecord)
+                .filter(OrderRecord.submitted_at >= start_at)
+                .order_by(OrderRecord.submitted_at.asc(), OrderRecord.id.asc())
+                .all()
             )
 
     def blocked_orders_count(self) -> int:
@@ -111,8 +180,17 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(ReconciliationEventRecord)
-                .order_by(ReconciliationEventRecord.created_at.desc())
+                .order_by(ReconciliationEventRecord.created_at.desc(), ReconciliationEventRecord.id.desc())
                 .limit(limit)
+                .all()
+            )
+
+    def reconciliation_events_since(self, start_at: datetime) -> list[ReconciliationEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(ReconciliationEventRecord)
+                .filter(ReconciliationEventRecord.created_at >= start_at)
+                .order_by(ReconciliationEventRecord.created_at.asc(), ReconciliationEventRecord.id.asc())
                 .all()
             )
 
@@ -131,8 +209,17 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(BrokerErrorEventRecord)
-                .order_by(BrokerErrorEventRecord.created_at.desc())
+                .order_by(BrokerErrorEventRecord.created_at.desc(), BrokerErrorEventRecord.id.desc())
                 .limit(limit)
+                .all()
+            )
+
+    def broker_error_events_since(self, start_at: datetime) -> list[BrokerErrorEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(BrokerErrorEventRecord)
+                .filter(BrokerErrorEventRecord.created_at >= start_at)
+                .order_by(BrokerErrorEventRecord.created_at.asc(), BrokerErrorEventRecord.id.asc())
                 .all()
             )
 
@@ -151,8 +238,54 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(KillSwitchEventRecord)
-                .order_by(KillSwitchEventRecord.created_at.desc())
+                .order_by(KillSwitchEventRecord.created_at.desc(), KillSwitchEventRecord.id.desc())
                 .limit(limit)
+                .all()
+            )
+
+    def kill_switch_events_since(self, start_at: datetime) -> list[KillSwitchEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(KillSwitchEventRecord)
+                .filter(KillSwitchEventRecord.created_at >= start_at)
+                .order_by(KillSwitchEventRecord.created_at.asc(), KillSwitchEventRecord.id.asc())
+                .all()
+            )
+
+    def log_alert_event(
+        self,
+        *,
+        channel: str,
+        delivery_status: str,
+        message: str,
+        error_message: str = "",
+    ) -> None:
+        with self._session_factory() as session:
+            session.add(
+                AlertEventRecord(
+                    channel=channel,
+                    delivery_status=delivery_status,
+                    message=message,
+                    error_message=error_message,
+                )
+            )
+            session.commit()
+
+    def recent_alert_events(self, limit: int = 50) -> list[AlertEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(AlertEventRecord)
+                .order_by(AlertEventRecord.created_at.desc(), AlertEventRecord.id.desc())
+                .limit(limit)
+                .all()
+            )
+
+    def alert_events_since(self, start_at: datetime) -> list[AlertEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(AlertEventRecord)
+                .filter(AlertEventRecord.created_at >= start_at)
+                .order_by(AlertEventRecord.created_at.asc(), AlertEventRecord.id.asc())
                 .all()
             )
 
@@ -178,7 +311,7 @@ class JournalRepo:
                         OrderRecord.broker_order_id == broker_order_id,
                     )
                 )
-                .order_by(OrderRecord.submitted_at.desc())
+                .order_by(OrderRecord.submitted_at.desc(), OrderRecord.id.desc())
                 .first()
             )
             if record is None:
@@ -225,6 +358,17 @@ class JournalRepo:
 
     def unresolved_order_symbols(self) -> set[str]:
         return {order.symbol for order in self.unresolved_orders()}
+
+    def unresolved_order_age_summary(self) -> dict[str, float]:
+        unresolved = self.unresolved_orders()
+        if not unresolved:
+            return {"count": 0.0, "oldest_minutes": 0.0}
+        now = datetime.now(UTC)
+        oldest_submitted_at = min(order.submitted_at for order in unresolved)
+        if oldest_submitted_at.tzinfo is None:
+            oldest_submitted_at = oldest_submitted_at.replace(tzinfo=UTC)
+        oldest_minutes = max((now - oldest_submitted_at) / timedelta(minutes=1), 0.0)
+        return {"count": float(len(unresolved)), "oldest_minutes": float(oldest_minutes)}
 
     def recent_order_failures(self, limit: int = 20) -> list[OrderRecord]:
         with self._session_factory() as session:
@@ -283,7 +427,7 @@ class JournalRepo:
         with self._session_factory() as session:
             return (
                 session.query(AccountSnapshotRecord)
-                .order_by(AccountSnapshotRecord.captured_at.desc())
+                .order_by(AccountSnapshotRecord.captured_at.desc(), AccountSnapshotRecord.id.desc())
                 .first()
             )
 
@@ -307,7 +451,7 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(PortfolioPnlSnapshotRecord)
-                .order_by(PortfolioPnlSnapshotRecord.timestamp.asc())
+                .order_by(PortfolioPnlSnapshotRecord.timestamp.asc(), PortfolioPnlSnapshotRecord.id.asc())
                 .limit(limit)
                 .all()
             )
@@ -397,7 +541,7 @@ class JournalRepo:
         with self._session_factory() as session:
             return list(
                 session.query(RealizedPnlRecord)
-                .order_by(RealizedPnlRecord.symbol.asc())
+                .order_by(RealizedPnlRecord.symbol.asc(), RealizedPnlRecord.id.asc())
                 .all()
             )
 

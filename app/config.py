@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     allow_live: bool = Field(default=False, alias="ALLOW_LIVE")
     live_config_profile: str = Field(default="", alias="LIVE_CONFIG_PROFILE")
     live_deployment_ack: str = Field(default="", alias="LIVE_DEPLOYMENT_ACK")
+    config_profile: str = Field(default="default", alias="CONFIG_PROFILE")
+    primary_live_strategy: str = Field(default="breakout", alias="PRIMARY_LIVE_STRATEGY")
     database_url: str = Field(default="sqlite:///trading.db", alias="DATABASE_URL")
     log_level: str = Field(default="INFO", alias="LOG_LEVEL")
     symbols: str = Field(default="SPY,QQQ,IWM,AAPL,MSFT", alias="SYMBOLS")
@@ -80,6 +82,9 @@ class Settings(BaseSettings):
     alert_on_stale_data: bool = Field(default=True, alias="ALERT_ON_STALE_DATA")
     alert_webhook_url: str = Field(default="", alias="ALERT_WEBHOOK_URL")
     alert_webhook_timeout_seconds: float = Field(default=5.0, alias="ALERT_WEBHOOK_TIMEOUT_SECONDS")
+    safe_open_enabled: bool = Field(default=False, alias="SAFE_OPEN_ENABLED")
+    safe_open_start_time: str = Field(default="09:35", alias="SAFE_OPEN_START_TIME")
+    safe_open_end_time: str = Field(default="10:30", alias="SAFE_OPEN_END_TIME")
     politician_copy_base_url: str = Field(
         default="https://www.capitoltrades.com",
         alias="POLITICIAN_COPY_BASE_URL",
@@ -164,6 +169,35 @@ class Settings(BaseSettings):
     @property
     def live_trading_enabled(self) -> bool:
         return not self.alpaca_paper
+
+    @property
+    def broker_mode(self) -> str:
+        return "paper" if self.alpaca_paper else "live"
+
+    def runtime_audit_payload(self, strategy_name: str) -> dict[str, object]:
+        return {
+            "config_profile": self.config_profile,
+            "broker_mode": self.broker_mode,
+            "strategy": strategy_name,
+            "primary_live_strategy": self.primary_live_strategy,
+            "symbols": self.symbol_list,
+            "max_positions": self.max_positions,
+            "max_symbols_per_run": self.max_symbols_per_run,
+            "max_position_notional": self.max_position_notional,
+            "max_gross_exposure": self.max_gross_exposure,
+            "max_daily_loss": self.max_daily_loss,
+            "max_unrealized_drawdown": self.max_unrealized_drawdown,
+            "emergency_unrealized_drawdown": self.emergency_unrealized_drawdown,
+            "deny_new_entries": self.deny_new_entries,
+            "safe_open_enabled": self.safe_open_enabled,
+            "safe_open_start_time": self.safe_open_start_time,
+            "safe_open_end_time": self.safe_open_end_time,
+            "allow_live": self.allow_live,
+            "paper_only": self.paper_only,
+            "dry_run": self.dry_run,
+            "database_url": self.database_url,
+            "alert_webhook_configured": bool(self.alert_webhook_url),
+        }
 
     @property
     def politician_copy_symbol_allowlist_set(self) -> set[str]:

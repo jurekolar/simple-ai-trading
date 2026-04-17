@@ -13,7 +13,15 @@ from app.data.historical_loader import load_bars, validate_bars
 from app.data.market_calendar import market_day_window, market_is_open
 from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
-from app.main import build_parser, compute_realized_pnl_records, run_compare_command, run_paper_command
+from app.main import (
+    build_parser,
+    compute_realized_pnl_records,
+    run_compare_command,
+    run_paper_command,
+    run_reconcile_command,
+)
+from app.monitoring.alerts import send_alerts
+from app.reports.daily_report import build_daily_report
 from app.risk.checks import entry_risk_decision, filter_exit_candidates, protective_exit_candidates
 from app.risk.kill_switch import (
     assess_reconciliation_health,
@@ -2028,12 +2036,29 @@ def test_run_paper_command_blocks_live_mode_without_ack(monkeypatch) -> None:
         ALPACA_PAPER=False,
         PAPER_ONLY=False,
         ALLOW_LIVE=True,
+        CONFIG_PROFILE="live",
         LIVE_CONFIG_PROFILE="live",
         LIVE_DEPLOYMENT_ACK="wrong",
     )
     monkeypatch.setattr("app.main.get_settings", lambda: settings)
 
     with pytest.raises(RuntimeError, match="LIVE_DEPLOYMENT_ACK"):
+        run_paper_command()
+
+
+def test_run_paper_command_blocks_live_mode_without_live_config_profile(monkeypatch) -> None:
+    settings = Settings(
+        DRY_RUN=False,
+        ALPACA_PAPER=False,
+        PAPER_ONLY=False,
+        ALLOW_LIVE=True,
+        CONFIG_PROFILE="default",
+        LIVE_CONFIG_PROFILE="live",
+        LIVE_DEPLOYMENT_ACK="I_ACKNOWLEDGE_LIVE_TRADING",
+    )
+    monkeypatch.setattr("app.main.get_settings", lambda: settings)
+
+    with pytest.raises(RuntimeError, match="CONFIG_PROFILE"):
         run_paper_command()
 
 
@@ -2151,3 +2176,221 @@ def test_run_paper_command_skips_entry_when_unresolved_order_exists_locally(tmp_
     refreshed_repo = JournalRepo(create_session_factory(settings.database_url))
     orders = refreshed_repo.recent_orders(limit=10)
     assert any(order.status == "skipped_existing" and order.symbol == "SPY" for order in orders)
+
+
+def test_send_alerts_logs_delivery_events(tmp_path) -> None:
+    settings = Settings(
+        DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}",
+        ALERT_WEBHOOK_URL="",
+    )
+    repo = JournalRepo(create_session_factory(settings.database_url))
+
+    results = send_alerts(["blocked order SPY"], settings, repo=repo)
+
+    assert [result.delivery_status for result in results] == ["sent", "skipped"]
+    alert_events = repo.recent_alert_events(limit=10)
+    assert [event.delivery_status for event in reversed(alert_events)] == ["sent", "skipped"]
+
+
+def test_run_reconcile_command_logs_config_snapshot(tmp_path, monkeypatch) -> None:
+    settings = Settings(
+        DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}",
+        CONFIG_PROFILE="paper",
+        PRIMARY_LIVE_STRATEGY="breakout",
+    )
+
+    class FakeBroker:
+        def __init__(self, _: Settings) -> None:
+            pass
+
+    monkeypatch.setattr("app.main.get_settings", lambda: settings)
+    monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
+    monkeypatch.setattr(
+        "app.main.reconcile_broker_state",
+        lambda repo, broker: {
+            "recent_orders": 0,
+            "open_orders": 0,
+            "positions": 0,
+            "pnl_points": 0,
+            "fills": 0,
+            "lot_matches": 0,
+            "realized_symbols": 0,
+        },
+    )
+
+    run_reconcile_command()
+
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    snapshot = repo.latest_config_snapshot(run_type="reconcile")
+    parsed = repo.parse_config_snapshot(snapshot)
+    assert snapshot is not None
+    assert snapshot.config_profile == "paper"
+    assert parsed["primary_live_strategy"] == "breakout"
+
+
+def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path, monkeypatch) -> None:
+    settings = Settings(
+        DRY_RUN=False,
+        ALPACA_PAPER=False,
+        PAPER_ONLY=False,
+        ALLOW_LIVE=True,
+        CONFIG_PROFILE="live",
+        LIVE_CONFIG_PROFILE="live",
+        LIVE_DEPLOYMENT_ACK="I_ACKNOWLEDGE_LIVE_TRADING",
+        SAFE_OPEN_ENABLED=True,
+        DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}",
+        MIN_HISTORY_DAYS=1,
+        SYMBOLS="SPY",
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000_000,
+            }
+        ]
+    )
+    latest = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "signal": "long",
+                "close": 100.0,
+                "atr": 1.0,
+            }
+        ]
+    )
+
+    class FakeBroker:
+        def __init__(self, _: Settings) -> None:
+            pass
+
+        def get_account_summary(self) -> object:
+            return type(
+                "AccountSnapshotStub",
+                (),
+                {"status": "ACTIVE", "buying_power": "10000", "equity": "10000", "cash": "10000"},
+            )()
+
+        def get_account_identifiers(self) -> dict[str, str]:
+            return {"account_id": "acct-live", "account_number": "1234"}
+
+        def list_open_orders(self, limit: int = 50) -> list[BrokerOrderSnapshot]:
+            return []
+
+        def list_positions(self) -> list[object]:
+            return []
+
+        def get_open_exposure(self) -> object:
+            return type(
+                "BrokerExposureSnapshotStub",
+                (),
+                {"gross_exposure": 0.0, "unrealized_pnl": 0.0, "position_notional_by_symbol": {}},
+            )()
+
+        def get_buying_power(self) -> float:
+            return 10000.0
+
+        def get_cash(self) -> float:
+            return 10000.0
+
+        def get_equity(self) -> float:
+            return 10000.0
+
+        def build_reconciliation_snapshot(self, *, local_position_qty_by_symbol: dict[str, float]) -> object:
+            return type(
+                "ReconciliationSnapshotStub",
+                (),
+                {
+                    "local_position_qty_by_symbol": local_position_qty_by_symbol,
+                    "broker_position_qty_by_symbol": {},
+                    "open_order_symbols": set(),
+                    "unresolved_order_symbols": set(),
+                },
+            )()
+
+    class FailIfCalledExecutor:
+        def __init__(self, repo: JournalRepo, settings: Settings, broker: FakeBroker | None = None) -> None:
+            self.repo = repo
+
+        def submit(self, order: OrderIntent) -> object:
+            raise AssertionError("submit should not be called outside the safe-open window")
+
+    monkeypatch.setattr("app.main.get_settings", lambda: settings)
+    monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
+    monkeypatch.setattr(
+        "app.main.load_bars_with_source",
+        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+    )
+    monkeypatch.setattr(
+        "app.main.reconcile_broker_state",
+        lambda repo, broker: {
+            "recent_orders": 0,
+            "open_orders": 0,
+            "positions": 0,
+            "pnl_points": 0,
+            "fills": 0,
+            "lot_matches": 0,
+            "realized_symbols": 0,
+        },
+    )
+    monkeypatch.setattr(
+        "app.main.market_day_window",
+        lambda: (
+            datetime(2026, 4, 16, 0, 0, tzinfo=UTC),
+            datetime(2026, 4, 17, 0, 0, tzinfo=UTC),
+        ),
+    )
+    monkeypatch.setattr("app.main.generate_signals", lambda bars, settings: latest)
+    monkeypatch.setattr("app.main.latest_signals", lambda frame: frame)
+    monkeypatch.setattr("app.main.run_backtest", lambda bars, settings: (pd.DataFrame(), {"trades": 0.0}))
+    monkeypatch.setattr("app.main.build_daily_report", lambda repo: "report=ok")
+    monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
+    monkeypatch.setattr("app.main.PaperExecutor", FailIfCalledExecutor)
+    monkeypatch.setattr("app.main._safe_open_allows_entries", lambda settings: (False, "outside_safe_open_window"))
+
+    run_paper_command()
+
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    blocked_orders = [order for order in repo.recent_orders(limit=10) if order.status == "blocked"]
+    assert any(order.status_detail == "outside_safe_open_window" for order in blocked_orders)
+
+
+def test_build_daily_report_includes_scorecard_and_strategy_metadata(tmp_path) -> None:
+    settings = Settings(DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}")
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    repo.log_config_snapshot(
+        run_type="paper",
+        strategy_name="breakout",
+        config_profile="paper",
+        broker_mode="paper",
+        details=settings.runtime_audit_payload("breakout"),
+    )
+    repo.create_run("paper", "completed", details="strategy=breakout")
+    repo.add_account_snapshot(status="ACTIVE", buying_power=10000.0, equity=10000.0, cash=9000.0)
+    repo.replace_position_snapshots(
+        [
+            {
+                "symbol": "SPY",
+                "qty": 5.0,
+                "market_value": 500.0,
+                "avg_entry_price": 100.0,
+                "current_price": 100.0,
+                "cost_basis": 500.0,
+                "unrealized_pl": 0.0,
+                "unrealized_plpc": 0.0,
+            }
+        ]
+    )
+
+    report = build_daily_report(repo)
+
+    assert "Daily Operator Report" in report
+    assert "strategy=breakout" in report
+    assert "Burn-In Scorecard" in report

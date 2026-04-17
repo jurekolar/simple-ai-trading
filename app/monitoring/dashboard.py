@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from collections import Counter
+
 import pandas as pd
 import streamlit as st
 
@@ -33,6 +35,15 @@ def _extract_flag(runs: pd.DataFrame, flag_name: str, default: str = "unknown") 
     return default
 
 
+def _drawdown_frame(pnl_history: pd.DataFrame) -> pd.DataFrame:
+    if pnl_history.empty:
+        return pd.DataFrame(columns=["drawdown_pct"])
+    frame = pnl_history.copy()
+    frame["equity_peak"] = frame["equity"].cummax()
+    frame["drawdown_pct"] = ((frame["equity"] - frame["equity_peak"]) / frame["equity_peak"]).fillna(0.0)
+    return frame.set_index("timestamp")[["drawdown_pct"]]
+
+
 def main() -> None:
     settings = get_settings()
     repo = JournalRepo(create_session_factory(settings.database_url))
@@ -40,11 +51,30 @@ def main() -> None:
 
     st.set_page_config(page_title="Trading Bot Dashboard", layout="wide")
     st.title("Trading Bot Dashboard")
-    st.caption("Paper-trading state and recent journal activity.")
+    st.caption("Paper and live-readiness state, operator health, and recent journal activity.")
 
     signals = _records_to_frame(repo.recent_signals(), ["symbol", "signal", "price", "created_at"])
-    orders = _records_to_frame(repo.recent_orders(), ["symbol", "side", "qty", "status", "submitted_at"])
+    orders = _records_to_frame(
+        repo.recent_orders(),
+        ["symbol", "side", "qty", "status", "status_detail", "submitted_at"],
+    )
     runs = _records_to_frame(repo.recent_runs(), ["run_type", "status", "details", "created_at"])
+    config_snapshots = _records_to_frame(
+        repo.recent_config_snapshots(),
+        ["run_type", "strategy_name", "config_profile", "broker_mode", "created_at", "details"],
+    )
+    kill_switch_events = _records_to_frame(
+        repo.recent_kill_switch_events(),
+        ["severity", "reason", "details", "created_at"],
+    )
+    reconciliation_events = _records_to_frame(
+        repo.recent_reconciliation_events(),
+        ["severity", "reason", "details", "created_at"],
+    )
+    alert_events = _records_to_frame(
+        repo.recent_alert_events(),
+        ["channel", "delivery_status", "message", "error_message", "created_at"],
+    )
     data_source = _extract_data_source(runs)
     dry_run = _extract_flag(runs, "dry_run", default=str(settings.dry_run).lower())
     account = broker.get_account_summary()
@@ -107,14 +137,48 @@ def main() -> None:
         repo.realized_pnl(),
         ["symbol", "realized_qty", "realized_pnl", "last_fill_at"],
     )
+    unresolved_orders = _records_to_frame(
+        repo.unresolved_orders(),
+        ["symbol", "side", "qty", "status", "status_detail", "submitted_at", "client_order_id"],
+    )
+    unresolved_summary = repo.unresolved_order_age_summary()
 
-    top_left, top_mid, top_right = st.columns(3)
+    blocked_reason_frame = pd.DataFrame(
+        [
+            {"reason": reason, "count": count}
+            for reason, count in Counter(
+                order.status_detail or order.status
+                for order in repo.recent_orders(limit=200)
+                if order.status == "blocked"
+            ).most_common()
+        ]
+    )
+    exposure_frame = (
+        local_positions[["symbol", "market_value", "unrealized_pl"]]
+        .sort_values("market_value", key=lambda series: series.abs(), ascending=False)
+        if not local_positions.empty
+        else pd.DataFrame(columns=["symbol", "market_value", "unrealized_pl"])
+    )
+
+    top_left, top_mid, top_right, top_fourth = st.columns(4)
     with top_left:
-        st.metric("Data Source", data_source)
+        st.metric("Config Profile", config_snapshots.iloc[0]["config_profile"] if not config_snapshots.empty else "unknown")
     with top_mid:
-        st.metric("Dry Run", dry_run)
+        st.metric("Broker Mode", config_snapshots.iloc[0]["broker_mode"] if not config_snapshots.empty else settings.broker_mode)
     with top_right:
-        st.metric("Recent Runs", len(runs))
+        st.metric("Data Source", data_source)
+    with top_fourth:
+        st.metric("Dry Run", dry_run)
+
+    live_left, live_mid, live_right = st.columns(3)
+    with live_left:
+        st.metric("Strategy", config_snapshots.iloc[0]["strategy_name"] if not config_snapshots.empty else "unknown")
+    with live_mid:
+        latest_kill_switch = kill_switch_events.iloc[0]["reason"] if not kill_switch_events.empty else "none"
+        st.metric("Kill Switch", latest_kill_switch)
+    with live_right:
+        latest_reconciliation = reconciliation_events.iloc[0]["reason"] if not reconciliation_events.empty else "none"
+        st.metric("Reconciliation", latest_reconciliation)
 
     broker_left, broker_mid, broker_right = st.columns(3)
     with broker_left:
@@ -131,6 +195,14 @@ def main() -> None:
         st.metric("Portfolio PnL", getattr(latest_local_pnl, "profit_loss", 0))
     with snapshot_right:
         st.metric("Tracked Positions", len(local_positions))
+
+    unresolved_left, unresolved_mid, unresolved_right = st.columns(3)
+    with unresolved_left:
+        st.metric("Unresolved Orders", int(unresolved_summary["count"]))
+    with unresolved_mid:
+        st.metric("Oldest Unresolved (m)", f"{unresolved_summary['oldest_minutes']:.1f}")
+    with unresolved_right:
+        st.metric("Alert Failures", int((alert_events["delivery_status"] == "failed").sum()) if not alert_events.empty else 0)
 
     pnl_left, pnl_mid, pnl_right = st.columns(3)
     with pnl_left:
@@ -162,6 +234,20 @@ def main() -> None:
         st.subheader("Local Orders")
         st.dataframe(orders, width="stretch")
 
+    risk_left, risk_right = st.columns(2)
+    with risk_left:
+        st.subheader("Blocked Order Reasons")
+        if blocked_reason_frame.empty:
+            st.info("No blocked orders recorded in the recent window.")
+        else:
+            st.dataframe(blocked_reason_frame, width="stretch")
+    with risk_right:
+        st.subheader("Unresolved Order Aging")
+        if unresolved_orders.empty:
+            st.info("No unresolved orders.")
+        else:
+            st.dataframe(unresolved_orders, width="stretch")
+
     broker_table_left, broker_table_right = st.columns(2)
     with broker_table_left:
         st.subheader("Alpaca Orders")
@@ -169,6 +255,15 @@ def main() -> None:
     with broker_table_right:
         st.subheader("Alpaca Positions")
         st.dataframe(broker_positions, width="stretch")
+
+    exposure_left, exposure_right = st.columns(2)
+    with exposure_left:
+        st.subheader("Exposure By Symbol")
+        st.dataframe(exposure_frame, width="stretch")
+    with exposure_right:
+        st.subheader("Current Kill Switch / Reconciliation")
+        st.dataframe(kill_switch_events, width="stretch")
+        st.dataframe(reconciliation_events, width="stretch")
 
     st.subheader("Local Position Snapshots")
     st.dataframe(local_positions, width="stretch")
@@ -178,6 +273,7 @@ def main() -> None:
         st.info("Run reconcile to populate the portfolio PnL timeline.")
     else:
         st.line_chart(local_pnl_history.set_index("timestamp")[["equity", "profit_loss"]], width="stretch")
+        st.line_chart(_drawdown_frame(local_pnl_history), width="stretch")
         st.dataframe(local_pnl_history, width="stretch")
 
     ledger_left, ledger_right = st.columns(2)
@@ -192,6 +288,14 @@ def main() -> None:
 
     st.subheader("Realized PnL")
     st.dataframe(realized_pnl, width="stretch")
+
+    bottom_left, bottom_right = st.columns(2)
+    with bottom_left:
+        st.subheader("Alert Delivery")
+        st.dataframe(alert_events, width="stretch")
+    with bottom_right:
+        st.subheader("Config Snapshots")
+        st.dataframe(config_snapshots, width="stretch")
 
     st.subheader("Recent Runs")
     st.dataframe(runs, width="stretch")

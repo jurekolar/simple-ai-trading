@@ -1,6 +1,6 @@
 # Operator Runbook
 
-Use this runbook for paper burn-in operations and as the baseline for any future live-readiness review.
+Use this runbook for paper burn-in operations and as the baseline for live-readiness review. Pair it with [LIVE_DEPLOYMENT_CHECKLIST.md](/Users/jurekolar/Code/simple-ai-trading/LIVE_DEPLOYMENT_CHECKLIST.md) before any live-capital session.
 
 ## Startup
 

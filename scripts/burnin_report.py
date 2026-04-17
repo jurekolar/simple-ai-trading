@@ -8,7 +8,9 @@ from sqlalchemy import and_, func
 
 from app.config import Settings
 from app.db.models import (
+    AlertEventRecord,
     BrokerErrorEventRecord,
+    ConfigSnapshotRecord,
     KillSwitchEventRecord,
     OrderRecord,
     ReconciliationEventRecord,
@@ -65,6 +67,17 @@ def main() -> None:
             .order_by(BrokerErrorEventRecord.created_at.asc())
             .all()
         )
+        alert_events = list(
+            session.query(AlertEventRecord)
+            .filter(AlertEventRecord.created_at >= start_at)
+            .order_by(AlertEventRecord.created_at.asc())
+            .all()
+        )
+        latest_config = (
+            session.query(ConfigSnapshotRecord)
+            .order_by(ConfigSnapshotRecord.created_at.desc())
+            .first()
+        )
         duplicate_client_ids = session.query(func.count()).select_from(
             session.query(OrderRecord.client_order_id)
             .filter(OrderRecord.client_order_id != "", OrderRecord.submitted_at >= start_at)
@@ -87,11 +100,15 @@ def main() -> None:
     kill_switch_counts = Counter(event.reason for event in kill_switch_events)
     reconciliation_counts = Counter(event.reason for event in reconciliation_events)
     broker_error_counts = Counter(event.operation for event in broker_error_events)
+    alert_status_counts = Counter(event.delivery_status for event in alert_events)
     gross_exposure = float(sum(abs(position.market_value) for position in latest_positions))
     unrealized_pnl = float(sum(position.unrealized_pl for position in latest_positions))
 
     print(f"Burn-In Summary ({args.days}d)")
     print(f"Window start: {start_at.isoformat()}")
+    print(f"Config profile: {getattr(latest_config, 'config_profile', 'unknown')}")
+    print(f"Broker mode: {getattr(latest_config, 'broker_mode', 'unknown')}")
+    print(f"Strategy: {getattr(latest_config, 'strategy_name', 'unknown')}")
     print(f"Paper runs: {len(runs)}")
     print(f"Orders: {len(orders)}")
     print(f"Blocked orders: {status_counts.get('blocked', 0)}")
@@ -103,6 +120,8 @@ def main() -> None:
     print(f"Reconciliation events: {len(reconciliation_events)}")
     print(f"Kill-switch events: {len(kill_switch_events)}")
     print(f"Broker error events: {len(broker_error_events)}")
+    print(f"Alert events: {len(alert_events)}")
+    print(f"Alert delivery failures: {alert_status_counts.get('failed', 0)}")
     print(f"Latest equity: {getattr(latest_account, 'equity', 0.0)}")
     print(f"Latest buying power: {getattr(latest_account, 'buying_power', 0.0)}")
     print(f"Latest cash: {getattr(latest_account, 'cash', 0.0)}")
@@ -124,6 +143,11 @@ def main() -> None:
         for operation, count in sorted(broker_error_counts.items()):
             print(f"- {operation}: {count}")
 
+    if alert_status_counts:
+        print("\nAlert Delivery Status")
+        for status, count in sorted(alert_status_counts.items()):
+            print(f"- {status}: {count}")
+
     if unresolved_orders:
         print("\nCurrent Unresolved Orders")
         for order in unresolved_orders[:10]:
@@ -140,6 +164,8 @@ def main() -> None:
         issues.append("reconciliation drift events present")
     if broker_error_events:
         issues.append("broker errors present")
+    if alert_status_counts.get("failed", 0) > 0:
+        issues.append("alert delivery failures present")
     if status_counts.get("error", 0) > 0:
         issues.append("order submit errors present")
     if issues:

@@ -1,10 +1,11 @@
 # Paper Burn-In Checklist
 
-Use this every trading day during the 2-4 week paper burn-in.
+Use this every trading day during the 3-4 week paper burn-in for the primary live candidate strategy.
 
 ## Pre-Market
 
 - Confirm `.env` matches the paper burn-in profile and still has `ALPACA_PAPER=true`, `PAPER_ONLY=true`, `ALLOW_LIVE=false`.
+- Confirm `CONFIG_PROFILE=paper` and `PRIMARY_LIVE_STRATEGY=breakout`.
 - Confirm `DRY_RUN=false` if you want real paper orders submitted.
 - Confirm the database path is correct and writable.
 - Confirm alert routing is configured and tested if `ALERT_WEBHOOK_URL` is set.
@@ -60,8 +61,10 @@ Use this every trading day during the 2-4 week paper burn-in.
 
 Before first live capital, require:
 
+- A continuous `3-4` week burn-in on the frozen primary live strategy.
 - Zero reconciliation drift over the burn-in window.
 - Zero duplicate orders.
 - Stable alert delivery.
 - Known behavior under stale data and broker failures.
+- Documented drills for restart, deny-new-entries, emergency flatten, stale data, and broker failure.
 - A reviewed operator runbook for restart, flatten, and recovery.

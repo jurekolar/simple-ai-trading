@@ -1,4 +1,4 @@
-.PHONY: burnin-day burnin-review burnin-auth paper reconcile burnin-report-1d burnin-report-7d
+.PHONY: burnin-day burnin-review burnin-auth paper reconcile report burnin-report-1d burnin-report-7d
 
 STRATEGY ?= momentum
 
@@ -10,6 +10,9 @@ paper:
 
 reconcile:
 	.venv/bin/python -m app.main reconcile
+
+report:
+	.venv/bin/python -m app.main report
 
 burnin-report-1d:
 	.venv/bin/python scripts/burnin_report.py --days 1

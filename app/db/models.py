@@ -24,6 +24,18 @@ class StrategyRun(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
+class ConfigSnapshotRecord(Base):
+    __tablename__ = "config_snapshots"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_type: Mapped[str] = mapped_column(String(32), index=True)
+    strategy_name: Mapped[str] = mapped_column(String(64), default="", index=True)
+    config_profile: Mapped[str] = mapped_column(String(32), default="", index=True)
+    broker_mode: Mapped[str] = mapped_column(String(16), default="", index=True)
+    details: Mapped[str] = mapped_column(String(4096), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
 class SignalRecord(Base):
     __tablename__ = "signals"
 
@@ -161,6 +173,17 @@ class KillSwitchEventRecord(Base):
     severity: Mapped[str] = mapped_column(String(32), index=True)
     reason: Mapped[str] = mapped_column(String(64), index=True)
     details: Mapped[str] = mapped_column(String(512), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
+class AlertEventRecord(Base):
+    __tablename__ = "alert_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    channel: Mapped[str] = mapped_column(String(32), index=True)
+    delivery_status: Mapped[str] = mapped_column(String(32), index=True)
+    message: Mapped[str] = mapped_column(String(512), default="")
+    error_message: Mapped[str] = mapped_column(String(512), default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
 
 

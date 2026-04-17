@@ -5,6 +5,7 @@ import logging
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 
@@ -41,6 +42,7 @@ from app.strategy.signals import latest_signals
 
 LOGGER = logging.getLogger(__name__)
 FEE_MODEL_LABEL = "estimated_activity_allocation"
+NEW_YORK = ZoneInfo("America/New_York")
 
 
 @dataclass(frozen=True)
@@ -275,12 +277,72 @@ def _enforce_live_mode_gate(settings) -> None:
         return
     if settings.paper_only or not settings.allow_live:
         raise RuntimeError("live trading blocked: PAPER_ONLY must be false and ALLOW_LIVE must be true")
+    if settings.config_profile.strip().lower() != "live":
+        raise RuntimeError("live trading blocked: CONFIG_PROFILE must be set to 'live'")
     if settings.live_config_profile.strip().lower() != "live":
         raise RuntimeError("live trading blocked: LIVE_CONFIG_PROFILE must be set to 'live'")
     if settings.live_deployment_ack.strip() != "I_ACKNOWLEDGE_LIVE_TRADING":
         raise RuntimeError(
             "live trading blocked: LIVE_DEPLOYMENT_ACK must equal I_ACKNOWLEDGE_LIVE_TRADING"
         )
+
+
+def _log_runtime_config_snapshot(
+    repo: JournalRepo,
+    *,
+    settings,
+    run_type: str,
+    strategy_name: str,
+) -> None:
+    repo.log_config_snapshot(
+        run_type=run_type,
+        strategy_name=strategy_name,
+        config_profile=settings.config_profile,
+        broker_mode=settings.broker_mode,
+        details=settings.runtime_audit_payload(strategy_name),
+    )
+
+
+def _safe_open_allows_entries(settings, now: datetime | None = None) -> tuple[bool, str]:
+    if not settings.live_trading_enabled or not settings.safe_open_enabled:
+        return True, "disabled"
+    current = (now or datetime.now(UTC)).astimezone(NEW_YORK)
+    try:
+        start_time = datetime.strptime(settings.safe_open_start_time, "%H:%M").time()
+        end_time = datetime.strptime(settings.safe_open_end_time, "%H:%M").time()
+    except ValueError:
+        return False, "invalid_safe_open_window"
+    if current.weekday() >= 5:
+        return False, "safe_open_weekday_only"
+    current_time = current.time().replace(tzinfo=None)
+    if start_time <= current_time <= end_time:
+        return True, "active"
+    return False, f"outside_safe_open_window:{settings.safe_open_start_time}-{settings.safe_open_end_time}"
+
+
+def _startup_risk_summary(
+    *,
+    settings,
+    strategy_name: str,
+    account,
+    broker: AlpacaTradingAdapter,
+    entries_allowed: bool,
+    entry_gate_reason: str,
+) -> str:
+    if hasattr(broker, "get_account_identifiers"):
+        identifiers = broker.get_account_identifiers()
+    else:
+        identifiers = {"account_id": "", "account_number": ""}
+    return (
+        f"startup_summary profile={settings.config_profile} broker_mode={settings.broker_mode} "
+        f"strategy={strategy_name} primary_live_strategy={settings.primary_live_strategy} "
+        f"account_status={getattr(account, 'status', 'unknown')} "
+        f"account_id={identifiers.get('account_id', '') or 'unknown'} "
+        f"account_number={identifiers.get('account_number', '') or 'unknown'} "
+        f"symbols={','.join(settings.symbol_list)} max_gross_exposure={settings.max_gross_exposure:.2f} "
+        f"max_daily_loss={settings.max_daily_loss:.2f} deny_new_entries={settings.deny_new_entries} "
+        f"entries_allowed={entries_allowed} entry_gate={entry_gate_reason}"
+    )
 
 
 def _compute_reconciliation_state(
@@ -427,6 +489,7 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     if active_strategy.name == politician_copy_strategy.name:
         raise RuntimeError("politician_copy does not support historical backtest mode in v1")
     repo = JournalRepo(create_session_factory(settings.database_url))
+    _log_runtime_config_snapshot(repo, settings=settings, run_type="backtest", strategy_name=active_strategy.name)
     repo.create_run("backtest", "started")
     loaded = load_bars_with_source(settings)
     trades, metrics = run_backtest(loaded.bars, settings, strategy=active_strategy)
@@ -455,6 +518,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     _enforce_live_mode_gate(settings)
     repo = JournalRepo(create_session_factory(settings.database_url))
     broker = AlpacaTradingAdapter(settings)
+    _log_runtime_config_snapshot(repo, settings=settings, run_type="paper", strategy_name=active_strategy.name)
     repo.create_run("paper", "started")
 
     if not should_run_trading_loop(broker):
@@ -476,6 +540,19 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         data_source = loaded.source
 
     account = broker.get_account_summary()
+    safe_open_entries_allowed, safe_open_reason = _safe_open_allows_entries(settings)
+    startup_summary = _startup_risk_summary(
+        settings=settings,
+        strategy_name=active_strategy.name,
+        account=account,
+        broker=broker,
+        entries_allowed=(not settings.deny_new_entries) and safe_open_entries_allowed,
+        entry_gate_reason=safe_open_reason,
+    )
+    if settings.live_trading_enabled:
+        LOGGER.warning(startup_summary)
+    else:
+        LOGGER.info(startup_summary)
     open_positions = broker.list_positions()
     open_orders = broker.list_open_orders(limit=50)
     sync_summary = reconcile_broker_state(repo, broker)
@@ -617,6 +694,8 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         alert_messages.append("data validation failed")
     if kill_switch.enabled:
         alert_messages.append(f"kill switch active: {kill_switch.reason}")
+    if settings.live_trading_enabled and settings.safe_open_enabled and not safe_open_entries_allowed:
+        alert_messages.append(f"live entry gate active: {safe_open_reason}")
     if stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
         exit_candidates = protective_exit_candidates(position_qty_by_symbol, position_price_by_symbol)
         if not exit_candidates.empty:
@@ -759,6 +838,18 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
             )
             alert_messages.append(f"entry blocked by config for {order.symbol}")
             continue
+        if settings.live_trading_enabled and settings.safe_open_enabled and not safe_open_entries_allowed:
+            blocked_orders += 1
+            repo.log_order(
+                order.symbol,
+                order.side,
+                float(order.qty),
+                "blocked",
+                status_detail=safe_open_reason,
+                requested_price=order.close,
+            )
+            alert_messages.append(f"entry blocked {order.symbol}: {safe_open_reason}")
+            continue
         if kill_switch.block_new_entries or (settings.trading_mode_enabled and data_source != "alpaca"):
             blocked_orders += 1
             LOGGER.warning("blocking new entry for %s because kill switch is active", order.symbol)
@@ -849,12 +940,13 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
 
     sync_summary = reconcile_broker_state(repo, broker)
     report = build_daily_report(repo)
-    send_alerts(dict.fromkeys(alert_messages), settings)
+    send_alerts(dict.fromkeys(alert_messages), settings, repo=repo)
     repo.create_run(
         "paper",
         "completed",
         details=(
-            f"strategy={active_strategy.name} source={data_source} fee_model={FEE_MODEL_LABEL} dry_run={settings.dry_run} "
+            f"profile={settings.config_profile} strategy={active_strategy.name} source={data_source} "
+            f"broker_mode={settings.broker_mode} fee_model={FEE_MODEL_LABEL} dry_run={settings.dry_run} "
             f"paper_only={settings.paper_only} allow_live={settings.allow_live} "
             f"kill_switch_severity={kill_switch.severity} "
             f"kill_switch={kill_switch.reason or 'none'} "
@@ -862,6 +954,8 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
             f"partial_data={partial_data_failure} "
             f"realized_pnl={realized_pnl:.2f} unrealized_pnl={unrealized_pnl:.2f} "
             f"reserved_buy_notional={reserved_buy_notional:.2f} "
+            f"safe_open_entries_allowed={safe_open_entries_allowed} "
+            f"safe_open_reason={safe_open_reason} "
             f"submitted={submitted_orders} exits={exit_orders} blocked={blocked_orders} "
             f"skipped_existing={skipped_existing} skipped_exit={skipped_exit} "
             f"synced_orders={sync_summary['recent_orders']} "
@@ -880,13 +974,14 @@ def run_reconcile_command() -> None:
     settings = get_settings()
     repo = JournalRepo(create_session_factory(settings.database_url))
     broker = AlpacaTradingAdapter(settings)
+    _log_runtime_config_snapshot(repo, settings=settings, run_type="reconcile", strategy_name="reconcile")
     repo.create_run("reconcile", "started")
     summary = reconcile_broker_state(repo, broker)
     repo.create_run(
         "reconcile",
         "completed",
         details=(
-            f"fee_model={FEE_MODEL_LABEL} "
+            f"profile={settings.config_profile} broker_mode={settings.broker_mode} fee_model={FEE_MODEL_LABEL} "
             f"synced_orders={summary['recent_orders']} "
             f"open_orders={summary['open_orders']} positions={summary['positions']} "
             f"pnl_points={summary['pnl_points']} fills={summary['fills']} "

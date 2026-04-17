@@ -1,6 +1,6 @@
 # Strategy
 
-This repository currently defaults to a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs. Its preferred TradingView-derived trend-following option is the `breakout` strategy, which implements a Donchian/Turtle-style long-only breakout over prior channel highs and lows.
+This repository currently defaults to a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs. Its preferred TradingView-derived trend-following option is the `breakout` strategy, which implements a Donchian/Turtle-style long-only breakout over prior channel highs and lows and is the recommended first live candidate.
 
 ## Scope
 

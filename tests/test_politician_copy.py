@@ -309,7 +309,7 @@ def test_run_paper_command_allows_politician_symbols_outside_static_symbols(tmp_
     monkeypatch.setattr("app.main._compute_reconciliation_state", lambda repo, broker: (reconciliation_snapshot, reconciliation_state))
     monkeypatch.setattr("app.main._compute_kill_switch_state", lambda **kwargs: kill_switch)
     monkeypatch.setattr("app.main.build_daily_report", lambda repo: "report")
-    monkeypatch.setattr("app.main.send_alerts", lambda messages, settings: None)
+    monkeypatch.setattr("app.main.send_alerts", lambda messages, settings, repo=None: None)
 
     run_paper_command(get_strategy("politician_copy"))
     repo = JournalRepo(create_session_factory(database_url))
