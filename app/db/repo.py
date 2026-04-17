@@ -13,6 +13,7 @@ from app.db.models import (
     ConfigSnapshotRecord,
     ExecutionFillRecord,
     KillSwitchEventRecord,
+    OperatorActionEventRecord,
     OrderRecord,
     PortfolioPnlSnapshotRecord,
     PositionSnapshotRecord,
@@ -48,6 +49,23 @@ class JournalRepo:
             return list(
                 session.query(StrategyRun).order_by(StrategyRun.created_at.desc()).limit(limit).all()
             )
+
+    def benchmark_free_scorecard(self) -> str:
+        start_at = datetime.now(UTC) - timedelta(days=7)
+        orders = self.orders_since(start_at)
+        reconciliation_events = self.reconciliation_events_since(start_at)
+        broker_errors = self.broker_error_events_since(start_at)
+        unresolved = self.unresolved_orders()
+        failures: list[str] = []
+        if reconciliation_events:
+            failures.append("reconciliation_events")
+        if broker_errors:
+            failures.append("broker_errors")
+        if unresolved:
+            failures.append("unresolved_orders_present")
+        if orders and any(order.status == "error" for order in orders):
+            failures.append("error_orders")
+        return "7d=pass(clean)" if not failures else f"7d=review({','.join(failures)})"
 
     def log_config_snapshot(
         self,
@@ -270,6 +288,43 @@ class JournalRepo:
                 )
             )
             session.commit()
+
+    def log_operator_action_event(
+        self,
+        *,
+        action: str,
+        old_value: str = "",
+        new_value: str = "",
+        details: str = "",
+    ) -> None:
+        with self._session_factory() as session:
+            session.add(
+                OperatorActionEventRecord(
+                    action=action,
+                    old_value=old_value,
+                    new_value=new_value,
+                    details=details,
+                )
+            )
+            session.commit()
+
+    def recent_operator_action_events(self, limit: int = 50) -> list[OperatorActionEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(OperatorActionEventRecord)
+                .order_by(OperatorActionEventRecord.created_at.desc(), OperatorActionEventRecord.id.desc())
+                .limit(limit)
+                .all()
+            )
+
+    def operator_action_events_since(self, start_at: datetime) -> list[OperatorActionEventRecord]:
+        with self._session_factory() as session:
+            return list(
+                session.query(OperatorActionEventRecord)
+                .filter(OperatorActionEventRecord.created_at >= start_at)
+                .order_by(OperatorActionEventRecord.created_at.asc(), OperatorActionEventRecord.id.asc())
+                .all()
+            )
 
     def recent_alert_events(self, limit: int = 50) -> list[AlertEventRecord]:
         with self._session_factory() as session:

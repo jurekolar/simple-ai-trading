@@ -28,6 +28,7 @@ from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
 from app.logging_setup import configure_logging
 from app.monitoring.alerts import send_alerts
+from app.ops.preflight import evaluate_preflight, format_preflight_checks, preflight_passed
 from app.reports.daily_report import build_daily_report
 from app.risk.checks import (
     entry_risk_decision,
@@ -300,6 +301,8 @@ def _log_runtime_config_snapshot(
     run_type: str,
     strategy_name: str,
 ) -> None:
+    previous_snapshot = repo.latest_config_snapshot(run_type=run_type) or repo.latest_config_snapshot()
+    previous_details = repo.parse_config_snapshot(previous_snapshot)
     repo.log_config_snapshot(
         run_type=run_type,
         strategy_name=strategy_name,
@@ -307,6 +310,24 @@ def _log_runtime_config_snapshot(
         broker_mode=settings.broker_mode,
         details=settings.runtime_audit_payload(strategy_name),
     )
+    current_values = {
+        "deny_new_entries": str(settings.deny_new_entries).lower(),
+        "emergency_flatten": str(settings.emergency_flatten).lower(),
+        "force_exit_symbols": ",".join(settings.force_exit_symbol_list),
+        "safe_open_enabled": str(settings.safe_open_enabled).lower(),
+    }
+    for key, new_value in current_values.items():
+        old_raw = previous_details.get(key)
+        old_value = (
+            ",".join(old_raw) if isinstance(old_raw, list) else str(old_raw).lower()
+        ) if old_raw is not None else ""
+        if old_value and old_value != new_value:
+            repo.log_operator_action_event(
+                action=key,
+                old_value=old_value,
+                new_value=new_value,
+                details=f"run_type={run_type} strategy={strategy_name}",
+            )
 
 
 def _safe_open_allows_entries(settings, now: datetime | None = None) -> tuple[bool, str]:
@@ -501,7 +522,7 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     validation = validate_bars(loaded.bars, settings, active_strategy.name)
     if validation.failed_symbols:
         raise RuntimeError(f"required market data validation failed: {validation.failed_symbols}")
-    evaluation = evaluate_strategy_research(validation.valid_bars, settings, active_strategy.name)
+    evaluation = evaluate_strategy_research(validation.valid_bars, settings, active_strategy.name, source=loaded.source)
     trades = evaluation.combined_trade_log
     metrics = evaluation.summary
     for _, trade in trades.iterrows():
@@ -511,7 +532,9 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
         "completed",
         details=f"strategy={active_strategy.name} source={loaded.source} metrics={metrics}",
     )
+    artifact_dir = write_benchmark_artifacts(pd.DataFrame([evaluation.summary]), [evaluation], settings=settings, source=loaded.source)
     print(format_single_strategy_summary(metrics))
+    print(f"artifacts={artifact_dir}")
     LOGGER.info("backtest metrics %s", metrics)
 
 
@@ -520,10 +543,15 @@ def run_compare_command() -> None:
     loaded = load_bars_with_source(settings, "mean_reversion")
     validation = validate_bars(loaded.bars, settings, "mean_reversion")
     results = [
-        evaluate_strategy_research(validation.valid_bars, settings, strategy_name)
+        evaluate_strategy_research(validation.valid_bars, settings, strategy_name, source=loaded.source)
         for strategy_name in backtest_strategy_names()
     ]
-    summary = compare_strategies(validation.valid_bars, settings, strategy_names=backtest_strategy_names())
+    summary = compare_strategies(
+        validation.valid_bars,
+        settings,
+        strategy_names=backtest_strategy_names(),
+        source=loaded.source,
+    )
     artifact_dir = write_benchmark_artifacts(summary, results, settings=settings, source=loaded.source)
     print(format_strategy_comparison(summary))
     print(f"\nartifacts={artifact_dir}")
@@ -536,6 +564,10 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     _enforce_live_mode_gate(settings)
     repo = JournalRepo(create_session_factory(settings.database_url))
     broker = AlpacaTradingAdapter(settings)
+    if settings.live_trading_enabled:
+        checks = evaluate_preflight(settings=settings, repo=repo, broker=broker, strategy_name=active_strategy.name)
+        if not preflight_passed(checks, live_mode=True):
+            raise RuntimeError(format_preflight_checks(checks))
     _log_runtime_config_snapshot(repo, settings=settings, run_type="paper", strategy_name=active_strategy.name)
     repo.create_run("paper", "started")
 
@@ -1010,9 +1042,20 @@ def run_reconcile_command() -> None:
     LOGGER.info("reconcile complete %s", summary)
 
 
+def run_preflight_command(strategy: TradingStrategy | None = None) -> None:
+    settings = get_settings()
+    active_strategy = strategy or get_strategy(settings.primary_live_strategy)
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    broker = AlpacaTradingAdapter(settings)
+    checks = evaluate_preflight(settings=settings, repo=repo, broker=broker, strategy_name=active_strategy.name)
+    print(format_preflight_checks(checks))
+    if not preflight_passed(checks, live_mode=settings.live_trading_enabled):
+        raise RuntimeError("preflight failed")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Trading bot entrypoint")
-    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "reconcile", "report"])
+    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "preflight", "reconcile", "report"])
     parser.add_argument(
         "--strategy",
         choices=strategy_names(),
@@ -1036,6 +1079,8 @@ def main() -> None:
         run_paper_command(strategy)
     elif args.command == "preview":
         run_preview_command(strategy)
+    elif args.command == "preflight":
+        run_preflight_command(strategy)
     elif args.command == "reconcile":
         run_reconcile_command()
     else:

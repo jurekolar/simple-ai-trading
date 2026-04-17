@@ -17,12 +17,16 @@ Use this runbook for paper burn-in operations and as the baseline for live-readi
    make burnin-report-1d
    make burnin-report-7d
    ```
-4. Start the daily workflow:
+4. Run preflight if you are validating a live-ready setup or checking drift against the latest approved benchmark:
+   ```bash
+   make preflight STRATEGY=breakout
+   ```
+5. Start the daily workflow:
    ```bash
    make burnin-day
    make burnin-day STRATEGY=breakout
    ```
-5. If needed, open the dashboard:
+6. If needed, open the dashboard:
    ```bash
    streamlit run app/monitoring/dashboard.py
    ```
@@ -57,6 +61,10 @@ Use this when the bot process stops unexpectedly or you need to restart intentio
    make burnin-report-1d
    .venv/bin/python -m app.main reconcile
    make burnin-report-1d
+   ```
+   Or run the packaged recovery flow:
+   ```bash
+   make recover-unresolved STRATEGY=breakout
    ```
 3. Check:
 - open orders
@@ -181,6 +189,7 @@ Daily signoff is complete only if:
 - no duplicate order IDs exist
 - any blocked/error orders are explained
 - any kill-switch or broker-error event has a written note
+- any operator-action audit events are understood
 
 ## Incident Notes Template
 

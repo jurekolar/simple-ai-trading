@@ -3,6 +3,8 @@ from __future__ import annotations
 from collections import Counter
 from datetime import UTC, datetime, timedelta
 
+from app.backtest.compare import load_latest_benchmark_index
+from app.config import get_settings
 from app.db.repo import JournalRepo
 
 
@@ -48,6 +50,7 @@ def _scorecard_line(repo: JournalRepo, days: int) -> str:
 
 def build_daily_report(repo: JournalRepo) -> str:
     now = datetime.now(UTC)
+    settings = get_settings()
     start_at = now - timedelta(days=1)
     runs = repo.recent_runs(limit=10)
     paper_runs = repo.runs_since(start_at, run_type="paper")
@@ -65,8 +68,10 @@ def build_daily_report(repo: JournalRepo) -> str:
     reconciliation_events = repo.reconciliation_events_since(start_at)
     broker_error_events = repo.broker_error_events_since(start_at)
     alert_events = repo.alert_events_since(start_at)
+    operator_action_events = repo.operator_action_events_since(start_at)
     config_snapshot = repo.latest_config_snapshot(run_type="paper") or repo.latest_config_snapshot()
     config_details = repo.parse_config_snapshot(config_snapshot)
+    latest_benchmark = load_latest_benchmark_index(settings)
 
     gross_exposure = float(sum(abs(position.market_value) for position in positions))
     unrealized_pnl = float(sum(position.unrealized_pl for position in positions))
@@ -123,6 +128,17 @@ def build_daily_report(repo: JournalRepo) -> str:
     alert_delivery = ", ".join(
         f"{status}:{count}" for status, count in sorted(alert_status_counts.items())
     ) or "none"
+    operator_actions = ", ".join(
+        f"{event.action}:{event.old_value}->{event.new_value}"
+        for event in operator_action_events[:5]
+    ) or "none"
+    benchmark_candidate = latest_benchmark.get("recommended_live_candidate", "none")
+    benchmark_generated_at = latest_benchmark.get("generated_at", "missing")
+    benchmark_valid = latest_benchmark.get("benchmark_valid", False)
+    benchmark_ready = latest_benchmark.get("decision_ready", False)
+    benchmark_matches_active = benchmark_candidate == (
+        config_details.get("strategy", getattr(config_snapshot, "strategy_name", "unknown"))
+    )
 
     return "\n".join(
         [
@@ -133,6 +149,11 @@ def build_daily_report(repo: JournalRepo) -> str:
             f"strategy={config_details.get('strategy', getattr(config_snapshot, 'strategy_name', 'unknown'))}",
             f"primary_live_strategy={config_details.get('primary_live_strategy', 'unknown')}",
             f"symbols={','.join(config_details.get('symbols', [])) if config_details.get('symbols') else 'unknown'}",
+            f"latest_benchmark_candidate={benchmark_candidate}",
+            f"latest_benchmark_generated_at={benchmark_generated_at}",
+            f"latest_benchmark_valid={benchmark_valid}",
+            f"latest_benchmark_ready={benchmark_ready}",
+            f"active_strategy_matches_benchmark={benchmark_matches_active}",
             "",
             "Operator Summary",
             f"paper_runs_1d={len(paper_runs)}",
@@ -177,6 +198,8 @@ def build_daily_report(repo: JournalRepo) -> str:
             f"alert_failures_1d={alert_status_counts.get('failed', 0)}",
             f"stale_data_incidents_1d={kill_switch_reason_counts.get('stale_data', 0)}",
             f"broker_error_operations={broker_error_operations}",
+            f"operator_actions_1d={len(operator_action_events)}",
+            f"operator_action_changes={operator_actions}",
             "",
             "Burn-In Scorecard",
             f"scorecard={_scorecard_line(repo, 7)}; {_scorecard_line(repo, 14)}; {_scorecard_line(repo, 30)}",

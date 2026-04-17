@@ -28,6 +28,8 @@ Use this checklist before the first live-capital session and before any later sc
 - `SAFE_OPEN_ENABLED=true` and the operator-watched entry window is agreed.
 - `DATABASE_URL` points to a dedicated live journal, not the paper burn-in database.
 - Alert routing is configured and tested.
+- `PRIMARY_LIVE_STRATEGY` matches the latest approved benchmark candidate.
+- The latest benchmark artifact is recent enough for `preflight` to pass.
 
 ## Operator Readiness
 
@@ -42,7 +44,12 @@ Use this checklist before the first live-capital session and before any later sc
 
 ## Session Launch
 
+- Run preflight before enabling live trading:
+  ```bash
+  python -m app.main --strategy breakout preflight
+  ```
 - Confirm latest burn-in and daily operator report outputs are clean.
+- Confirm `BACKTEST_OUTPUT_DIR/latest.json` still points to the approved candidate and a decision-ready artifact set.
 - Run auth checks.
 - Run `reconcile` before market open.
 - Review startup summary:

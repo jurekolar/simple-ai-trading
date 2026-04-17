@@ -5,6 +5,7 @@ from collections import Counter
 import pandas as pd
 import streamlit as st
 
+from app.backtest.compare import load_latest_benchmark_index
 from app.broker.alpaca_client import AlpacaTradingAdapter
 from app.config import get_settings
 from app.db.models import create_session_factory
@@ -75,6 +76,11 @@ def main() -> None:
         repo.recent_alert_events(),
         ["channel", "delivery_status", "message", "error_message", "created_at"],
     )
+    operator_actions = _records_to_frame(
+        repo.recent_operator_action_events(),
+        ["action", "old_value", "new_value", "details", "created_at"],
+    )
+    latest_benchmark = load_latest_benchmark_index(settings)
     data_source = _extract_data_source(runs)
     dry_run = _extract_flag(runs, "dry_run", default=str(settings.dry_run).lower())
     account = broker.get_account_summary()
@@ -170,7 +176,7 @@ def main() -> None:
     with top_fourth:
         st.metric("Dry Run", dry_run)
 
-    live_left, live_mid, live_right = st.columns(3)
+    live_left, live_mid, live_right, live_fourth = st.columns(4)
     with live_left:
         st.metric("Strategy", config_snapshots.iloc[0]["strategy_name"] if not config_snapshots.empty else "unknown")
     with live_mid:
@@ -179,6 +185,16 @@ def main() -> None:
     with live_right:
         latest_reconciliation = reconciliation_events.iloc[0]["reason"] if not reconciliation_events.empty else "none"
         st.metric("Reconciliation", latest_reconciliation)
+    with live_fourth:
+        st.metric("Benchmark Candidate", latest_benchmark.get("recommended_live_candidate", "none"))
+
+    benchmark_left, benchmark_mid, benchmark_right = st.columns(3)
+    with benchmark_left:
+        st.metric("Benchmark Ready", "yes" if latest_benchmark.get("decision_ready") else "no")
+    with benchmark_mid:
+        st.metric("Benchmark Valid", "yes" if latest_benchmark.get("benchmark_valid") else "no")
+    with benchmark_right:
+        st.metric("Benchmark Generated", latest_benchmark.get("generated_at", "missing"))
 
     broker_left, broker_mid, broker_right = st.columns(3)
     with broker_left:
@@ -248,6 +264,10 @@ def main() -> None:
         else:
             st.dataframe(unresolved_orders, width="stretch")
 
+    if latest_benchmark:
+        st.subheader("Latest Benchmark Artifact")
+        st.write(f"path={latest_benchmark.get('artifact_dir', 'unknown')}")
+
     broker_table_left, broker_table_right = st.columns(2)
     with broker_table_left:
         st.subheader("Alpaca Orders")
@@ -296,6 +316,12 @@ def main() -> None:
     with bottom_right:
         st.subheader("Config Snapshots")
         st.dataframe(config_snapshots, width="stretch")
+
+    st.subheader("Operator Action Audit")
+    if operator_actions.empty:
+        st.info("No operator action changes recorded yet.")
+    else:
+        st.dataframe(operator_actions, width="stretch")
 
     st.subheader("Recent Runs")
     st.dataframe(runs, width="stretch")

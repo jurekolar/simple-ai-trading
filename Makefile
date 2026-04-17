@@ -1,4 +1,4 @@
-.PHONY: burnin-day burnin-review burnin-auth paper reconcile report burnin-report-1d burnin-report-7d stress-drill
+.PHONY: burnin-day burnin-review burnin-auth paper reconcile report preflight burnin-report-1d burnin-report-7d stress-drill recover-unresolved
 
 STRATEGY ?= momentum
 SCENARIO ?= stale_data_block
@@ -15,6 +15,9 @@ reconcile:
 report:
 	.venv/bin/python -m app.main report
 
+preflight:
+	.venv/bin/python -m app.main --strategy $(STRATEGY) preflight
+
 burnin-report-1d:
 	.venv/bin/python scripts/burnin_report.py --days 1
 
@@ -29,3 +32,6 @@ burnin-review:
 
 stress-drill:
 	.venv/bin/python scripts/stress_drill.py --scenario $(SCENARIO)
+
+recover-unresolved:
+	./scripts/recover_unresolved_state.sh

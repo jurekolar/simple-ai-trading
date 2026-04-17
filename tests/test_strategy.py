@@ -1,3 +1,4 @@
+import json
 from datetime import UTC, datetime, timedelta
 
 import pandas as pd
@@ -2429,6 +2430,20 @@ def test_run_reconcile_command_logs_config_snapshot(tmp_path, monkeypatch) -> No
 
 
 def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path, monkeypatch) -> None:
+    benchmark_output_dir = tmp_path / "artifacts"
+    benchmark_output_dir.mkdir(parents=True)
+    (benchmark_output_dir / "latest.json").write_text(
+        json.dumps(
+            {
+                "generated_at": datetime.now(UTC).isoformat(),
+                "decision_ready": True,
+                "benchmark_valid": True,
+                "recommended_live_candidate": "momentum",
+                "artifact_dir": str(benchmark_output_dir / "run-001"),
+            }
+        ),
+        encoding="utf-8",
+    )
     settings = Settings(
         DRY_RUN=False,
         ALPACA_PAPER=False,
@@ -2438,7 +2453,10 @@ def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path
         LIVE_CONFIG_PROFILE="live",
         LIVE_DEPLOYMENT_ACK="I_ACKNOWLEDGE_LIVE_TRADING",
         SAFE_OPEN_ENABLED=True,
+        PRIMARY_LIVE_STRATEGY="momentum",
+        ALERT_WEBHOOK_URL="https://example.test/webhook",
         DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}",
+        BACKTEST_OUTPUT_DIR=str(benchmark_output_dir),
         MIN_HISTORY_DAYS=1,
         SYMBOLS="SPY",
     )
@@ -2559,9 +2577,12 @@ def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path
     monkeypatch.setattr("app.main.PaperExecutor", FailIfCalledExecutor)
     monkeypatch.setattr("app.main._safe_open_allows_entries", lambda settings: (False, "outside_safe_open_window"))
 
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    repo.add_account_snapshot(status="ACTIVE", buying_power=10000.0, equity=10000.0, cash=10000.0)
+    repo.create_run("reconcile", "completed", details="ok")
+
     run_paper_command()
 
-    repo = JournalRepo(create_session_factory(settings.database_url))
     blocked_orders = [order for order in repo.recent_orders(limit=10) if order.status == "blocked"]
     assert any(order.status_detail == "outside_safe_open_window" for order in blocked_orders)
 

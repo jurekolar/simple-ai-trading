@@ -84,10 +84,16 @@ class Settings(BaseSettings):
     backtest_walk_forward_train_days: int = Field(default=126, alias="BACKTEST_WALK_FORWARD_TRAIN_DAYS")
     backtest_walk_forward_test_days: int = Field(default=63, alias="BACKTEST_WALK_FORWARD_TEST_DAYS")
     backtest_min_closed_trades: int = Field(default=3, alias="BACKTEST_MIN_CLOSED_TRADES")
+    backtest_min_out_of_sample_days: int = Field(default=20, alias="BACKTEST_MIN_OUT_OF_SAMPLE_DAYS")
+    backtest_min_walk_forward_folds: int = Field(default=2, alias="BACKTEST_MIN_WALK_FORWARD_FOLDS")
+    backtest_max_symbol_concentration: float = Field(default=0.60, alias="BACKTEST_MAX_SYMBOL_CONCENTRATION")
+    backtest_min_baseline_advantage: float = Field(default=0.0, alias="BACKTEST_MIN_BASELINE_ADVANTAGE")
     backtest_max_out_of_sample_drawdown: float = Field(
         default=0.20,
         alias="BACKTEST_MAX_OUT_OF_SAMPLE_DRAWDOWN",
     )
+    live_preflight_max_benchmark_age_days: int = Field(default=14, alias="LIVE_PREFLIGHT_MAX_BENCHMARK_AGE_DAYS")
+    live_preflight_max_snapshot_age_minutes: int = Field(default=120, alias="LIVE_PREFLIGHT_MAX_SNAPSHOT_AGE_MINUTES")
     backtest_output_dir: str = Field(default="artifacts/backtests", alias="BACKTEST_OUTPUT_DIR")
     allow_unsafe_data_fallback: bool = Field(default=False, alias="ALLOW_UNSAFE_DATA_FALLBACK")
     allow_partial_market_data: bool = Field(default=False, alias="ALLOW_PARTIAL_MARKET_DATA")
@@ -206,7 +212,9 @@ class Settings(BaseSettings):
             "max_daily_loss": self.max_daily_loss,
             "max_unrealized_drawdown": self.max_unrealized_drawdown,
             "emergency_unrealized_drawdown": self.emergency_unrealized_drawdown,
+            "emergency_flatten": self.emergency_flatten,
             "deny_new_entries": self.deny_new_entries,
+            "force_exit_symbols": self.force_exit_symbol_list,
             "safe_open_enabled": self.safe_open_enabled,
             "safe_open_start_time": self.safe_open_start_time,
             "safe_open_end_time": self.safe_open_end_time,

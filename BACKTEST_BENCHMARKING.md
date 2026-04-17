@@ -127,9 +127,21 @@ Each `compare` run writes a timestamped directory under `BACKTEST_OUTPUT_DIR` wi
 - one in-sample trade log per strategy
 - one out-of-sample trade log per strategy
 - one walk-forward trade log per strategy
+- combined and out-of-sample equity curve CSVs
 - `metadata.json`
+- `approval_summary.json`
+- `approval_summary.md`
+- `latest.json` in the root of `BACKTEST_OUTPUT_DIR` as the current machine-readable pointer
+- `latest_approval_summary.md` in the root of `BACKTEST_OUTPUT_DIR` as the current human-readable pointer
 
 The CLI prints the artifact directory path after the comparison table.
+
+The benchmark is not automatically trustworthy just because artifacts were written. Treat these warnings as blocking for live selection:
+
+- `unsafe_source=synthetic` or other non-`alpaca` source warnings
+- `benchmark_valid=False`
+- `recommendation=review` or `recommendation=fail`
+- insufficient walk-forward folds or too-short out-of-sample windows in the printed warnings
 
 ## Recommended Workflow
 

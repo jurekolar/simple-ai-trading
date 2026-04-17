@@ -40,6 +40,7 @@ python -m app.main compare
 ```
 
 For full instructions on running and interpreting the benchmark backtests, see [BACKTEST_BENCHMARKING.md](/Users/jurekolar/Code/simple-ai-trading/BACKTEST_BENCHMARKING.md).
+For the end-to-end decision flow from benchmark to burn-in to live signoff, see [DECISION_WORKFLOW.md](/Users/jurekolar/Code/simple-ai-trading/DECISION_WORKFLOW.md).
 
 If you want the TradingView-derived trend-following option in this repo, use:
 
@@ -66,6 +67,13 @@ Its exit remains signal-based only: it exits when the z-score mean reverts back 
 
 ```bash
 python -m app.main paper
+```
+
+Run the non-trading startup validation first when you want the go/no-go checks without placing orders:
+
+```bash
+python -m app.main --strategy breakout preflight
+make preflight STRATEGY=breakout
 ```
 
 Preview the current politician-copy portfolio selection and target weights:
@@ -161,6 +169,13 @@ make stress-drill SCENARIO=emergency_flatten
 ```
 
 The drill harness is intentionally separate from `app.main`; it appends a dated entry under `logs/burnin/` and records the expected recovery commands for the operator to run next.
+
+For unresolved-state recovery after a restart or incident:
+
+```bash
+make recover-unresolved
+make recover-unresolved STRATEGY=breakout
+```
 
 ## Current scope
 

@@ -23,29 +23,44 @@ class BacktestPosition:
     last_price: float
 
 
+@dataclass(frozen=True)
+class BacktestResult:
+    trade_log: pd.DataFrame
+    equity_curve: pd.DataFrame
+    metrics: dict[str, float | str]
+
+
 def _strategy_bars(bars: pd.DataFrame, strategy_name: str, settings: Settings) -> pd.DataFrame:
     if strategy_name == "mean_reversion":
         return bars.copy()
     return bars[bars["symbol"].astype(str).str.upper().isin(settings.symbol_list)].copy()
 
 
-def run_backtest(
+def run_backtest_detailed(
     bars: pd.DataFrame,
     settings: Settings,
     strategy: TradingStrategy | None = None,
     *,
     start_at: pd.Timestamp | None = None,
     end_at: pd.Timestamp | None = None,
-) -> tuple[pd.DataFrame, dict[str, float | str]]:
+) -> BacktestResult:
     active_strategy = strategy or get_strategy("momentum")
     strategy_bars = _strategy_bars(bars, active_strategy.name, settings)
+    if "timestamp" in strategy_bars.columns:
+        strategy_bars = strategy_bars.copy()
+        strategy_bars["timestamp"] = pd.to_datetime(strategy_bars["timestamp"], utc=True)
     if start_at is not None:
-        strategy_bars = strategy_bars[pd.to_datetime(strategy_bars["timestamp"], utc=True) >= pd.Timestamp(start_at)]
+        strategy_bars = strategy_bars[strategy_bars["timestamp"] >= pd.Timestamp(start_at)]
     if end_at is not None:
-        strategy_bars = strategy_bars[pd.to_datetime(strategy_bars["timestamp"], utc=True) <= pd.Timestamp(end_at)]
+        strategy_bars = strategy_bars[strategy_bars["timestamp"] <= pd.Timestamp(end_at)]
     signal_frame = active_strategy.generate_signals(strategy_bars, settings).sort_values(["timestamp", "symbol"])
     if signal_frame.empty:
-        return pd.DataFrame(), summarize(pd.DataFrame(), pd.DataFrame(), initial_equity=BACKTEST_INITIAL_EQUITY)
+        empty_frame = pd.DataFrame()
+        return BacktestResult(
+            trade_log=empty_frame,
+            equity_curve=empty_frame,
+            metrics=summarize(pd.DataFrame(), pd.DataFrame(), initial_equity=BACKTEST_INITIAL_EQUITY),
+        )
 
     positions: dict[str, BacktestPosition] = {}
     trade_rows: list[dict[str, object]] = []
@@ -160,4 +175,22 @@ def run_backtest(
     trade_log = pd.DataFrame(trade_rows)
     equity_curve = pd.DataFrame(equity_rows)
     metrics = summarize(trade_log, equity_curve, initial_equity=BACKTEST_INITIAL_EQUITY)
-    return trade_log, metrics
+    return BacktestResult(trade_log=trade_log, equity_curve=equity_curve, metrics=metrics)
+
+
+def run_backtest(
+    bars: pd.DataFrame,
+    settings: Settings,
+    strategy: TradingStrategy | None = None,
+    *,
+    start_at: pd.Timestamp | None = None,
+    end_at: pd.Timestamp | None = None,
+) -> tuple[pd.DataFrame, dict[str, float | str]]:
+    result = run_backtest_detailed(
+        bars,
+        settings,
+        strategy=strategy,
+        start_at=start_at,
+        end_at=end_at,
+    )
+    return result.trade_log, result.metrics

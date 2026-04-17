@@ -11,6 +11,7 @@ from app.backtest.compare import (
     evaluate_strategy_research,
     format_single_strategy_summary,
     format_strategy_comparison,
+    load_latest_benchmark_index,
     write_benchmark_artifacts,
 )
 from app.backtest.engine import run_backtest
@@ -235,7 +236,7 @@ def test_evaluate_strategy_research_includes_validation_windows_and_recommendati
     settings = _research_settings(tmp_path)
     bars = _multi_symbol_bars()
 
-    result = evaluate_strategy_research(bars, settings, "momentum")
+    result = evaluate_strategy_research(bars, settings, "momentum", source="alpaca")
 
     assert result.summary["recommendation"] in {"pass", "review", "fail"}
     assert result.summary["in_sample_start_at"]
@@ -248,7 +249,7 @@ def test_compare_strategies_ranks_by_selection_score(tmp_path) -> None:
     settings = _research_settings(tmp_path)
     bars = _multi_symbol_bars()
 
-    summary = compare_strategies(bars, settings)
+    summary = compare_strategies(bars, settings, source="alpaca")
 
     assert summary.iloc[0]["rank"] == 1
     assert bool(summary.iloc[0]["winner"])
@@ -359,16 +360,29 @@ def test_format_single_strategy_summary_includes_recommendation_and_ranges() -> 
 def test_write_benchmark_artifacts_writes_csvs_and_metadata(tmp_path) -> None:
     settings = _research_settings(tmp_path)
     bars = _multi_symbol_bars()
-    result = evaluate_strategy_research(bars, settings, "momentum")
+    result = evaluate_strategy_research(bars, settings, "momentum", source="alpaca")
     summary = pd.DataFrame([result.summary])
 
-    artifact_dir = write_benchmark_artifacts(summary, [result], settings=settings, source="synthetic")
+    artifact_dir = write_benchmark_artifacts(summary, [result], settings=settings, source="alpaca")
 
     assert (artifact_dir / "strategy_comparison.csv").exists()
     assert (artifact_dir / "momentum_combined_trades.csv").exists()
     metadata = json.loads((artifact_dir / "metadata.json").read_text(encoding="utf-8"))
-    assert metadata["source"] == "synthetic"
+    assert metadata["source"] == "alpaca"
     assert metadata["config_profile"] == settings.config_profile
+    latest_index = load_latest_benchmark_index(settings)
+    assert latest_index["artifact_dir"] == str(artifact_dir)
+
+
+def test_invalid_benchmark_detection_fails_fallback_source(tmp_path) -> None:
+    settings = _research_settings(tmp_path)
+    bars = _multi_symbol_bars()
+
+    result = evaluate_strategy_research(bars, settings, "momentum", source="synthetic")
+
+    assert not result.summary["benchmark_valid"]
+    assert "unsafe_source:synthetic" in result.summary["benchmark_invalid_reasons"]
+    assert result.summary["recommendation"] == "fail"
 
 
 def test_run_backtest_command_prints_human_readable_summary(tmp_path, monkeypatch, capsys) -> None:

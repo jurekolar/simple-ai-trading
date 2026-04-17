@@ -187,6 +187,17 @@ class AlertEventRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
 
 
+class OperatorActionEventRecord(Base):
+    __tablename__ = "operator_action_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    action: Mapped[str] = mapped_column(String(64), index=True)
+    old_value: Mapped[str] = mapped_column(String(128), default="")
+    new_value: Mapped[str] = mapped_column(String(128), default="")
+    details: Mapped[str] = mapped_column(String(512), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, index=True)
+
+
 def _upgrade_orders_table(engine) -> None:
     inspector = inspect(engine)
     if "orders" not in inspector.get_table_names():
