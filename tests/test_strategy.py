@@ -938,8 +938,10 @@ def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies()
 
     summary = compare_strategies(bars, settings)
 
-    assert list(summary["strategy"]) == backtest_strategy_names()
+    assert set(summary["strategy"]) == set(backtest_strategy_names())
     assert "politician_copy" not in set(summary["strategy"])
+    assert list(summary["rank"]) == [1, 2, 3, 4]
+    assert summary.iloc[0]["winner"]
 
 
 def test_compare_command_prints_all_backtest_supported_bar_strategies(monkeypatch, capsys) -> None:

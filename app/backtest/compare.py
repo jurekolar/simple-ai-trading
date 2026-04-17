@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from app.backtest.fills import apply_slippage
+from app.backtest.engine import run_backtest
 from app.config import Settings
-from app.risk.checks import filter_trade_candidates
 from app.strategy import backtest_strategy_names, get_strategy
-from app.strategy.signals import latest_signals
 
 
 def compare_strategies(
@@ -18,43 +16,50 @@ def compare_strategies(
     rows: list[dict[str, object]] = []
     for strategy_name in names:
         strategy = get_strategy(strategy_name)
-        strategy_bars = bars
-        if strategy_name != "mean_reversion":
-            strategy_bars = bars[bars["symbol"].isin(settings.symbol_list)].copy()
-        signal_frame = strategy.generate_signals(strategy_bars, settings)
-        latest = latest_signals(signal_frame)
-        trades = filter_trade_candidates(latest, settings)
-        trades = apply_slippage(trades)
-        avg_atr_ratio = 0.0
-        if not trades.empty and "atr_ratio" in trades.columns:
-            avg_atr_ratio = float(trades["atr_ratio"].fillna(0.0).mean())
-        entry_types = ""
-        if strategy_name == "trend_trailing_stop" and not trades.empty and "entry_type" in trades.columns:
-            entry_types = ",".join(
-                f"{row.symbol}:{row.entry_type}"
-                for row in trades[["symbol", "entry_type"]].itertuples(index=False)
-            )
-        rows.append(
-            {
-                "strategy": strategy_name,
-                "trade_candidates": int(len(trades)),
-                "gross_exposure": float((trades["qty"] * trades["fill_price"]).sum()) if not trades.empty else 0.0,
-                "symbols_selected": ",".join(trades["symbol"].tolist()) if not trades.empty else "",
-                "avg_score": float(trades["score"].mean()) if not trades.empty else 0.0,
-                "avg_atr_ratio": avg_atr_ratio,
-                "entry_types": entry_types,
-            }
-        )
-    return pd.DataFrame(rows)
+        _, metrics = run_backtest(bars, settings, strategy=strategy)
+        rows.append({"strategy": strategy_name, **metrics})
+
+    summary = pd.DataFrame(rows)
+    if summary.empty:
+        return summary
+    summary = summary.sort_values(
+        ["risk_adjusted_score", "max_drawdown", "total_return", "strategy"],
+        ascending=[False, True, False, True],
+        kind="mergesort",
+    ).reset_index(drop=True)
+    summary["rank"] = range(1, len(summary) + 1)
+    summary["winner"] = summary["rank"] == 1
+    ordered_columns = [
+        "rank",
+        "winner",
+        "strategy",
+        "risk_adjusted_score",
+        "sharpe_like",
+        "total_return",
+        "annualized_return",
+        "max_drawdown",
+        "volatility",
+        "win_rate",
+        "trades",
+        "closed_trades",
+        "avg_holding_days",
+        "turnover",
+        "gross_exposure_usage",
+        "gross_exposure",
+    ]
+    return summary[ordered_columns]
 
 
 def format_strategy_comparison(summary: pd.DataFrame) -> str:
     if summary.empty:
         return "No backtest-supported strategies available for comparison."
     printable = summary.copy()
-    printable["gross_exposure"] = printable["gross_exposure"].map(lambda value: f"{value:.2f}")
-    printable["avg_score"] = printable["avg_score"].map(lambda value: f"{value:.4f}")
-    printable["avg_atr_ratio"] = printable["avg_atr_ratio"].map(lambda value: f"{value:.4f}")
-    printable["symbols_selected"] = printable["symbols_selected"].replace("", "-")
-    printable["entry_types"] = printable["entry_types"].replace("", "-")
+    printable["winner"] = printable["winner"].map(lambda flag: "*" if flag else "")
+    for column in ("risk_adjusted_score", "sharpe_like", "avg_holding_days", "turnover"):
+        printable[column] = printable[column].map(lambda value: f"{float(value):.4f}")
+    for column in ("total_return", "annualized_return", "max_drawdown", "volatility", "win_rate", "gross_exposure_usage"):
+        printable[column] = printable[column].map(lambda value: f"{100 * float(value):.2f}%")
+    printable["gross_exposure"] = printable["gross_exposure"].map(lambda value: f"{float(value):.2f}")
+    printable["trades"] = printable["trades"].map(lambda value: f"{float(value):.0f}")
+    printable["closed_trades"] = printable["closed_trades"].map(lambda value: f"{float(value):.0f}")
     return printable.to_string(index=False)
