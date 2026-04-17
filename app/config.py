@@ -173,6 +173,18 @@ class Settings(BaseSettings):
         default=10,
         alias="POLITICIAN_COPY_PREVIEW_LIMIT",
     )
+    politician_copy_rebalance_frequency: str = Field(
+        default="W-FRI",
+        alias="POLITICIAN_COPY_REBALANCE_FREQUENCY",
+    )
+    politician_copy_replay_initial_equity: float = Field(
+        default=100_000.0,
+        alias="POLITICIAN_COPY_REPLAY_INITIAL_EQUITY",
+    )
+    politician_copy_replay_slippage_bps: float = Field(
+        default=10.0,
+        alias="POLITICIAN_COPY_REPLAY_SLIPPAGE_BPS",
+    )
 
     @property
     def symbol_list(self) -> list[str]:

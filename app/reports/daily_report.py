@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import UTC, datetime, timedelta
+import re
 
 from app.backtest.compare import load_latest_benchmark_index
 from app.config import get_settings
@@ -139,6 +140,11 @@ def build_daily_report(repo: JournalRepo) -> str:
     benchmark_matches_active = benchmark_candidate == (
         config_details.get("strategy", getattr(config_snapshot, "strategy_name", "unknown"))
     )
+    latest_paper_run = paper_runs[-1] if paper_runs else None
+    latest_paper_details = latest_paper_run.details if latest_paper_run is not None else ""
+    politician_rejected = _extract_detail_value(latest_paper_details, "politician_copy_rejected_disclosures")
+    politician_selected = _extract_detail_value(latest_paper_details, "politician_copy_selected")
+    politician_targets = _extract_detail_value(latest_paper_details, "politician_copy_targets")
 
     return "\n".join(
         [
@@ -167,6 +173,9 @@ def build_daily_report(repo: JournalRepo) -> str:
             f"broker_errors_1d={len(broker_error_events)}",
             f"blocked_order_reasons={blocked_reasons}",
             f"kill_switch_reasons={kill_switch_reasons}",
+            f"politician_copy_rejected_disclosures={politician_rejected or '0'}",
+            f"politician_copy_selected={politician_selected or '0'}",
+            f"politician_copy_targets={politician_targets or '0'}",
             "",
             "Portfolio Snapshot",
             f"latest_equity={account.equity if account else 0}",
@@ -205,3 +214,8 @@ def build_daily_report(repo: JournalRepo) -> str:
             f"scorecard={_scorecard_line(repo, 7)}; {_scorecard_line(repo, 14)}; {_scorecard_line(repo, 30)}",
         ]
     )
+
+
+def _extract_detail_value(details: str, key: str) -> str:
+    match = re.search(rf"{re.escape(key)}=([^ ]+)", details)
+    return match.group(1) if match else ""

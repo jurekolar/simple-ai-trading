@@ -45,6 +45,12 @@ from app.strategy import backtest_strategy_names, get_strategy, strategy_names
 from app.strategy.base import TradingStrategy
 from app.strategy.momentum import generate_signals
 from app.strategy.politician_copy import AllocationPlan, politician_copy_strategy
+from app.strategy.politician_copy_replay import (
+    format_politician_copy_replay_summary,
+    load_politician_copy_replay_inputs,
+    run_politician_copy_replay,
+    write_politician_copy_replay_artifacts,
+)
 from app.strategy.signals import latest_signals
 
 LOGGER = logging.getLogger(__name__)
@@ -494,6 +500,40 @@ def run_preview_command(strategy: TradingStrategy | None = None) -> None:
     print(plan.preview(limit=settings.politician_copy_preview_limit))
 
 
+def run_replay_command(strategy: TradingStrategy | None = None) -> None:
+    settings = get_settings()
+    active_strategy = strategy or get_strategy("momentum")
+    if active_strategy.name != politician_copy_strategy.name:
+        raise RuntimeError("replay is currently supported only for --strategy politician_copy")
+    repo = JournalRepo(create_session_factory(settings.database_url))
+    _log_runtime_config_snapshot(repo, settings=settings, run_type="replay", strategy_name=active_strategy.name)
+    repo.create_run("replay", "started")
+    disclosures, price_frame, source, production_safe = load_politician_copy_replay_inputs(settings)
+    result = run_politician_copy_replay(
+        disclosures=disclosures,
+        price_frame=price_frame,
+        settings=settings,
+        source=source,
+        production_safe=production_safe,
+    )
+    artifact_dir = write_politician_copy_replay_artifacts(result, settings=settings, disclosures=disclosures)
+    repo.create_run(
+        "replay",
+        "completed",
+        details=(
+            f"strategy={active_strategy.name} source={source} "
+            f"replay_valid={result.summary.get('replay_valid', False)} "
+            f"rebalances={result.summary.get('rebalances', 0.0)} "
+            f"trades={result.summary.get('trades', 0.0)} "
+            f"risk_adjusted_score={result.summary.get('risk_adjusted_score', 0.0)} "
+            f"invalid={result.summary.get('replay_invalid_reasons', '')}"
+        ),
+    )
+    print(format_politician_copy_replay_summary(result.summary))
+    print(f"artifacts={artifact_dir}")
+    LOGGER.info("politician_copy replay metrics %s", result.summary)
+
+
 def _executor_submit(executor, order: OrderIntent, allowed_symbols: set[str]):
     try:
         return executor.submit(order, allowed_symbols=allowed_symbols)
@@ -746,15 +786,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         alert_messages.append(f"kill switch active: {kill_switch.reason}")
     if settings.live_trading_enabled and settings.safe_open_enabled and not safe_open_entries_allowed:
         alert_messages.append(f"live entry gate active: {safe_open_reason}")
-    if stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
-        exit_candidates = protective_exit_candidates(position_qty_by_symbol, position_price_by_symbol)
-        if not exit_candidates.empty:
-            LOGGER.warning(
-                "using protective broker-state exits because market data is stale for symbols: %s",
-                sorted(exit_candidates["symbol"].tolist()),
-            )
-        entry_trades = pd.DataFrame()
-    elif active_strategy.name == politician_copy_strategy.name and plan is not None:
+    if active_strategy.name == politician_copy_strategy.name and plan is not None:
         exit_candidates = pd.DataFrame(
             [
                 {
@@ -780,6 +812,21 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
                 if order.side == "buy"
             ]
         )
+        if stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
+            if not exit_candidates.empty:
+                LOGGER.warning(
+                    "using politician_copy rebalance exits under unsafe data source=%s for symbols: %s",
+                    data_source,
+                    sorted(exit_candidates["symbol"].tolist()),
+                )
+    elif stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
+        exit_candidates = protective_exit_candidates(position_qty_by_symbol, position_price_by_symbol)
+        if not exit_candidates.empty:
+            LOGGER.warning(
+                "using protective broker-state exits because market data is stale for symbols: %s",
+                sorted(exit_candidates["symbol"].tolist()),
+            )
+        entry_trades = pd.DataFrame()
     else:
         exit_candidates = filter_exit_candidates(latest, position_qty_by_symbol, forced_exit_symbols)
         entry_trades = trades
@@ -1007,6 +1054,9 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
             f"safe_open_entries_allowed={safe_open_entries_allowed} "
             f"safe_open_reason={safe_open_reason} "
             f"submitted={submitted_orders} exits={exit_orders} blocked={blocked_orders} "
+            f"politician_copy_rejected_disclosures={len(plan.rejected_disclosures) if plan is not None else 0} "
+            f"politician_copy_selected={len(plan.selected_politicians) if plan is not None else 0} "
+            f"politician_copy_targets={len(plan.target_allocations) if plan is not None else 0} "
             f"skipped_existing={skipped_existing} skipped_exit={skipped_exit} "
             f"synced_orders={sync_summary['recent_orders']} "
             f"open_orders={sync_summary['open_orders']} positions={sync_summary['positions']} "
@@ -1055,7 +1105,7 @@ def run_preflight_command(strategy: TradingStrategy | None = None) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Trading bot entrypoint")
-    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "preflight", "reconcile", "report"])
+    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "replay", "preflight", "reconcile", "report"])
     parser.add_argument(
         "--strategy",
         choices=strategy_names(),
@@ -1079,6 +1129,8 @@ def main() -> None:
         run_paper_command(strategy)
     elif args.command == "preview":
         run_preview_command(strategy)
+    elif args.command == "replay":
+        run_replay_command(strategy)
     elif args.command == "preflight":
         run_preflight_command(strategy)
     elif args.command == "reconcile":

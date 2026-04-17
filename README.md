@@ -88,6 +88,12 @@ Run the politician-copy paper workflow:
 python -m app.main --strategy politician_copy paper
 ```
 
+Run the historical disclosure replay validator for `politician_copy`:
+
+```bash
+python -m app.main --strategy politician_copy replay
+```
+
 To force a deterministic paper-trade exit test on currently held symbols, set
 `FORCE_EXIT_SYMBOLS` before running `paper`, for example
 `FORCE_EXIT_SYMBOLS=SPY python -m app.main paper`. Symbols without an open
