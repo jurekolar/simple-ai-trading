@@ -33,6 +33,20 @@ Checks before leaving the bot unattended:
 - No unresolved orders that are unexplained.
 - No reconciliation mismatch.
 
+## Stress Drill Harness
+
+Use the non-production harness to record and rehearse a named drill while staying on the paper burn-in profile:
+
+```bash
+make stress-drill SCENARIO=stale_data_block
+make stress-drill SCENARIO=broker_submit_failures
+make stress-drill SCENARIO=reconciliation_drift
+make stress-drill SCENARIO=restart_with_open_orders
+make stress-drill SCENARIO=emergency_flatten
+```
+
+The harness does not place broker orders. It writes a dated entry under `logs/burnin/` and records the follow-up commands the operator should run next.
+
 ## Restart During Market Hours
 
 Use this when the bot process stops unexpectedly or you need to restart intentionally.

@@ -1,6 +1,7 @@
-.PHONY: burnin-day burnin-review burnin-auth paper reconcile report burnin-report-1d burnin-report-7d
+.PHONY: burnin-day burnin-review burnin-auth paper reconcile report burnin-report-1d burnin-report-7d stress-drill
 
 STRATEGY ?= momentum
+SCENARIO ?= stale_data_block
 
 burnin-auth:
 	.venv/bin/python scripts/check_alpaca_auth.py --symbol SPY
@@ -25,3 +26,6 @@ burnin-day:
 
 burnin-review:
 	./scripts/review_burnin_day.sh
+
+stress-drill:
+	.venv/bin/python scripts/stress_drill.py --scenario $(SCENARIO)

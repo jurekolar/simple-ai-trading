@@ -33,6 +33,7 @@ Use this every trading day during the 3-4 week paper burn-in for the primary liv
 - Trigger `EMERGENCY_FLATTEN=true` and verify positions reduce cleanly.
 - Simulate stale/unsafe data and verify the run blocks new entries.
 - Simulate broker submit failures and verify alerts fire.
+- Use `make stress-drill SCENARIO=<name>` to stamp the expected behavior and follow-up commands into the burn-in log before or after each drill.
 
 ## End-Of-Day Review
 

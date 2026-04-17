@@ -148,6 +148,18 @@ make burnin-day STRATEGY=breakout
 make burnin-review
 ```
 
+To record and rehearse a named non-production stress drill against the paper burn-in profile:
+
+```bash
+make stress-drill SCENARIO=stale_data_block
+make stress-drill SCENARIO=broker_submit_failures
+make stress-drill SCENARIO=reconciliation_drift
+make stress-drill SCENARIO=restart_with_open_orders
+make stress-drill SCENARIO=emergency_flatten
+```
+
+The drill harness is intentionally separate from `app.main`; it appends a dated entry under `logs/burnin/` and records the expected recovery commands for the operator to run next.
+
 ## Current scope
 
 Version `0.1.0` is intentionally narrow and should still be treated as paper-burn-in software first:
