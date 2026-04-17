@@ -1,6 +1,6 @@
 # Strategy
 
-This repository currently defaults to a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs.
+This repository currently defaults to a narrow, long-only daily-bar momentum strategy for a fixed list of US equities and ETFs. Its preferred TradingView-derived trend-following option is the `breakout` strategy, which implements a Donchian/Turtle-style long-only breakout over prior channel highs and lows.
 
 ## Scope
 
@@ -234,8 +234,38 @@ Held positions
 - `BREAKOUT_ENTRY_WINDOW = 55`
 - `BREAKOUT_EXIT_WINDOW = 20`
 - `BREAKOUT_ATR_WINDOW = 20`
+- `TREND_TRAILING_TREND_WINDOW = 100`
+- `TREND_TRAILING_BREAKOUT_WINDOW = 252`
+- `TREND_TRAILING_PULLBACK_FAST_WINDOW = 20`
+- `TREND_TRAILING_PULLBACK_SLOW_WINDOW = 50`
+- `TREND_TRAILING_ATR_WINDOW = 14`
+- `TREND_TRAILING_STOP_TYPE = atr`
+- `TREND_TRAILING_ATR_MULTIPLIER = 3.0`
+- `TREND_TRAILING_PERCENT = 0.08`
 - `MIN_AVERAGE_DAILY_VOLUME = 500000`
 - `MAX_ATR_RATIO = 0.12`
+
+## Additional Strategy Differences
+
+`breakout` is the repo's TradingView-aligned Donchian/Turtle trend-following strategy:
+
+- entry triggers when `close >` the prior rolling high over `BREAKOUT_ENTRY_WINDOW`
+- exit triggers when `close <` the prior rolling low over `BREAKOUT_EXIT_WINDOW`
+- both channel levels use `shift(1)` so the current bar does not leak into its own signal
+- ATR, liquidity, and ATR-ratio filters stay in place for compatibility with the existing sizing and risk pipeline
+- it remains long-only, so lower-channel breaks produce `exit`, not `short`
+
+`trend_trailing_stop` extends the current bar-based strategy set with a continuation-focused long setup:
+
+- versus `momentum`: it requires either a breakout or a pullback into the `20`/`50` MA zone and exits on a trailing stop instead of a fixed exit MA
+- versus `breakout`: it supports both breakout and pullback entries and uses a ratcheting trailing stop instead of an exit-low channel
+- versus `mean_reversion`: it buys strength in established uptrends instead of buying weakness against a short-term mean
+
+Use the comparison command to inspect candidate count, exposure, selected symbols, and average score side by side:
+
+```bash
+python -m app.main compare
+```
 
 ### Throughput / Portfolio Limits
 

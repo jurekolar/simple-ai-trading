@@ -11,6 +11,7 @@ class BreakoutStrategy:
     def generate_signals(self, bars: pd.DataFrame, settings: Settings) -> pd.DataFrame:
         frame = bars.copy()
         frame["prev_close"] = frame.groupby("symbol")["close"].shift(1)
+        # Use prior-bar channel levels so the Donchian breakout stays free of lookahead bias.
         frame["entry_high"] = frame.groupby("symbol")["high"].transform(
             lambda series: series.shift(1).rolling(
                 settings.breakout_entry_window,
@@ -52,6 +53,7 @@ class BreakoutStrategy:
             (frame["close"] > frame["entry_high"]) & frame["liquidity_ok"] & frame["volatility_ok"],
             "signal",
         ] = "long"
+        # Breakout stays long-only; a lower-channel breach closes an existing long instead of going short.
         frame.loc[frame["close"] < frame["exit_low"], "signal"] = "exit"
         return frame
 

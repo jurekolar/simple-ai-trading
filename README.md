@@ -4,6 +4,7 @@ Scaffold for an Alpaca-backed trading system with:
 
 - historical data loading
 - a simple momentum strategy
+- a TradingView-aligned Donchian/Turtle breakout strategy
 - bar-by-bar backtesting
 - paper-trading orchestration
 - SQLite trade journal storage
@@ -31,11 +32,20 @@ To run a specific strategy explicitly:
 python -m app.main --strategy momentum backtest
 python -m app.main --strategy mean_reversion backtest
 python -m app.main --strategy breakout backtest
+python -m app.main --strategy trend_trailing_stop backtest
+python -m app.main compare
+```
+
+If you want the TradingView-derived trend-following option in this repo, use:
+
+```bash
+python -m app.main --strategy breakout backtest
 ```
 
 Registered strategies live under [app/strategy](/Users/jurekolar/Code/simple-ai-trading/app/strategy). To add a new one, create a module that exposes a strategy object with `name` and `generate_signals(...)`, then register it in [app/strategy/__init__.py](/Users/jurekolar/Code/simple-ai-trading/app/strategy/__init__.py).
 Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; the example mean-reversion strategy uses its own `MEAN_REVERSION_*` settings.
-The new breakout strategy uses `BREAKOUT_ENTRY_WINDOW` / `BREAKOUT_EXIT_WINDOW` / `BREAKOUT_ATR_WINDOW`.
+The `breakout` strategy is the repo's TradingView-aligned Donchian/Turtle breakout and uses `BREAKOUT_ENTRY_WINDOW` / `BREAKOUT_EXIT_WINDOW` / `BREAKOUT_ATR_WINDOW`.
+The `trend_trailing_stop` strategy uses `TREND_TRAILING_*` settings for its trend filter, breakout or pullback entries, and ATR or percent trailing stop exits.
 `politician_copy` is allocation-based rather than bar-signal-based, so it supports `preview` and `paper`, but not `backtest` in v1.
 
 5. Run the paper-trading loop:

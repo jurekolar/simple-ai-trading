@@ -4,6 +4,7 @@ import pandas as pd
 import pytest
 
 from app.broker.execution import PaperExecutor
+from app.backtest.compare import compare_strategies, format_strategy_comparison
 from app.backtest.engine import run_backtest
 from app.broker.alpaca_client import AlpacaTradingAdapter, BrokerOrderSnapshot, BrokerSubmitError
 from app.broker.order_mapper import OrderIntent
@@ -12,7 +13,7 @@ from app.data.historical_loader import load_bars, validate_bars
 from app.data.market_calendar import market_day_window, market_is_open
 from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
-from app.main import build_parser, compute_realized_pnl_records, run_paper_command
+from app.main import build_parser, compute_realized_pnl_records, run_compare_command, run_paper_command
 from app.risk.checks import entry_risk_decision, filter_exit_candidates, protective_exit_candidates
 from app.risk.kill_switch import (
     assess_reconciliation_health,
@@ -20,7 +21,7 @@ from app.risk.kill_switch import (
     evaluate_kill_switch,
     merge_kill_switch_states,
 )
-from app.strategy import get_strategy, strategy_names
+from app.strategy import backtest_strategy_names, get_strategy, strategy_names
 
 
 def test_backtest_produces_trade_candidates() -> None:
@@ -42,6 +43,7 @@ def test_parser_accepts_strategy_argument() -> None:
 def test_strategy_registry_lists_second_example_strategy() -> None:
     assert "mean_reversion" in strategy_names()
     assert "breakout" in strategy_names()
+    assert "trend_trailing_stop" in strategy_names()
 
 
 def test_mean_reversion_strategy_generates_entry_and_exit_signals() -> None:
@@ -256,6 +258,584 @@ def test_breakout_strategy_generates_exit_signal() -> None:
     signal_frame = strategy.generate_signals(bars, settings)
 
     assert signal_frame.iloc[3]["signal"] == "exit"
+
+
+def test_breakout_strategy_uses_prior_rolling_high_not_current_bar_high() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 103.0,
+                "low": 100.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 104.0,
+                "low": 101.0,
+                "close": 103.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 110.0,
+                "low": 102.0,
+                "close": 104.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["entry_high"] == 104.0
+    assert signal_frame.iloc[3]["signal"] == "flat"
+
+
+def test_breakout_strategy_uses_prior_rolling_low_not_current_bar_low() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 104.0,
+                "low": 98.0,
+                "close": 103.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 105.0,
+                "low": 97.0,
+                "close": 104.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 104.0,
+                "high": 106.0,
+                "low": 96.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 105.0,
+                "high": 107.0,
+                "low": 80.0,
+                "close": 96.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["exit_low"] == 96.0
+    assert signal_frame.iloc[3]["signal"] == "flat"
+
+
+def test_breakout_strategy_never_emits_short_signal() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 104.0,
+                "low": 100.0,
+                "close": 103.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 105.0,
+                "low": 101.0,
+                "close": 104.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 98.0,
+                "high": 99.0,
+                "low": 95.0,
+                "close": 96.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert set(signal_frame["signal"].unique()) <= {"flat", "long", "exit"}
+
+
+def test_breakout_strategy_respects_liquidity_and_volatility_filters() -> None:
+    strategy = get_strategy("breakout")
+    settings = Settings(
+        BREAKOUT_ENTRY_WINDOW=3,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=3,
+        MIN_AVERAGE_DAILY_VOLUME=2_000,
+        MAX_ATR_RATIO=0.05,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 102.0,
+                "low": 100.0,
+                "close": 101.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 103.0,
+                "low": 101.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 108.0,
+                "low": 96.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert not bool(signal_frame.iloc[3]["liquidity_ok"])
+    assert not bool(signal_frame.iloc[3]["volatility_ok"])
+    assert signal_frame.iloc[3]["signal"] == "flat"
+
+
+def test_parser_accepts_trend_trailing_stop_strategy_argument() -> None:
+    args = build_parser().parse_args(["--strategy", "trend_trailing_stop", "backtest"])
+
+    assert args.strategy == "trend_trailing_stop"
+    assert args.command == "backtest"
+
+
+def test_trend_trailing_stop_strategy_generates_breakout_entry_signal() -> None:
+    strategy = get_strategy("trend_trailing_stop")
+    settings = Settings(
+        TREND_TRAILING_TREND_WINDOW=3,
+        TREND_TRAILING_BREAKOUT_WINDOW=3,
+        TREND_TRAILING_PULLBACK_FAST_WINDOW=2,
+        TREND_TRAILING_PULLBACK_SLOW_WINDOW=3,
+        TREND_TRAILING_ATR_WINDOW=3,
+        TREND_TRAILING_STOP_TYPE="atr",
+        TREND_TRAILING_ATR_MULTIPLIER=1.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 102.0,
+                "low": 100.0,
+                "close": 101.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 103.0,
+                "low": 101.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 106.0,
+                "low": 102.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "long"
+    assert signal_frame.iloc[3]["entry_type"] == "breakout"
+
+
+def test_trend_trailing_stop_strategy_generates_pullback_entry_signal() -> None:
+    strategy = get_strategy("trend_trailing_stop")
+    settings = Settings(
+        TREND_TRAILING_TREND_WINDOW=4,
+        TREND_TRAILING_BREAKOUT_WINDOW=4,
+        TREND_TRAILING_PULLBACK_FAST_WINDOW=2,
+        TREND_TRAILING_PULLBACK_SLOW_WINDOW=3,
+        TREND_TRAILING_ATR_WINDOW=2,
+        TREND_TRAILING_STOP_TYPE="atr",
+        TREND_TRAILING_ATR_MULTIPLIER=5.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 106.0,
+                "high": 107.0,
+                "low": 105.0,
+                "close": 106.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 112.0,
+                "high": 113.0,
+                "low": 111.0,
+                "close": 112.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 118.0,
+                "high": 119.0,
+                "low": 117.0,
+                "close": 118.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 20, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 114.0,
+                "high": 116.0,
+                "low": 113.0,
+                "close": 115.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[4]["signal"] == "long"
+    assert signal_frame.iloc[4]["entry_type"] == "pullback"
+
+
+def test_trend_trailing_stop_strategy_generates_atr_exit_signal() -> None:
+    strategy = get_strategy("trend_trailing_stop")
+    settings = Settings(
+        TREND_TRAILING_TREND_WINDOW=3,
+        TREND_TRAILING_BREAKOUT_WINDOW=3,
+        TREND_TRAILING_PULLBACK_FAST_WINDOW=2,
+        TREND_TRAILING_PULLBACK_SLOW_WINDOW=3,
+        TREND_TRAILING_ATR_WINDOW=2,
+        TREND_TRAILING_STOP_TYPE="atr",
+        TREND_TRAILING_ATR_MULTIPLIER=1.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 104.0,
+                "low": 102.0,
+                "close": 103.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 107.0,
+                "high": 108.0,
+                "low": 106.0,
+                "close": 107.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 102.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "exit"
+
+
+def test_trend_trailing_stop_strategy_generates_percent_exit_signal() -> None:
+    strategy = get_strategy("trend_trailing_stop")
+    settings = Settings(
+        TREND_TRAILING_TREND_WINDOW=3,
+        TREND_TRAILING_BREAKOUT_WINDOW=3,
+        TREND_TRAILING_PULLBACK_FAST_WINDOW=2,
+        TREND_TRAILING_PULLBACK_SLOW_WINDOW=3,
+        TREND_TRAILING_ATR_WINDOW=2,
+        TREND_TRAILING_STOP_TYPE="percent",
+        TREND_TRAILING_PERCENT=0.05,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 105.0,
+                "high": 106.0,
+                "low": 104.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 109.0,
+                "high": 110.0,
+                "low": 108.0,
+                "close": 109.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 103.0,
+                "low": 100.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "exit"
+
+
+def test_trend_trailing_stop_strategy_uses_dedicated_settings() -> None:
+    strategy = get_strategy("trend_trailing_stop")
+    settings = Settings(
+        TREND_WINDOW=50,
+        EXIT_WINDOW=20,
+        BREAKOUT_ENTRY_WINDOW=10,
+        TREND_TRAILING_TREND_WINDOW=3,
+        TREND_TRAILING_BREAKOUT_WINDOW=3,
+        TREND_TRAILING_PULLBACK_FAST_WINDOW=2,
+        TREND_TRAILING_PULLBACK_SLOW_WINDOW=3,
+        TREND_TRAILING_ATR_WINDOW=2,
+        TREND_TRAILING_STOP_TYPE="atr",
+        TREND_TRAILING_ATR_MULTIPLIER=1.0,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+    )
+    bars = pd.DataFrame(
+        [
+            {
+                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 100.0,
+                "high": 101.0,
+                "low": 99.0,
+                "close": 100.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 101.0,
+                "high": 102.0,
+                "low": 100.0,
+                "close": 101.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 102.0,
+                "high": 103.0,
+                "low": 101.0,
+                "close": 102.0,
+                "volume": 1_000,
+            },
+            {
+                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
+                "symbol": "SPY",
+                "open": 103.0,
+                "high": 106.0,
+                "low": 102.0,
+                "close": 105.0,
+                "volume": 1_000,
+            },
+        ]
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+
+    assert signal_frame.iloc[3]["signal"] == "long"
+    assert signal_frame.iloc[3]["breakout_high"] == 103.0
+
+
+def test_compare_helper_excludes_politician_copy() -> None:
+    assert "politician_copy" not in backtest_strategy_names()
+
+
+def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies() -> None:
+    settings = Settings(MAX_SYMBOLS_PER_RUN=3)
+    bars = load_bars(settings)
+
+    summary = compare_strategies(bars, settings)
+
+    assert list(summary["strategy"]) == backtest_strategy_names()
+    assert "politician_copy" not in set(summary["strategy"])
+
+
+def test_compare_command_prints_all_backtest_supported_bar_strategies(monkeypatch, capsys) -> None:
+    settings = Settings()
+    bars = load_bars(settings)
+    loaded = type("LoadedBars", (), {"bars": bars, "source": "synthetic", "production_safe": True})()
+    validation = type(
+        "ValidationResult",
+        (),
+        {"valid_bars": bars, "failed_symbols": [], "has_partial_failure": False},
+    )()
+
+    monkeypatch.setattr("app.main.get_settings", lambda: settings)
+    monkeypatch.setattr("app.main.load_bars_with_source", lambda _: loaded)
+    monkeypatch.setattr("app.main.validate_bars", lambda bars, _: validation)
+
+    run_compare_command()
+    output = capsys.readouterr().out
+
+    for strategy_name in backtest_strategy_names():
+        assert strategy_name in output
+    assert "politician_copy" not in output
+    assert format_strategy_comparison(compare_strategies(bars, settings))
 
 
 def test_filter_exit_candidates_uses_existing_positions() -> None:

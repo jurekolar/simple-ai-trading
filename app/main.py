@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 
 import pandas as pd
 
+from app.backtest.compare import compare_strategies, format_strategy_comparison
 from app.backtest.engine import run_backtest
 from app.broker.alpaca_client import AlpacaTradingAdapter
 from app.broker.alpaca_client import BrokerClosePositionError, BrokerExposureSnapshot, ReconciliationSnapshot
@@ -32,7 +33,7 @@ from app.risk.checks import (
 from app.risk.kill_switch import data_is_stale, evaluate_kill_switch
 from app.risk.kill_switch import assess_reconciliation_health, merge_kill_switch_states
 from app.scheduler import should_run_trading_loop
-from app.strategy import get_strategy, strategy_names
+from app.strategy import backtest_strategy_names, get_strategy, strategy_names
 from app.strategy.base import TradingStrategy
 from app.strategy.momentum import generate_signals
 from app.strategy.politician_copy import AllocationPlan, politician_copy_strategy
@@ -437,6 +438,15 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
         details=f"strategy={active_strategy.name} source={loaded.source} metrics={metrics}",
     )
     LOGGER.info("backtest metrics %s", metrics)
+
+
+def run_compare_command() -> None:
+    settings = get_settings()
+    loaded = load_bars_with_source(settings)
+    validation = validate_bars(loaded.bars, settings)
+    summary = compare_strategies(validation.valid_bars, settings, strategy_names=backtest_strategy_names())
+    print(format_strategy_comparison(summary))
+    LOGGER.info("compare metrics %s", summary.to_dict(orient="records"))
 
 
 def run_paper_command(strategy: TradingStrategy | None = None) -> None:
@@ -889,7 +899,7 @@ def run_reconcile_command() -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Trading bot entrypoint")
-    parser.add_argument("command", choices=["backtest", "paper", "preview", "reconcile", "report"])
+    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "reconcile", "report"])
     parser.add_argument(
         "--strategy",
         choices=strategy_names(),
@@ -907,6 +917,8 @@ def main() -> None:
 
     if args.command == "backtest":
         run_backtest_command(strategy)
+    elif args.command == "compare":
+        run_compare_command()
     elif args.command == "paper":
         run_paper_command(strategy)
     elif args.command == "preview":

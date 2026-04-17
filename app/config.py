@@ -49,6 +49,20 @@ class Settings(BaseSettings):
     breakout_entry_window: int = Field(default=55, alias="BREAKOUT_ENTRY_WINDOW")
     breakout_exit_window: int = Field(default=20, alias="BREAKOUT_EXIT_WINDOW")
     breakout_atr_window: int = Field(default=20, alias="BREAKOUT_ATR_WINDOW")
+    trend_trailing_trend_window: int = Field(default=100, alias="TREND_TRAILING_TREND_WINDOW")
+    trend_trailing_breakout_window: int = Field(default=252, alias="TREND_TRAILING_BREAKOUT_WINDOW")
+    trend_trailing_pullback_fast_window: int = Field(
+        default=20,
+        alias="TREND_TRAILING_PULLBACK_FAST_WINDOW",
+    )
+    trend_trailing_pullback_slow_window: int = Field(
+        default=50,
+        alias="TREND_TRAILING_PULLBACK_SLOW_WINDOW",
+    )
+    trend_trailing_atr_window: int = Field(default=14, alias="TREND_TRAILING_ATR_WINDOW")
+    trend_trailing_stop_type: str = Field(default="atr", alias="TREND_TRAILING_STOP_TYPE")
+    trend_trailing_atr_multiplier: float = Field(default=3.0, alias="TREND_TRAILING_ATR_MULTIPLIER")
+    trend_trailing_percent: float = Field(default=0.08, alias="TREND_TRAILING_PERCENT")
     atr_risk_budget: float = Field(default=100, alias="ATR_RISK_BUDGET")
     risk_per_trade_fraction: float = Field(default=0.01, alias="RISK_PER_TRADE_FRACTION")
     min_average_daily_volume: float = Field(default=500_000, alias="MIN_AVERAGE_DAILY_VOLUME")
