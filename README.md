@@ -39,6 +39,8 @@ python -m app.main --strategy trend_trailing_stop backtest
 python -m app.main compare
 ```
 
+For full instructions on running and interpreting the benchmark backtests, see [BACKTEST_BENCHMARKING.md](/Users/jurekolar/Code/simple-ai-trading/BACKTEST_BENCHMARKING.md).
+
 If you want the TradingView-derived trend-following option in this repo, use:
 
 ```bash
