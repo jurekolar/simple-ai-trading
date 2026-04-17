@@ -44,10 +44,19 @@ class Settings(BaseSettings):
     trend_window: int = Field(default=100, alias="TREND_WINDOW")
     exit_window: int = Field(default=50, alias="EXIT_WINDOW")
     atr_window: int = Field(default=14, alias="ATR_WINDOW")
-    mean_reversion_window: int = Field(default=20, alias="MEAN_REVERSION_WINDOW")
+    mean_reversion_window: int = Field(default=50, alias="MEAN_REVERSION_WINDOW")
     mean_reversion_volatility_window: int = Field(default=20, alias="MEAN_REVERSION_VOLATILITY_WINDOW")
-    mean_reversion_entry_zscore: float = Field(default=-1.0, alias="MEAN_REVERSION_ENTRY_ZSCORE")
+    mean_reversion_entry_zscore: float = Field(default=-1.5, alias="MEAN_REVERSION_ENTRY_ZSCORE")
     mean_reversion_exit_zscore: float = Field(default=0.0, alias="MEAN_REVERSION_EXIT_ZSCORE")
+    mean_reversion_benchmark_symbol: str = Field(default="SPY", alias="MEAN_REVERSION_BENCHMARK_SYMBOL")
+    mean_reversion_rs_window: int = Field(default=20, alias="MEAN_REVERSION_RS_WINDOW")
+    mean_reversion_trend_window: int = Field(default=200, alias="MEAN_REVERSION_TREND_WINDOW")
+    mean_reversion_atr_window: int = Field(default=14, alias="MEAN_REVERSION_ATR_WINDOW")
+    mean_reversion_volume_window: int = Field(default=20, alias="MEAN_REVERSION_VOLUME_WINDOW")
+    mean_reversion_relative_weakness_threshold: float = Field(
+        default=-0.05,
+        alias="MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD",
+    )
     breakout_entry_window: int = Field(default=55, alias="BREAKOUT_ENTRY_WINDOW")
     breakout_exit_window: int = Field(default=20, alias="BREAKOUT_EXIT_WINDOW")
     breakout_atr_window: int = Field(default=20, alias="BREAKOUT_ATR_WINDOW")

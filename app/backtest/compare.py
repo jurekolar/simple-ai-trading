@@ -18,7 +18,10 @@ def compare_strategies(
     rows: list[dict[str, object]] = []
     for strategy_name in names:
         strategy = get_strategy(strategy_name)
-        signal_frame = strategy.generate_signals(bars, settings)
+        strategy_bars = bars
+        if strategy_name != "mean_reversion":
+            strategy_bars = bars[bars["symbol"].isin(settings.symbol_list)].copy()
+        signal_frame = strategy.generate_signals(strategy_bars, settings)
         latest = latest_signals(signal_frame)
         trades = filter_trade_candidates(latest, settings)
         trades = apply_slippage(trades)

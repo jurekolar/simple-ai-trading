@@ -25,13 +25,22 @@ class DataValidationReport:
         return bool(self.failed_symbols)
 
 
-def load_bars(settings: Settings) -> pd.DataFrame:
-    return load_bars_with_source(settings).bars
+def required_market_symbols(settings: Settings, strategy_name: str | None = None) -> list[str]:
+    symbols = list(settings.symbol_list)
+    if strategy_name == "mean_reversion":
+        benchmark_symbol = settings.mean_reversion_benchmark_symbol.strip().upper()
+        if benchmark_symbol and benchmark_symbol not in symbols:
+            symbols.append(benchmark_symbol)
+    return symbols
 
 
-def load_bars_with_source(settings: Settings) -> LoadedBars:
+def load_bars(settings: Settings, strategy_name: str | None = None) -> pd.DataFrame:
+    return load_bars_with_source(settings, strategy_name).bars
+
+
+def load_bars_with_source(settings: Settings, strategy_name: str | None = None) -> LoadedBars:
     client = AlpacaDataClient(settings)
-    result = client.get_daily_bars(settings.symbol_list, settings.lookback_days)
+    result = client.get_daily_bars(required_market_symbols(settings, strategy_name), settings.lookback_days)
     bars = result.bars
     required_columns = {"timestamp", "symbol", "open", "high", "low", "close", "volume"}
     missing = required_columns.difference(bars.columns)
@@ -44,9 +53,17 @@ def load_bars_with_source(settings: Settings) -> LoadedBars:
     )
 
 
-def validate_bars(bars: pd.DataFrame, settings: Settings) -> DataValidationReport:
+def validate_bars(
+    bars: pd.DataFrame,
+    settings: Settings,
+    strategy_name: str | None = None,
+) -> DataValidationReport:
+    required_symbols = required_market_symbols(settings, strategy_name)
     if bars.empty:
-        return DataValidationReport(valid_bars=bars.copy(), failed_symbols={symbol: "missing_symbol" for symbol in settings.symbol_list})
+        return DataValidationReport(
+            valid_bars=bars.copy(),
+            failed_symbols={symbol: "missing_symbol" for symbol in required_symbols},
+        )
 
     frame = bars.copy()
     frame["symbol"] = frame["symbol"].astype(str).str.upper()
@@ -54,7 +71,7 @@ def validate_bars(bars: pd.DataFrame, settings: Settings) -> DataValidationRepor
     failed_symbols: dict[str, str] = {}
     valid_symbols: list[str] = []
 
-    for symbol in settings.symbol_list:
+    for symbol in required_symbols:
         symbol_frame = frame[frame["symbol"] == symbol].sort_values("timestamp")
         if symbol_frame.empty:
             failed_symbols[symbol] = "missing_symbol"

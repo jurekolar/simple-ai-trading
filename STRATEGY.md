@@ -28,7 +28,9 @@ Those symbols are:
 
 Any symbol with missing, invalid, duplicated, too-short, or suspicious bar history is excluded from signal generation.
 
-## Indicators
+`mean_reversion` has one additional data dependency: it also loads and validates `MEAN_REVERSION_BENCHMARK_SYMBOL` for signal generation, default `SPY`. That benchmark is used as a reference series and does not become a trade candidate unless it is explicitly listed in `SYMBOLS`.
+
+## Momentum Indicators
 
 For each symbol, the strategy computes:
 
@@ -41,7 +43,7 @@ For each symbol, the strategy computes:
 
 Implementation: [app/strategy/momentum.py](/Users/jurekolar/Code/simple-ai-trading/app/strategy/momentum.py:8)
 
-## Signal Rules
+## Momentum Signal Rules
 
 ### Long Signal
 
@@ -69,6 +71,41 @@ Implementation: [app/strategy/momentum.py](/Users/jurekolar/Code/simple-ai-tradi
 ### Flat Signal
 
 If neither rule applies, the symbol remains `flat`.
+
+## Mean Reversion Strategy
+
+`mean_reversion` is now a benchmark-aware daily pullback strategy rather than a standalone z-score screen.
+
+For each candidate symbol it computes:
+
+- `mean_ma`: rolling close mean over `MEAN_REVERSION_WINDOW`, default `50`
+- `stddev`: rolling close std dev over `MEAN_REVERSION_WINDOW`
+- `z_score`: `(close - mean_ma) / stddev`
+- `trend_ma`: rolling close mean over `MEAN_REVERSION_TREND_WINDOW`, default `200`
+- `stock_return_rs`: trailing return over `MEAN_REVERSION_RS_WINDOW`, default `20`
+- `benchmark_return_rs`: same trailing return for `MEAN_REVERSION_BENCHMARK_SYMBOL`
+- `rs_delta`: `stock_return_rs - benchmark_return_rs`
+- `atr`: average true range over `MEAN_REVERSION_ATR_WINDOW`, default `14`
+- `avg_volume`: rolling average volume over `MEAN_REVERSION_VOLUME_WINDOW`, default `20`
+
+Long signal requirements:
+
+- `z_score <= MEAN_REVERSION_ENTRY_ZSCORE`
+- `rs_delta <= MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD`
+- `close > trend_ma`
+- `avg_volume >= MIN_AVERAGE_DAILY_VOLUME`
+
+Exit signal:
+
+- `z_score >= MEAN_REVERSION_EXIT_ZSCORE`
+
+Ranking score:
+
+```text
+score = (-z_score) + (-(rs_delta) / abs(MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD))
+```
+
+This keeps the strategy long-only, daily-bar based, and compatible with the existing position sizing and trade filtering pipeline. Stop-loss and max-hold overlays are intentionally out of scope for this version.
 
 ## Candidate Ranking
 
@@ -206,7 +243,7 @@ Fixed symbol list
   -> submit market buys
 
 Held positions
-  -> normal exit if close < 50-day MA
+  -> normal exit if the active strategy emits `exit`
   -> or forced / protective / emergency exit
   -> submit market sells
 ```
@@ -227,10 +264,16 @@ Held positions
 - `TREND_WINDOW = 100`
 - `EXIT_WINDOW = 50`
 - `ATR_WINDOW = 14`
-- `MEAN_REVERSION_WINDOW = 20`
+- `MEAN_REVERSION_WINDOW = 50`
 - `MEAN_REVERSION_VOLATILITY_WINDOW = 20`
-- `MEAN_REVERSION_ENTRY_ZSCORE = -1.0`
+- `MEAN_REVERSION_ENTRY_ZSCORE = -1.5`
 - `MEAN_REVERSION_EXIT_ZSCORE = 0.0`
+- `MEAN_REVERSION_BENCHMARK_SYMBOL = SPY`
+- `MEAN_REVERSION_RS_WINDOW = 20`
+- `MEAN_REVERSION_TREND_WINDOW = 200`
+- `MEAN_REVERSION_ATR_WINDOW = 14`
+- `MEAN_REVERSION_VOLUME_WINDOW = 20`
+- `MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD = -0.05`
 - `BREAKOUT_ENTRY_WINDOW = 55`
 - `BREAKOUT_EXIT_WINDOW = 20`
 - `BREAKOUT_ATR_WINDOW = 20`

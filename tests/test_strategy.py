@@ -9,7 +9,7 @@ from app.backtest.engine import run_backtest
 from app.broker.alpaca_client import AlpacaTradingAdapter, BrokerOrderSnapshot, BrokerSubmitError
 from app.broker.order_mapper import OrderIntent
 from app.config import Settings
-from app.data.historical_loader import load_bars, validate_bars
+from app.data.historical_loader import load_bars, load_bars_with_source, validate_bars
 from app.data.market_calendar import market_day_window, market_is_open
 from app.db.models import create_session_factory
 from app.db.repo import JournalRepo
@@ -22,7 +22,12 @@ from app.main import (
 )
 from app.monitoring.alerts import send_alerts
 from app.reports.daily_report import build_daily_report
-from app.risk.checks import entry_risk_decision, filter_exit_candidates, protective_exit_candidates
+from app.risk.checks import (
+    entry_risk_decision,
+    filter_exit_candidates,
+    filter_trade_candidates,
+    protective_exit_candidates,
+)
 from app.risk.kill_switch import (
     assess_reconciliation_health,
     data_is_stale,
@@ -30,6 +35,36 @@ from app.risk.kill_switch import (
     merge_kill_switch_states,
 )
 from app.strategy import backtest_strategy_names, get_strategy, strategy_names
+
+
+def _daily_bars(
+    symbol: str,
+    closes: list[float],
+    *,
+    start_day: int = 1,
+    volume: float = 1_000_000,
+    gap_down_index: int | None = None,
+) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    for index, close in enumerate(closes):
+        timestamp = datetime(2026, 1, start_day + index, 20, 0, tzinfo=UTC)
+        open_price = closes[index - 1] if index > 0 else close
+        if gap_down_index is not None and index == gap_down_index and index > 0:
+            open_price = closes[index - 1] - 10.0
+        high = max(open_price, close) + 1.0
+        low = min(open_price, close) - 1.0
+        rows.append(
+            {
+                "timestamp": timestamp,
+                "symbol": symbol,
+                "open": float(open_price),
+                "high": float(high),
+                "low": float(low),
+                "close": float(close),
+                "volume": float(volume),
+            }
+        )
+    return rows
 
 
 def test_backtest_produces_trade_candidates() -> None:
@@ -57,105 +92,189 @@ def test_strategy_registry_lists_second_example_strategy() -> None:
 def test_mean_reversion_strategy_generates_entry_and_exit_signals() -> None:
     strategy = get_strategy("mean_reversion")
     settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
         MEAN_REVERSION_WINDOW=3,
-        MEAN_REVERSION_VOLATILITY_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=6,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
         MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
         MEAN_REVERSION_EXIT_ZSCORE=0.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
         MIN_AVERAGE_DAILY_VOLUME=100,
     )
     bars = pd.DataFrame(
-        [
-            {
-                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1_000,
-            },
-            {
-                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1_000,
-            },
-            {
-                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 95.0,
-                "high": 96.0,
-                "low": 94.0,
-                "close": 95.0,
-                "volume": 1_000,
-            },
-            {
-                "timestamp": datetime(2026, 4, 17, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1_000,
-            },
-        ]
+        _daily_bars("QQQ", [70, 72, 74, 100, 110, 90, 100])
+        + _daily_bars("SPY", [100, 101, 102, 103, 104, 102, 103])
     )
 
-    signal_frame = strategy.generate_signals(bars, settings)
+    signal_frame = strategy.generate_signals(bars, settings).sort_values(["symbol", "timestamp"])
+    qqq = signal_frame[signal_frame["symbol"] == "QQQ"].reset_index(drop=True)
 
-    assert signal_frame.iloc[2]["signal"] == "long"
-    assert signal_frame.iloc[3]["signal"] == "exit"
+    assert qqq.iloc[5]["signal"] == "long"
+    assert qqq.iloc[6]["signal"] == "exit"
 
 
 def test_mean_reversion_strategy_uses_dedicated_settings_not_momentum_windows() -> None:
     strategy = get_strategy("mean_reversion")
     settings = Settings(
+        SYMBOLS="QQQ",
+        TREND_WINDOW=50,
         EXIT_WINDOW=50,
         ATR_WINDOW=14,
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
         MEAN_REVERSION_WINDOW=3,
-        MEAN_REVERSION_VOLATILITY_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=6,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
         MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
         MEAN_REVERSION_EXIT_ZSCORE=0.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
         MIN_AVERAGE_DAILY_VOLUME=100,
     )
     bars = pd.DataFrame(
-        [
-            {
-                "timestamp": datetime(2026, 4, 14, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1_000,
-            },
-            {
-                "timestamp": datetime(2026, 4, 15, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 100.0,
-                "high": 101.0,
-                "low": 99.0,
-                "close": 100.0,
-                "volume": 1_000,
-            },
-            {
-                "timestamp": datetime(2026, 4, 16, 20, 0, tzinfo=UTC),
-                "symbol": "SPY",
-                "open": 95.0,
-                "high": 96.0,
-                "low": 94.0,
-                "close": 95.0,
-                "volume": 1_000,
-            },
-        ]
+        _daily_bars("QQQ", [70, 72, 74, 100, 110, 90])
+        + _daily_bars("SPY", [100, 101, 102, 103, 104, 102])
     )
 
     signal_frame = strategy.generate_signals(bars, settings)
+    qqq = signal_frame[signal_frame["symbol"] == "QQQ"].reset_index(drop=True)
 
-    assert signal_frame.iloc[2]["signal"] == "long"
+    assert qqq.iloc[5]["signal"] == "long"
+
+
+def test_mean_reversion_requires_trend_filter_for_entry() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=4,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [100, 102, 104, 106, 108, 90])
+        + _daily_bars("SPY", [100, 101, 102, 103, 104, 102])
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+    qqq = signal_frame[signal_frame["symbol"] == "QQQ"].reset_index(drop=True)
+
+    assert qqq.iloc[5]["signal"] == "flat"
+    assert qqq.iloc[5]["close"] < qqq.iloc[5]["trend_ma"]
+
+
+def test_mean_reversion_requires_relative_weakness_vs_benchmark() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=6,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [70, 72, 74, 100, 110, 90])
+        + _daily_bars("SPY", [100, 101, 102, 103, 120, 90])
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+    qqq = signal_frame[signal_frame["symbol"] == "QQQ"].reset_index(drop=True)
+
+    assert qqq.iloc[5]["signal"] == "flat"
+    assert qqq.iloc[5]["rs_delta"] > settings.mean_reversion_relative_weakness_threshold
+
+
+def test_mean_reversion_ranking_prefers_stronger_composite_score() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        SYMBOLS="QQQ,AAPL",
+        MAX_SYMBOLS_PER_RUN=1,
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=6,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [70, 72, 74, 100, 110, 90])
+        + _daily_bars("AAPL", [70, 72, 74, 100, 108, 92])
+        + _daily_bars("SPY", [100, 101, 102, 103, 104, 102])
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+    latest = signal_frame.sort_values("timestamp").groupby("symbol", as_index=False).tail(1).reset_index(drop=True)
+    latest["account_equity"] = 100_000.0
+    trades = filter_trade_candidates(latest, settings)
+
+    assert list(trades["symbol"]) == ["QQQ"]
+    assert float(trades.iloc[0]["score"]) > float(latest[latest["symbol"] == "AAPL"]["score"].iloc[0])
+
+
+def test_mean_reversion_atr_uses_true_range_instead_of_close_stddev() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MEAN_REVERSION_WINDOW=2,
+        MEAN_REVERSION_TREND_WINDOW=2,
+        MEAN_REVERSION_RS_WINDOW=1,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
+        MEAN_REVERSION_ENTRY_ZSCORE=-0.5,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.01,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [100, 100, 90], gap_down_index=2)
+        + _daily_bars("SPY", [100, 100, 99])
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+    qqq = signal_frame[signal_frame["symbol"] == "QQQ"].reset_index(drop=True)
+
+    assert qqq.iloc[2]["atr"] == pytest.approx(6.5)
+
+
+def test_mean_reversion_benchmark_is_not_trade_candidate_when_reference_only() -> None:
+    strategy = get_strategy("mean_reversion")
+    settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MEAN_REVERSION_WINDOW=3,
+        MEAN_REVERSION_TREND_WINDOW=6,
+        MEAN_REVERSION_RS_WINDOW=2,
+        MEAN_REVERSION_ATR_WINDOW=2,
+        MEAN_REVERSION_VOLUME_WINDOW=2,
+        MEAN_REVERSION_ENTRY_ZSCORE=-1.0,
+        MEAN_REVERSION_RELATIVE_WEAKNESS_THRESHOLD=-0.05,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [70, 72, 74, 100, 110, 90])
+        + _daily_bars("SPY", [100, 101, 102, 103, 104, 102])
+    )
+
+    signal_frame = strategy.generate_signals(bars, settings)
+    latest = signal_frame.sort_values("timestamp").groupby("symbol", as_index=False).tail(1).reset_index(drop=True)
+
+    assert latest.loc[latest["symbol"] == "SPY", "signal"].iloc[0] == "flat"
 
 
 def test_breakout_strategy_generates_entry_signal() -> None:
@@ -815,7 +934,7 @@ def test_compare_helper_excludes_politician_copy() -> None:
 
 def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies() -> None:
     settings = Settings(MAX_SYMBOLS_PER_RUN=3)
-    bars = load_bars(settings)
+    bars = load_bars(settings, "mean_reversion")
 
     summary = compare_strategies(bars, settings)
 
@@ -825,7 +944,7 @@ def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies()
 
 def test_compare_command_prints_all_backtest_supported_bar_strategies(monkeypatch, capsys) -> None:
     settings = Settings()
-    bars = load_bars(settings)
+    bars = load_bars(settings, "mean_reversion")
     loaded = type("LoadedBars", (), {"bars": bars, "source": "synthetic", "production_safe": True})()
     validation = type(
         "ValidationResult",
@@ -834,8 +953,8 @@ def test_compare_command_prints_all_backtest_supported_bar_strategies(monkeypatc
     )()
 
     monkeypatch.setattr("app.main.get_settings", lambda: settings)
-    monkeypatch.setattr("app.main.load_bars_with_source", lambda _: loaded)
-    monkeypatch.setattr("app.main.validate_bars", lambda bars, _: validation)
+    monkeypatch.setattr("app.main.load_bars_with_source", lambda *args, **kwargs: loaded)
+    monkeypatch.setattr("app.main.validate_bars", lambda *args, **kwargs: validation)
 
     run_compare_command()
     output = capsys.readouterr().out
@@ -1408,7 +1527,11 @@ def test_run_paper_command_skips_entry_when_symbol_has_open_order(tmp_path, monk
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "alpaca", "production_safe": True},
+        )(),
     )
     monkeypatch.setattr("app.main.reconcile_broker_state", lambda repo, broker: {"recent_orders": 0, "open_orders": 0, "positions": 0, "pnl_points": 0, "fills": 0, "lot_matches": 0, "realized_symbols": 0})
     monkeypatch.setattr(
@@ -1525,7 +1648,11 @@ def test_run_paper_command_emergency_drawdown_forces_exit(tmp_path, monkeypatch)
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "alpaca", "production_safe": True},
+        )(),
     )
     monkeypatch.setattr(
         "app.main.reconcile_broker_state",
@@ -1634,7 +1761,11 @@ def test_run_paper_command_stale_data_still_allows_exit(tmp_path, monkeypatch) -
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "synthetic", "production_safe": False})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "synthetic", "production_safe": False},
+        )(),
     )
     monkeypatch.setattr(
         "app.main.reconcile_broker_state",
@@ -1788,7 +1919,11 @@ def test_run_paper_command_daily_loss_limit_still_allows_exit(tmp_path, monkeypa
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "alpaca", "production_safe": True},
+        )(),
     )
     monkeypatch.setattr(
         "app.main.reconcile_broker_state",
@@ -1865,6 +2000,57 @@ def test_validate_bars_flags_partial_data_failures() -> None:
     assert report.has_partial_failure
     assert report.failed_symbols == {"QQQ": "duplicate_timestamp"}
     assert sorted(report.valid_bars["symbol"].unique().tolist()) == ["SPY"]
+
+
+def test_validate_bars_requires_benchmark_history_for_mean_reversion() -> None:
+    settings = Settings(
+        SYMBOLS="QQQ",
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+        MIN_HISTORY_DAYS=2,
+    )
+    bars = pd.DataFrame(
+        _daily_bars("QQQ", [100, 101], volume=1_000_000)
+    )
+
+    report = validate_bars(bars, settings, "mean_reversion")
+
+    assert report.has_partial_failure
+    assert report.failed_symbols == {"SPY": "missing_symbol"}
+    assert sorted(report.valid_bars["symbol"].unique().tolist()) == ["QQQ"]
+
+
+def test_load_bars_requests_benchmark_symbol_for_mean_reversion(monkeypatch) -> None:
+    settings = Settings(
+        SYMBOLS="QQQ",
+        LOOKBACK_DAYS=25,
+        MEAN_REVERSION_BENCHMARK_SYMBOL="SPY",
+    )
+    requested: dict[str, object] = {}
+
+    class FakeClient:
+        def __init__(self, _: Settings) -> None:
+            pass
+
+        def get_daily_bars(self, symbols: list[str], lookback_days: int) -> object:
+            requested["symbols"] = symbols
+            requested["lookback_days"] = lookback_days
+            return type(
+                "LoadedBarsStub",
+                (),
+                {
+                    "bars": pd.DataFrame(_daily_bars("QQQ", [100, 101]) + _daily_bars("SPY", [100, 101])),
+                    "source": "synthetic",
+                    "production_safe": False,
+                },
+            )()
+
+    monkeypatch.setattr("app.data.historical_loader.AlpacaDataClient", FakeClient)
+
+    loaded = load_bars_with_source(settings, "mean_reversion")
+
+    assert requested["symbols"] == ["QQQ", "SPY"]
+    assert requested["lookback_days"] == 25
+    assert sorted(loaded.bars["symbol"].unique().tolist()) == ["QQQ", "SPY"]
 
 
 def test_entry_risk_decision_blocks_on_reserved_buying_power() -> None:
@@ -1963,7 +2149,11 @@ def test_run_paper_command_chunks_oversized_exits(tmp_path, monkeypatch) -> None
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "synthetic", "production_safe": False})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "synthetic", "production_safe": False},
+        )(),
     )
     monkeypatch.setattr(
         "app.main.reconcile_broker_state",
@@ -2022,7 +2212,11 @@ def test_run_paper_command_blocks_synthetic_data_in_trading_mode(tmp_path, monke
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "synthetic", "production_safe": False})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "synthetic", "production_safe": False},
+        )(),
     )
     monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
 
@@ -2154,7 +2348,11 @@ def test_run_paper_command_skips_entry_when_unresolved_order_exists_locally(tmp_
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "alpaca", "production_safe": True},
+        )(),
     )
     monkeypatch.setattr("app.main.reconcile_broker_state", lambda repo, broker: {"recent_orders": 0, "open_orders": 0, "positions": 0, "pnl_points": 0, "fills": 0, "lot_matches": 0, "realized_symbols": 0})
     monkeypatch.setattr(
@@ -2326,7 +2524,11 @@ def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path
     monkeypatch.setattr("app.main.should_run_trading_loop", lambda broker: True)
     monkeypatch.setattr(
         "app.main.load_bars_with_source",
-        lambda _: type("LoadedBarsStub", (), {"bars": bars, "source": "alpaca", "production_safe": True})(),
+        lambda *args, **kwargs: type(
+            "LoadedBarsStub",
+            (),
+            {"bars": bars, "source": "alpaca", "production_safe": True},
+        )(),
     )
     monkeypatch.setattr(
         "app.main.reconcile_broker_state",

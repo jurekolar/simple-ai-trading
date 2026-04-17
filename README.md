@@ -46,10 +46,19 @@ python -m app.main --strategy breakout backtest
 ```
 
 Registered strategies live under [app/strategy](/Users/jurekolar/Code/simple-ai-trading/app/strategy). To add a new one, create a module that exposes a strategy object with `name` and `generate_signals(...)`, then register it in [app/strategy/__init__.py](/Users/jurekolar/Code/simple-ai-trading/app/strategy/__init__.py).
-Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; the example mean-reversion strategy uses its own `MEAN_REVERSION_*` settings.
+Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; `mean_reversion` now uses a benchmark-aware pullback model with its own `MEAN_REVERSION_*` settings and requires benchmark history for `MEAN_REVERSION_BENCHMARK_SYMBOL` (default `SPY`) even if that symbol is not in `SYMBOLS`.
 The `breakout` strategy is the repo's TradingView-aligned Donchian/Turtle breakout and uses `BREAKOUT_ENTRY_WINDOW` / `BREAKOUT_EXIT_WINDOW` / `BREAKOUT_ATR_WINDOW`.
 The `trend_trailing_stop` strategy uses `TREND_TRAILING_*` settings for its trend filter, breakout or pullback entries, and ATR or percent trailing stop exits.
 `politician_copy` is allocation-based rather than bar-signal-based, so it supports `preview` and `paper`, but not `backtest` in v1.
+
+The upgraded `mean_reversion` entry requires:
+
+- price below its own rolling mean by `MEAN_REVERSION_ENTRY_ZSCORE`
+- underperformance versus the benchmark over `MEAN_REVERSION_RS_WINDOW`
+- price still above `MEAN_REVERSION_TREND_WINDOW`
+- minimum average daily volume
+
+Its exit remains signal-based only: it exits when the z-score mean reverts back to `MEAN_REVERSION_EXIT_ZSCORE`. Hard stop-loss and max-hold rules are intentionally not modeled in this version.
 
 5. Run the paper-trading loop:
 

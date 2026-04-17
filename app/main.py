@@ -257,11 +257,11 @@ def _fallback_split_exit_order(order: OrderIntent, max_qty: int) -> list[OrderIn
     return chunks
 
 
-def _load_and_validate_data(settings) -> tuple[object, object, bool]:
-    loaded = load_bars_with_source(settings)
+def _load_and_validate_data(settings, strategy_name: str | None = None) -> tuple[object, object, bool]:
+    loaded = load_bars_with_source(settings, strategy_name)
     if settings.trading_mode_enabled and not settings.allow_unsafe_data_fallback and not loaded.production_safe:
         raise RuntimeError(f"unsafe market data source={loaded.source} blocked in trading mode")
-    validation = validate_bars(loaded.bars, settings)
+    validation = validate_bars(loaded.bars, settings, strategy_name)
     if (
         settings.trading_mode_enabled
         and validation.failed_symbols
@@ -491,8 +491,11 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     repo = JournalRepo(create_session_factory(settings.database_url))
     _log_runtime_config_snapshot(repo, settings=settings, run_type="backtest", strategy_name=active_strategy.name)
     repo.create_run("backtest", "started")
-    loaded = load_bars_with_source(settings)
-    trades, metrics = run_backtest(loaded.bars, settings, strategy=active_strategy)
+    loaded = load_bars_with_source(settings, active_strategy.name)
+    validation = validate_bars(loaded.bars, settings, active_strategy.name)
+    if validation.failed_symbols:
+        raise RuntimeError(f"required market data validation failed: {validation.failed_symbols}")
+    trades, metrics = run_backtest(validation.valid_bars, settings, strategy=active_strategy)
     for _, trade in trades.iterrows():
         repo.log_signal(str(trade["symbol"]), "long", float(trade["close"]))
     repo.create_run(
@@ -505,8 +508,8 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
 
 def run_compare_command() -> None:
     settings = get_settings()
-    loaded = load_bars_with_source(settings)
-    validation = validate_bars(loaded.bars, settings)
+    loaded = load_bars_with_source(settings, "mean_reversion")
+    validation = validate_bars(loaded.bars, settings, "mean_reversion")
     summary = compare_strategies(validation.valid_bars, settings, strategy_names=backtest_strategy_names())
     print(format_strategy_comparison(summary))
     LOGGER.info("compare metrics %s", summary.to_dict(orient="records"))
@@ -535,7 +538,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     metrics: dict[str, float] = {"trades": 0.0}
     allowed_symbols: set[str] = set(settings.symbol_list)
     if active_strategy.name != politician_copy_strategy.name:
-        loaded, validation, stale_data = _load_and_validate_data(settings)
+        loaded, validation, stale_data = _load_and_validate_data(settings, active_strategy.name)
         partial_data_failure = validation.has_partial_failure
         data_source = loaded.source
 
