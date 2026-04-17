@@ -1,0 +1,863 @@
+politician_id,politician_name,trade_date,published_at,symbol,asset_type,side,amount_bucket,amount_midpoint,source_url,filing_delay_days
+S001214,Greg Steube,2026-03-18T00:00:00+00:00,2026-04-15T00:00:00+00:00,IONQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797363,27
+S001214,Greg Steube,2026-04-08T00:00:00+00:00,2026-04-15T00:00:00+00:00,MAR,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797364,6
+S001214,Greg Steube,2025-07-10T00:00:00+00:00,2025-07-17T00:00:00+00:00,ACF,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003788320,6
+S001214,Greg Steube,2025-02-19T00:00:00+00:00,2025-04-07T00:00:00+00:00,SNV,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003783347,44
+S001214,Greg Steube,2024-03-28T00:00:00+00:00,2024-04-08T00:00:00+00:00,SNV,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003771796,9
+S001214,Greg Steube,2024-02-16T00:00:00+00:00,2024-03-18T00:00:00+00:00,SNV,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003771590,28
+S001214,Greg Steube,2023-07-03T00:00:00+00:00,2023-08-10T00:00:00+00:00,SNV,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003765880,37
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,DRI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797365,7
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,ESS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797366,7
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,META,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797367,7
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,MDLZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797368,7
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,VRSK,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794741,7
+L000560,Rick Larsen,2026-01-07T00:00:00+00:00,2026-01-15T00:00:00+00:00,WM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794742,7
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,ABT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791957,10
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,AEP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791958,10
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,CL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791959,10
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,ODFL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791960,10
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,WMT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791961,10
+L000560,Rick Larsen,2025-10-06T00:00:00+00:00,2025-10-17T00:00:00+00:00,ZTS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791962,10
+L000560,Rick Larsen,2025-04-09T00:00:00+00:00,2025-04-16T00:00:00+00:00,AXP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003784290,6
+L000560,Rick Larsen,2025-04-09T00:00:00+00:00,2025-04-16T00:00:00+00:00,NEE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003784291,6
+L000560,Rick Larsen,2025-01-07T00:00:00+00:00,2025-01-15T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780547,7
+L000560,Rick Larsen,2025-01-07T00:00:00+00:00,2025-01-15T00:00:00+00:00,BAH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780548,7
+L000560,Rick Larsen,2025-01-07T00:00:00+00:00,2025-01-15T00:00:00+00:00,BR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780549,7
+L000560,Rick Larsen,2025-01-07T00:00:00+00:00,2025-01-15T00:00:00+00:00,CTAS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780550,7
+L000560,Rick Larsen,2025-01-07T00:00:00+00:00,2025-01-15T00:00:00+00:00,CMCSA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780551,7
+K000398,Thomas Kean Jr,2026-03-31T00:00:00+00:00,2026-04-14T00:00:00+00:00,AMCR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797354,13
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,CB,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797355,18
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,FCNCA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797356,18
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,JNJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797357,18
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,LIN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797358,18
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,PEP,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797359,18
+K000398,Thomas Kean Jr,2026-03-26T00:00:00+00:00,2026-04-14T00:00:00+00:00,SPGI,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797360,18
+K000398,Thomas Kean Jr,2026-03-10T00:00:00+00:00,2026-04-14T00:00:00+00:00,WAT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797361,34
+K000398,Thomas Kean Jr,2026-02-05T00:00:00+00:00,2026-03-18T00:00:00+00:00,GOOGL,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795731,252
+K000398,Thomas Kean Jr,2026-02-05T00:00:00+00:00,2026-03-18T00:00:00+00:00,FCNCA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795732,252
+K000398,Thomas Kean Jr,2026-02-18T00:00:00+00:00,2026-03-18T00:00:00+00:00,LIN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795733,239
+K000398,Thomas Kean Jr,2026-02-13T00:00:00+00:00,2026-03-18T00:00:00+00:00,WAT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795736,244
+K000398,Thomas Kean Jr,2026-01-29T00:00:00+00:00,2026-02-20T00:00:00+00:00,ABT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795254,21
+K000398,Thomas Kean Jr,2026-01-07T00:00:00+00:00,2026-02-20T00:00:00+00:00,GM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795255,43
+K000398,Thomas Kean Jr,2026-01-23T00:00:00+00:00,2026-02-20T00:00:00+00:00,JNJ,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795256,27
+K000398,Thomas Kean Jr,2026-01-23T00:00:00+00:00,2026-02-20T00:00:00+00:00,MKL,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795257,27
+K000398,Thomas Kean Jr,2026-01-23T00:00:00+00:00,2026-02-20T00:00:00+00:00,MSFT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795258,27
+K000398,Thomas Kean Jr,2026-01-23T00:00:00+00:00,2026-02-20T00:00:00+00:00,SYK,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795259,27
+K000398,Thomas Kean Jr,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,SNREY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794835,45
+K000398,Thomas Kean Jr,2025-11-20T00:00:00+00:00,2025-12-19T00:00:00+00:00,JNJ,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794837,29
+K000398,Thomas Kean Jr,2025-11-20T00:00:00+00:00,2025-12-19T00:00:00+00:00,SYK,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794838,29
+K000398,Thomas Kean Jr,2025-11-26T00:00:00+00:00,2025-12-19T00:00:00+00:00,TXN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794245,23
+K000398,Thomas Kean Jr,2025-10-31T00:00:00+00:00,2025-11-18T00:00:00+00:00,FISV,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794246,17
+K000398,Thomas Kean Jr,2025-07-21T00:00:00+00:00,2025-08-21T00:00:00+00:00,ABT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791931,30
+K000398,Thomas Kean Jr,2025-07-29T00:00:00+00:00,2025-08-21T00:00:00+00:00,ADBE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791932,22
+K000398,Thomas Kean Jr,2025-07-29T00:00:00+00:00,2025-08-21T00:00:00+00:00,CHKP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003791933,22
+C001047,Shelley Moore Capito,2026-03-28T00:00:00+00:00,2026-04-12T00:00:00+00:00,MA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064889,15
+C001047,Shelley Moore Capito,2026-03-12T00:00:00+00:00,2026-04-05T00:00:00+00:00,PNC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064820,23
+C001047,Shelley Moore Capito,2026-03-31T00:00:00+00:00,2026-04-05T00:00:00+00:00,FDS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064821,4
+C001047,Shelley Moore Capito,2026-03-26T00:00:00+00:00,2026-04-05T00:00:00+00:00,FDS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064822,9
+C001047,Shelley Moore Capito,2026-03-25T00:00:00+00:00,2026-04-05T00:00:00+00:00,FDS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064823,10
+C001047,Shelley Moore Capito,2026-03-11T00:00:00+00:00,2026-04-05T00:00:00+00:00,AXP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064824,24
+C001047,Shelley Moore Capito,2026-02-24T00:00:00+00:00,2026-03-04T00:00:00+00:00,ITW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064660,8
+C001047,Shelley Moore Capito,2026-02-20T00:00:00+00:00,2026-03-04T00:00:00+00:00,PAYX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064661,12
+C001047,Shelley Moore Capito,2026-02-10T00:00:00+00:00,2026-03-04T00:00:00+00:00,BLK,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064662,22
+C001047,Shelley Moore Capito,2026-02-10T00:00:00+00:00,2026-03-04T00:00:00+00:00,ADI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064663,22
+C001047,Shelley Moore Capito,2026-02-09T00:00:00+00:00,2026-03-04T00:00:00+00:00,AVGO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064664,23
+C001047,Shelley Moore Capito,2026-02-09T00:00:00+00:00,2026-03-04T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064665,23
+C001047,Shelley Moore Capito,2026-01-28T00:00:00+00:00,2026-02-05T00:00:00+00:00,SBUX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064549,8
+C001047,Shelley Moore Capito,2025-12-11T00:00:00+00:00,2026-01-06T00:00:00+00:00,K,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064365,26
+C001047,Shelley Moore Capito,2025-12-16T00:00:00+00:00,2026-01-06T00:00:00+00:00,MSFT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064366,21
+C001047,Shelley Moore Capito,2025-12-16T00:00:00+00:00,2026-01-06T00:00:00+00:00,AAPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064367,21
+C001047,Shelley Moore Capito,2025-12-16T00:00:00+00:00,2026-01-06T00:00:00+00:00,GOOGL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064368,21
+C001047,Shelley Moore Capito,2025-11-13T00:00:00+00:00,2025-12-04T00:00:00+00:00,META,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064257,21
+C001047,Shelley Moore Capito,2025-11-13T00:00:00+00:00,2025-12-04T00:00:00+00:00,PAYX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064258,21
+C001047,Shelley Moore Capito,2025-11-13T00:00:00+00:00,2025-12-04T00:00:00+00:00,LOW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064259,21
+C001047,Shelley Moore Capito,2025-10-29T00:00:00+00:00,2025-11-04T00:00:00+00:00,C,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064160,6
+C001047,Shelley Moore Capito,2025-10-29T00:00:00+00:00,2025-11-04T00:00:00+00:00,IBM,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064161,6
+C001047,Shelley Moore Capito,2025-10-29T00:00:00+00:00,2025-11-04T00:00:00+00:00,MSFT,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064162,6
+C001047,Shelley Moore Capito,2025-10-17T00:00:00+00:00,2025-11-04T00:00:00+00:00,CVX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064163,18
+C001047,Shelley Moore Capito,2025-10-17T00:00:00+00:00,2025-11-04T00:00:00+00:00,COST,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064164,18
+C001047,Shelley Moore Capito,2025-10-20T00:00:00+00:00,2025-11-04T00:00:00+00:00,LOW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064165,15
+C001047,Shelley Moore Capito,2025-10-21T00:00:00+00:00,2025-11-04T00:00:00+00:00,LOW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064166,14
+C001047,Shelley Moore Capito,2025-10-21T00:00:00+00:00,2025-11-04T00:00:00+00:00,PAYX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064167,14
+C001047,Shelley Moore Capito,2025-10-22T00:00:00+00:00,2025-11-04T00:00:00+00:00,MSFT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064168,13
+C001047,Shelley Moore Capito,2025-10-24T00:00:00+00:00,2025-11-04T00:00:00+00:00,LLY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064169,11
+M001157,Michael McCaul,2026-03-03T00:00:00+00:00,2026-04-10T00:00:00+00:00,NSIT,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797268,36
+M001157,Michael McCaul,2026-03-31T00:00:00+00:00,2026-04-10T00:00:00+00:00,EQT,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797269,8
+M001157,Michael McCaul,2026-03-04T00:00:00+00:00,2026-04-10T00:00:00+00:00,AJG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797270,35
+M001157,Michael McCaul,2026-03-02T00:00:00+00:00,2026-04-10T00:00:00+00:00,MA,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797271,37
+M001157,Michael McCaul,2026-03-13T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797272,26
+M001157,Michael McCaul,2026-03-25T00:00:00+00:00,2026-04-10T00:00:00+00:00,AJG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797273,14
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,AJG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797275,27
+M001157,Michael McCaul,2026-03-27T00:00:00+00:00,2026-04-10T00:00:00+00:00,BSX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797277,12
+M001157,Michael McCaul,2026-03-20T00:00:00+00:00,2026-04-10T00:00:00+00:00,INTU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797278,19
+M001157,Michael McCaul,2026-03-02T00:00:00+00:00,2026-04-10T00:00:00+00:00,INTU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797280,37
+M001157,Michael McCaul,2026-03-31T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797281,8
+M001157,Michael McCaul,2026-03-02T00:00:00+00:00,2026-04-10T00:00:00+00:00,MELI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797283,37
+M001157,Michael McCaul,2026-03-04T00:00:00+00:00,2026-04-10T00:00:00+00:00,NOW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797284,35
+M001157,Michael McCaul,2026-03-17T00:00:00+00:00,2026-04-10T00:00:00+00:00,MA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797285,22
+M001157,Michael McCaul,2026-03-20T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797286,19
+M001157,Michael McCaul,2026-03-24T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797287,15
+M001157,Michael McCaul,2026-03-18T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797288,21
+M001157,Michael McCaul,2026-03-10T00:00:00+00:00,2026-04-10T00:00:00+00:00,INTU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797289,29
+M001157,Michael McCaul,2026-03-17T00:00:00+00:00,2026-04-10T00:00:00+00:00,INTU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797290,22
+M001157,Michael McCaul,2026-03-06T00:00:00+00:00,2026-04-10T00:00:00+00:00,SAP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797291,33
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,INTU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797292,27
+M001157,Michael McCaul,2026-03-23T00:00:00+00:00,2026-04-10T00:00:00+00:00,SAP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797293,16
+M001157,Michael McCaul,2026-03-19T00:00:00+00:00,2026-04-10T00:00:00+00:00,SAP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797294,20
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,MELI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797295,27
+M001157,Michael McCaul,2026-03-05T00:00:00+00:00,2026-04-10T00:00:00+00:00,DHR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797296,34
+M001157,Michael McCaul,2026-03-04T00:00:00+00:00,2026-04-10T00:00:00+00:00,ADSK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797297,35
+M001157,Michael McCaul,2026-03-17T00:00:00+00:00,2026-04-10T00:00:00+00:00,SPGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797299,22
+M001157,Michael McCaul,2026-03-27T00:00:00+00:00,2026-04-10T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797301,12
+M001157,Michael McCaul,2026-03-23T00:00:00+00:00,2026-04-10T00:00:00+00:00,CMCSA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797302,16
+M001157,Michael McCaul,2026-03-27T00:00:00+00:00,2026-04-10T00:00:00+00:00,GEV,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797303,12
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,CMCSA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797304,27
+M001157,Michael McCaul,2026-03-04T00:00:00+00:00,2026-04-10T00:00:00+00:00,PTC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797305,35
+M001157,Michael McCaul,2026-03-17T00:00:00+00:00,2026-04-10T00:00:00+00:00,BAYRY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797306,22
+M001157,Michael McCaul,2026-03-31T00:00:00+00:00,2026-04-10T00:00:00+00:00,ASML,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797307,8
+M001157,Michael McCaul,2026-03-11T00:00:00+00:00,2026-04-10T00:00:00+00:00,WWD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797308,28
+M001157,Michael McCaul,2026-03-31T00:00:00+00:00,2026-04-10T00:00:00+00:00,WWD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797309,8
+M001157,Michael McCaul,2026-03-03T00:00:00+00:00,2026-04-10T00:00:00+00:00,AER,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797310,36
+M001157,Michael McCaul,2026-03-03T00:00:00+00:00,2026-04-10T00:00:00+00:00,HLT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797311,36
+M001157,Michael McCaul,2026-03-04T00:00:00+00:00,2026-04-10T00:00:00+00:00,ABT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797312,35
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,HLT,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797313,27
+M001157,Michael McCaul,2026-03-12T00:00:00+00:00,2026-04-10T00:00:00+00:00,AON,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797314,27
+M001157,Michael McCaul,2026-03-25T00:00:00+00:00,2026-04-10T00:00:00+00:00,AON,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003797315,14
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,ACN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796459,25
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,AEIS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796460,35
+C001123,Gil Cisneros,2026-03-27T00:00:00+00:00,2026-04-08T00:00:00+00:00,AEIS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796461,11
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,AMD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796462,25
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,AGIO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796464,35
+C001123,Gil Cisneros,2026-03-27T00:00:00+00:00,2026-04-08T00:00:00+00:00,BABA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796465,11
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796466,25
+C001123,Gil Cisneros,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796467,22
+C001123,Gil Cisneros,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796468,22
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,APO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796469,25
+C001123,Gil Cisneros,2026-03-18T00:00:00+00:00,2026-04-08T00:00:00+00:00,APP,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796470,20
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,APP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796471,25
+C001123,Gil Cisneros,2026-03-20T00:00:00+00:00,2026-04-08T00:00:00+00:00,ADM,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796472,18
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,ARQT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796473,35
+C001123,Gil Cisneros,2026-03-25T00:00:00+00:00,2026-04-08T00:00:00+00:00,ANET,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796474,13
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,ATRC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796475,35
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,AVNT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796476,35
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,AZTA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796477,35
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,SQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796478,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,BKNG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796479,25
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,BOOT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796480,35
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,BBIO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796481,35
+C001123,Gil Cisneros,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,BBIO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796482,19
+C001123,Gil Cisneros,2026-03-18T00:00:00+00:00,2026-04-08T00:00:00+00:00,BBIO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796483,20
+C001123,Gil Cisneros,2026-03-25T00:00:00+00:00,2026-04-08T00:00:00+00:00,AVGO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796484,13
+C001123,Gil Cisneros,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,CDRE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796485,22
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,CATY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796490,35
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,CENT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796491,35
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,SKY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796492,35
+C001123,Gil Cisneros,2026-03-27T00:00:00+00:00,2026-04-08T00:00:00+00:00,SCHW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796493,11
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,CHTR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796494,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,CTSH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796495,25
+C001123,Gil Cisneros,2026-03-25T00:00:00+00:00,2026-04-08T00:00:00+00:00,COHR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796496,13
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,CAG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796497,25
+C001123,Gil Cisneros,2026-03-25T00:00:00+00:00,2026-04-08T00:00:00+00:00,GLW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796498,13
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,CSGP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796499,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,CRWD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796501,25
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,CSWI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796502,35
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,DDOG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796503,25
+C001123,Gil Cisneros,2026-03-12T00:00:00+00:00,2026-04-08T00:00:00+00:00,DBRG,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796504,26
+C001123,Gil Cisneros,2026-03-18T00:00:00+00:00,2026-04-08T00:00:00+00:00,DASH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796505,20
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,DASH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796506,25
+C001123,Gil Cisneros,2026-03-27T00:00:00+00:00,2026-04-08T00:00:00+00:00,DASH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796507,11
+C001123,Gil Cisneros,2026-03-18T00:00:00+00:00,2026-04-08T00:00:00+00:00,DASH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796508,20
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,LLY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796509,25
+C001123,Gil Cisneros,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,EPAC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796510,35
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,EPAM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796511,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,EFX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796512,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,RE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796513,25
+C001123,Gil Cisneros,2026-03-27T00:00:00+00:00,2026-04-08T00:00:00+00:00,FN,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796514,11
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,FDS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796515,25
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,FICO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796516,25
+C001123,Gil Cisneros,2026-03-09T00:00:00+00:00,2026-04-08T00:00:00+00:00,FSS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796517,29
+C001123,Gil Cisneros,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,FIS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796518,25
+M001232,April McClain Delaney,2026-03-26T00:00:00+00:00,2026-04-08T00:00:00+00:00,TECH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796598,11
+M001232,April McClain Delaney,2026-03-04T00:00:00+00:00,2026-04-08T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796599,33
+M001232,April McClain Delaney,2026-03-05T00:00:00+00:00,2026-04-08T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796600,32
+M001232,April McClain Delaney,2026-03-09T00:00:00+00:00,2026-04-08T00:00:00+00:00,EME,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796601,28
+M001232,April McClain Delaney,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,EME,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796602,34
+M001232,April McClain Delaney,2026-03-10T00:00:00+00:00,2026-04-08T00:00:00+00:00,EME,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796603,27
+M001232,April McClain Delaney,2026-03-31T00:00:00+00:00,2026-04-08T00:00:00+00:00,ENTG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796604,6
+M001232,April McClain Delaney,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796605,34
+M001232,April McClain Delaney,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796606,24
+M001232,April McClain Delaney,2026-03-09T00:00:00+00:00,2026-04-08T00:00:00+00:00,MLM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796607,28
+M001232,April McClain Delaney,2026-03-09T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796608,28
+M001232,April McClain Delaney,2026-03-03T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796609,34
+M001232,April McClain Delaney,2026-03-04T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796610,33
+M001232,April McClain Delaney,2026-03-10T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796611,27
+M001232,April McClain Delaney,2026-03-31T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796612,6
+M001232,April McClain Delaney,2026-03-18T00:00:00+00:00,2026-04-08T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796613,19
+M001232,April McClain Delaney,2026-03-20T00:00:00+00:00,2026-04-08T00:00:00+00:00,PKG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796614,17
+M001232,April McClain Delaney,2026-03-17T00:00:00+00:00,2026-04-08T00:00:00+00:00,PKG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796615,20
+M001232,April McClain Delaney,2026-03-31T00:00:00+00:00,2026-04-08T00:00:00+00:00,ROL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796616,6
+M001232,April McClain Delaney,2026-03-31T00:00:00+00:00,2026-04-08T00:00:00+00:00,SGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796617,6
+M001232,April McClain Delaney,2026-03-13T00:00:00+00:00,2026-04-08T00:00:00+00:00,SGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796618,24
+M001232,April McClain Delaney,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,SGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796619,21
+M001232,April McClain Delaney,2026-03-09T00:00:00+00:00,2026-04-08T00:00:00+00:00,SGI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796620,28
+M001232,April McClain Delaney,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,STE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796621,21
+M001232,April McClain Delaney,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,TSCO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796622,21
+M001232,April McClain Delaney,2026-03-04T00:00:00+00:00,2026-04-08T00:00:00+00:00,TSCO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796623,33
+M001232,April McClain Delaney,2026-03-31T00:00:00+00:00,2026-04-08T00:00:00+00:00,TSCO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796624,6
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,TECH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795444,14
+M001232,April McClain Delaney,2026-02-13T00:00:00+00:00,2026-03-11T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795445,25
+M001232,April McClain Delaney,2026-02-18T00:00:00+00:00,2026-03-11T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795446,20
+M001232,April McClain Delaney,2026-02-02T00:00:00+00:00,2026-03-11T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795447,36
+M001232,April McClain Delaney,2026-02-05T00:00:00+00:00,2026-03-11T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795448,33
+M001232,April McClain Delaney,2026-02-09T00:00:00+00:00,2026-03-11T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795449,29
+M001232,April McClain Delaney,2026-02-06T00:00:00+00:00,2026-03-11T00:00:00+00:00,BRO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795450,32
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,BRO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795451,14
+M001232,April McClain Delaney,2026-02-13T00:00:00+00:00,2026-03-11T00:00:00+00:00,CHRW,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795452,25
+M001232,April McClain Delaney,2026-02-06T00:00:00+00:00,2026-03-11T00:00:00+00:00,CHRW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795453,32
+M001232,April McClain Delaney,2026-02-05T00:00:00+00:00,2026-03-11T00:00:00+00:00,CHRW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795454,33
+M001232,April McClain Delaney,2026-02-09T00:00:00+00:00,2026-03-11T00:00:00+00:00,CHRW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795455,29
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,CDW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795456,14
+M001232,April McClain Delaney,2026-02-23T00:00:00+00:00,2026-03-11T00:00:00+00:00,CLH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795457,15
+M001232,April McClain Delaney,2026-02-27T00:00:00+00:00,2026-03-11T00:00:00+00:00,EME,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795458,11
+M001232,April McClain Delaney,2026-02-04T00:00:00+00:00,2026-03-11T00:00:00+00:00,EME,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795459,34
+M001232,April McClain Delaney,2026-02-09T00:00:00+00:00,2026-03-11T00:00:00+00:00,ENTG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795460,29
+M001232,April McClain Delaney,2026-02-23T00:00:00+00:00,2026-03-11T00:00:00+00:00,ENTG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795461,15
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,FBIN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795462,14
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795463,14
+M001232,April McClain Delaney,2026-02-11T00:00:00+00:00,2026-03-11T00:00:00+00:00,JLL,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795464,27
+M001232,April McClain Delaney,2026-02-18T00:00:00+00:00,2026-03-11T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795465,20
+M001232,April McClain Delaney,2026-02-23T00:00:00+00:00,2026-03-11T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795466,15
+M001232,April McClain Delaney,2026-02-27T00:00:00+00:00,2026-03-11T00:00:00+00:00,JLL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795467,11
+M001232,April McClain Delaney,2026-02-11T00:00:00+00:00,2026-03-11T00:00:00+00:00,LH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795468,27
+M001232,April McClain Delaney,2026-02-04T00:00:00+00:00,2026-03-11T00:00:00+00:00,LH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795469,34
+M001232,April McClain Delaney,2026-02-06T00:00:00+00:00,2026-03-11T00:00:00+00:00,MORN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795470,32
+M001232,April McClain Delaney,2026-02-19T00:00:00+00:00,2026-03-11T00:00:00+00:00,MORN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795471,19
+M001232,April McClain Delaney,2026-02-25T00:00:00+00:00,2026-03-11T00:00:00+00:00,MORN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795472,13
+M001232,April McClain Delaney,2026-02-27T00:00:00+00:00,2026-03-11T00:00:00+00:00,NDAQ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795473,11
+M001232,April McClain Delaney,2026-02-23T00:00:00+00:00,2026-03-11T00:00:00+00:00,PAYX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795474,15
+M001232,April McClain Delaney,2026-02-24T00:00:00+00:00,2026-03-11T00:00:00+00:00,PAYX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795475,14
+M001232,April McClain Delaney,2026-02-20T00:00:00+00:00,2026-03-11T00:00:00+00:00,ROL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795476,18
+S001203,Tina Smith,2026-03-31T00:00:00+00:00,2026-04-02T00:00:00+00:00,MMM,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000064809,2
+S001203,Tina Smith,2026-01-27T00:00:00+00:00,2026-01-30T00:00:00+00:00,MRSH,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000064810,3
+S001203,Tina Smith,2025-11-21T00:00:00+00:00,2025-11-27T00:00:00+00:00,HBAN,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064502,5
+S001203,Tina Smith,2025-02-11T00:00:00+00:00,2025-03-19T00:00:00+00:00,PEP,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064503,36
+S001203,Tina Smith,2025-02-11T00:00:00+00:00,2025-03-19T00:00:00+00:00,GIS,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064225,36
+S001203,Tina Smith,2024-11-12T00:00:00+00:00,2024-11-21T00:00:00+00:00,TCMD,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000063223,9
+S001203,Tina Smith,2024-04-04T00:00:00+00:00,2024-04-20T00:00:00+00:00,PODD,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000063224,15
+S001203,Tina Smith,2024-04-04T00:00:00+00:00,2024-04-20T00:00:00+00:00,NEE,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000062822,15
+S001203,Tina Smith,2023-11-16T00:00:00+00:00,2023-11-20T00:00:00+00:00,AORT,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000062275,4
+S001203,Tina Smith,2023-11-08T00:00:00+00:00,2023-11-20T00:00:00+00:00,TCMD,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000062276,12
+S001203,Tina Smith,2023-11-10T00:00:00+00:00,2023-11-20T00:00:00+00:00,AORT,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/10000061761,10
+K000389,Ro Khanna,2026-03-16T00:00:00+00:00,2026-04-09T00:00:00+00:00,BMO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796681,22
+K000389,Ro Khanna,2026-03-03T00:00:00+00:00,2026-04-09T00:00:00+00:00,NTIOF,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796682,35
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796683,32
+K000389,Ro Khanna,2026-03-11T00:00:00+00:00,2026-04-09T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796684,27
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,ROK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796685,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,TMO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796686,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,AVGO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796687,32
+K000389,Ro Khanna,2026-03-24T00:00:00+00:00,2026-04-09T00:00:00+00:00,RCI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796688,14
+K000389,Ro Khanna,2026-03-12T00:00:00+00:00,2026-04-09T00:00:00+00:00,KEY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796689,26
+K000389,Ro Khanna,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,FHN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796691,33
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,JNJ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796692,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,SBUX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796693,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,ETN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796694,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,JNJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796695,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,META,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796696,32
+K000389,Ro Khanna,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,AAPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796697,32
+K000389,Ro Khanna,2026-03-24T00:00:00+00:00,2026-04-09T00:00:00+00:00,NDAQ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796698,14
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,MCD,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796699,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,CSCO,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796700,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,KO,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796701,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,UNH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796702,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,BSX,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796703,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,PGR,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796704,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,AMZN,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796705,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,INTU,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796706,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,SPGI,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796707,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,CRM,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796708,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,ORCL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796710,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,AXP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796711,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,TFC,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796712,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,GOOGL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796713,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,DIS,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796714,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,MCO,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796715,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,COF,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796716,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,PANW,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796717,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,JPM,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796718,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,PG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796719,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,ADP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796720,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,PRU,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796721,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,KKR,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796722,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,ADSK,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796723,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,LOW,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796724,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,WFC,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796725,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,BX,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796726,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,IDXX,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796727,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,TSLA,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796728,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,ACN,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796729,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,MDLZ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796730,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,HLT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796731,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,PPG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796732,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,INCY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796733,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,MLM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796734,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,VRT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796735,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,LULU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796736,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,WM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796737,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,AJG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796738,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,GPC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796739,8
+K000389,Ro Khanna,2026-03-30T00:00:00+00:00,2026-04-09T00:00:00+00:00,FTV,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796740,8
+W000802,Sheldon Whitehouse,2026-03-30T00:00:00+00:00,2026-04-08T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064826,9
+W000802,Sheldon Whitehouse,2026-02-23T00:00:00+00:00,2026-03-06T00:00:00+00:00,HD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064698,11
+W000802,Sheldon Whitehouse,2026-02-23T00:00:00+00:00,2026-03-06T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064699,11
+W000802,Sheldon Whitehouse,2026-02-23T00:00:00+00:00,2026-03-06T00:00:00+00:00,VZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064700,11
+W000802,Sheldon Whitehouse,2026-02-23T00:00:00+00:00,2026-03-06T00:00:00+00:00,MA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064701,11
+W000802,Sheldon Whitehouse,2026-02-23T00:00:00+00:00,2026-03-06T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064702,11
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,SBUX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064504,26
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,NVDA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064505,26
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,HD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064506,26
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,SBUX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064507,26
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,NVDA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064508,26
+W000802,Sheldon Whitehouse,2026-01-09T00:00:00+00:00,2026-02-04T00:00:00+00:00,MCD,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064509,26
+W000802,Sheldon Whitehouse,2025-11-21T00:00:00+00:00,2025-12-01T00:00:00+00:00,HSY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064244,10
+W000802,Sheldon Whitehouse,2025-11-21T00:00:00+00:00,2025-12-01T00:00:00+00:00,KO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064245,10
+W000802,Sheldon Whitehouse,2025-11-21T00:00:00+00:00,2025-12-01T00:00:00+00:00,GH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064246,10
+W000802,Sheldon Whitehouse,2025-10-20T00:00:00+00:00,2025-11-03T00:00:00+00:00,NVDA,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064158,14
+W000802,Sheldon Whitehouse,2025-10-27T00:00:00+00:00,2025-11-03T00:00:00+00:00,PGR,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064159,7
+W000802,Sheldon Whitehouse,2025-07-07T00:00:00+00:00,2025-08-04T00:00:00+00:00,NVDA,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064096,28
+F000479,John Fetterman,2026-03-27T00:00:00+00:00,2026-04-03T00:00:00+00:00,T,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064811,7
+F000479,John Fetterman,2026-03-27T00:00:00+00:00,2026-04-03T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064812,7
+F000479,John Fetterman,2026-03-27T00:00:00+00:00,2026-04-03T00:00:00+00:00,ERIE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064813,7
+F000479,John Fetterman,2026-03-11T00:00:00+00:00,2026-04-03T00:00:00+00:00,CNXC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064814,23
+F000479,John Fetterman,2026-03-30T00:00:00+00:00,2026-04-03T00:00:00+00:00,MU,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064815,4
+F000479,John Fetterman,2026-03-30T00:00:00+00:00,2026-04-03T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064816,4
+F000479,John Fetterman,2026-03-30T00:00:00+00:00,2026-04-03T00:00:00+00:00,ERIE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064817,4
+F000479,John Fetterman,2026-03-30T00:00:00+00:00,2026-04-03T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064818,4
+F000479,John Fetterman,2026-03-30T00:00:00+00:00,2026-04-03T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064819,4
+F000479,John Fetterman,2026-02-03T00:00:00+00:00,2026-03-05T00:00:00+00:00,VFC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064697,30
+F000479,John Fetterman,2025-12-22T00:00:00+00:00,2026-01-06T00:00:00+00:00,STLD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064374,15
+F000479,John Fetterman,2025-11-18T00:00:00+00:00,2025-12-12T00:00:00+00:00,GXO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064291,24
+F000479,John Fetterman,2025-06-25T00:00:00+00:00,2025-07-15T00:00:00+00:00,BHI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064112,20
+F000479,John Fetterman,2025-06-17T00:00:00+00:00,2025-07-15T00:00:00+00:00,JPM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064113,28
+F000479,John Fetterman,2025-05-15T00:00:00+00:00,2025-06-10T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063954,25
+F000479,John Fetterman,2025-05-05T00:00:00+00:00,2025-06-10T00:00:00+00:00,HAS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063955,35
+F000479,John Fetterman,2025-04-23T00:00:00+00:00,2025-05-15T00:00:00+00:00,NOK,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063956,22
+F000479,John Fetterman,2025-04-22T00:00:00+00:00,2025-05-15T00:00:00+00:00,VTRS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063620,23
+F000479,John Fetterman,2025-04-22T00:00:00+00:00,2025-05-15T00:00:00+00:00,KMI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063621,23
+K000375,Bill Keating,2026-02-20T00:00:00+00:00,2026-03-17T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795724,24
+K000375,Bill Keating,2026-02-20T00:00:00+00:00,2026-03-17T00:00:00+00:00,CB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795725,24
+K000375,Bill Keating,2026-02-04T00:00:00+00:00,2026-02-27T00:00:00+00:00,VMW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795310,22
+K000375,Bill Keating,2025-12-05T00:00:00+00:00,2025-12-17T00:00:00+00:00,CMCSA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794229,11
+K000375,Bill Keating,2025-05-15T00:00:00+00:00,2025-06-24T00:00:00+00:00,MSFT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003790048,39
+K000375,Bill Keating,2025-06-09T00:00:00+00:00,2025-06-24T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787577,14
+K000375,Bill Keating,2025-03-06T00:00:00+00:00,2025-03-24T00:00:00+00:00,BAC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787578,15
+K000375,Bill Keating,2025-03-03T00:00:00+00:00,2025-03-24T00:00:00+00:00,BJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003783166,18
+K000375,Bill Keating,2025-02-28T00:00:00+00:00,2025-03-24T00:00:00+00:00,GS,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003783167,21
+D000399,Lloyd Doggett,2026-03-26T00:00:00+00:00,2026-04-08T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796625,11
+D000399,Lloyd Doggett,2026-03-10T00:00:00+00:00,2026-04-08T00:00:00+00:00,IBM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796626,27
+D000399,Lloyd Doggett,2026-03-10T00:00:00+00:00,2026-04-08T00:00:00+00:00,JNJ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796627,27
+D000399,Lloyd Doggett,2026-03-12T00:00:00+00:00,2026-04-08T00:00:00+00:00,PPG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796628,25
+D000399,Lloyd Doggett,2026-02-17T00:00:00+00:00,2026-03-06T00:00:00+00:00,PG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795319,16
+D000399,Lloyd Doggett,2025-12-15T00:00:00+00:00,2026-01-05T00:00:00+00:00,KO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794302,18
+D000399,Lloyd Doggett,2025-12-18T00:00:00+00:00,2026-01-05T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794303,15
+D000399,Lloyd Doggett,2025-12-12T00:00:00+00:00,2026-01-05T00:00:00+00:00,IBM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794304,21
+D000399,Lloyd Doggett,2025-12-09T00:00:00+00:00,2026-01-05T00:00:00+00:00,JNJ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794305,24
+D000399,Lloyd Doggett,2025-12-12T00:00:00+00:00,2026-01-05T00:00:00+00:00,PPG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794306,21
+D000399,Lloyd Doggett,2025-07-01T00:00:00+00:00,2025-08-05T00:00:00+00:00,KO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003788359,34
+D000399,Lloyd Doggett,2025-06-18T00:00:00+00:00,2025-07-08T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787718,19
+D000399,Lloyd Doggett,2025-06-10T00:00:00+00:00,2025-07-08T00:00:00+00:00,IBM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787719,27
+D000399,Lloyd Doggett,2025-06-10T00:00:00+00:00,2025-07-08T00:00:00+00:00,JNJ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787720,27
+D000399,Lloyd Doggett,2025-06-12T00:00:00+00:00,2025-07-08T00:00:00+00:00,PPG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787721,25
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,APD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796659,34
+G000583,Josh Gottheimer,2026-03-12T00:00:00+00:00,2026-04-09T00:00:00+00:00,ALC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796660,27
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,CBZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796661,34
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,COLB,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796662,34
+G000583,Josh Gottheimer,2026-03-24T00:00:00+00:00,2026-04-09T00:00:00+00:00,CCI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796663,15
+G000583,Josh Gottheimer,2026-03-24T00:00:00+00:00,2026-04-09T00:00:00+00:00,XNGSY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796664,15
+G000583,Josh Gottheimer,2026-03-24T00:00:00+00:00,2026-04-09T00:00:00+00:00,FN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796665,15
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,FWRG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796666,34
+G000583,Josh Gottheimer,2026-03-12T00:00:00+00:00,2026-04-09T00:00:00+00:00,HDB,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796667,27
+G000583,Josh Gottheimer,2026-03-12T00:00:00+00:00,2026-04-09T00:00:00+00:00,IFNNY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796668,27
+G000583,Josh Gottheimer,2026-03-12T00:00:00+00:00,2026-04-09T00:00:00+00:00,LZB,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796670,27
+G000583,Josh Gottheimer,2026-03-25T00:00:00+00:00,2026-04-09T00:00:00+00:00,MSFT,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796671,14
+G000583,Josh Gottheimer,2026-03-25T00:00:00+00:00,2026-04-09T00:00:00+00:00,MSFT,us_equity,buy,500K–1M,750000.0,https://www.capitoltrades.com/trades/20003796672,14
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,NTES,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796673,34
+G000583,Josh Gottheimer,2026-03-05T00:00:00+00:00,2026-04-09T00:00:00+00:00,PHR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796674,34
+G000583,Josh Gottheimer,2026-03-10T00:00:00+00:00,2026-04-09T00:00:00+00:00,SE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796675,29
+G000583,Josh Gottheimer,2026-03-06T00:00:00+00:00,2026-04-09T00:00:00+00:00,NOW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796676,33
+G000583,Josh Gottheimer,2026-02-18T00:00:00+00:00,2026-03-17T00:00:00+00:00,CVNA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795708,26
+G000583,Josh Gottheimer,2026-02-04T00:00:00+00:00,2026-03-17T00:00:00+00:00,NET,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795709,40
+G000583,Josh Gottheimer,2026-02-05T00:00:00+00:00,2026-03-17T00:00:00+00:00,CMI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795710,39
+G000583,Josh Gottheimer,2026-02-04T00:00:00+00:00,2026-03-17T00:00:00+00:00,XOM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795711,40
+G000583,Josh Gottheimer,2026-02-02T00:00:00+00:00,2026-03-17T00:00:00+00:00,XOM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795712,42
+G000583,Josh Gottheimer,2026-02-04T00:00:00+00:00,2026-03-17T00:00:00+00:00,FICO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795713,40
+G000583,Josh Gottheimer,2026-02-26T00:00:00+00:00,2026-03-17T00:00:00+00:00,FSS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795714,18
+G000583,Josh Gottheimer,2026-02-05T00:00:00+00:00,2026-03-17T00:00:00+00:00,GEV,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795715,39
+G000583,Josh Gottheimer,2026-02-27T00:00:00+00:00,2026-03-17T00:00:00+00:00,IFNNY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795716,17
+G000583,Josh Gottheimer,2026-02-20T00:00:00+00:00,2026-03-17T00:00:00+00:00,INTU,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795717,24
+G000583,Josh Gottheimer,2026-02-04T00:00:00+00:00,2026-03-17T00:00:00+00:00,MRK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795718,40
+G000583,Josh Gottheimer,2026-02-02T00:00:00+00:00,2026-03-17T00:00:00+00:00,MSFT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795719,42
+G000583,Josh Gottheimer,2026-02-02T00:00:00+00:00,2026-03-17T00:00:00+00:00,MNST,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795720,42
+G000583,Josh Gottheimer,2026-02-27T00:00:00+00:00,2026-03-17T00:00:00+00:00,PANW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795721,17
+G000583,Josh Gottheimer,2026-02-05T00:00:00+00:00,2026-03-17T00:00:00+00:00,UNH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795722,39
+G000583,Josh Gottheimer,2026-02-18T00:00:00+00:00,2026-03-17T00:00:00+00:00,V,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795723,26
+G000583,Josh Gottheimer,2026-01-27T00:00:00+00:00,2026-02-27T00:00:00+00:00,GILD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795303,30
+G000583,Josh Gottheimer,2026-01-26T00:00:00+00:00,2026-02-27T00:00:00+00:00,ICE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795304,31
+G000583,Josh Gottheimer,2026-01-26T00:00:00+00:00,2026-02-27T00:00:00+00:00,NSRGY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795305,31
+G000583,Josh Gottheimer,2026-01-26T00:00:00+00:00,2026-02-27T00:00:00+00:00,SNDR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795306,31
+G000583,Josh Gottheimer,2026-01-30T00:00:00+00:00,2026-02-27T00:00:00+00:00,NOW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795307,27
+G000583,Josh Gottheimer,2026-01-30T00:00:00+00:00,2026-02-27T00:00:00+00:00,UBER,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795308,27
+G000583,Josh Gottheimer,2025-12-08T00:00:00+00:00,2026-01-15T00:00:00+00:00,APD,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794727,37
+G000583,Josh Gottheimer,2025-12-12T00:00:00+00:00,2026-01-15T00:00:00+00:00,LNG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794728,33
+G000583,Josh Gottheimer,2025-12-05T00:00:00+00:00,2026-01-15T00:00:00+00:00,CVLT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794729,40
+G000583,Josh Gottheimer,2025-12-05T00:00:00+00:00,2026-01-15T00:00:00+00:00,MTHRY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794730,40
+G000583,Josh Gottheimer,2025-12-05T00:00:00+00:00,2026-01-15T00:00:00+00:00,SE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794731,40
+G000583,Josh Gottheimer,2025-12-17T00:00:00+00:00,2026-01-15T00:00:00+00:00,NOW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794732,28
+G000583,Josh Gottheimer,2025-12-05T00:00:00+00:00,2026-01-15T00:00:00+00:00,SSMXY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794733,40
+G000583,Josh Gottheimer,2025-12-11T00:00:00+00:00,2026-01-15T00:00:00+00:00,UBER,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794734,34
+G000583,Josh Gottheimer,2025-12-08T00:00:00+00:00,2026-01-15T00:00:00+00:00,UTZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794735,37
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,BHP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794287,40
+G000583,Josh Gottheimer,2025-11-17T00:00:00+00:00,2025-12-30T00:00:00+00:00,CSWI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794288,42
+G000583,Josh Gottheimer,2025-11-21T00:00:00+00:00,2025-12-30T00:00:00+00:00,DASTY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794289,38
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,EW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794290,40
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,FIS,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794291,40
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,HD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794292,40
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,HUBS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794293,40
+G000583,Josh Gottheimer,2025-11-19T00:00:00+00:00,2025-12-30T00:00:00+00:00,KKR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794294,40
+G000583,Josh Gottheimer,2025-10-20T00:00:00+00:00,2025-11-18T00:00:00+00:00,MMM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792811,28
+G000583,Josh Gottheimer,2025-10-16T00:00:00+00:00,2025-11-18T00:00:00+00:00,ICE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792812,32
+G000583,Josh Gottheimer,2025-10-17T00:00:00+00:00,2025-11-18T00:00:00+00:00,NTES,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792813,31
+C001035,Susan Collins,2026-02-03T00:00:00+00:00,2026-03-26T00:00:00+00:00,PFE,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064794,50
+C001035,Susan Collins,2024-07-17T00:00:00+00:00,2024-08-16T00:00:00+00:00,TMO,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064134,29
+C001035,Susan Collins,2024-06-05T00:00:00+00:00,2024-07-13T00:00:00+00:00,FIS,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000062680,37
+H001082,Kevin Hern,2026-03-16T00:00:00+00:00,2026-04-06T00:00:00+00:00,ACN,us_equity,sell,250K–500K,375000.0,https://www.capitoltrades.com/trades/20003796435,18
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,BDX,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796436,17
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,MUA,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796437,17
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,CTSH,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796438,17
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,CMCSA,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796439,17
+H001082,Kevin Hern,2026-03-24T00:00:00+00:00,2026-04-06T00:00:00+00:00,EXAS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796440,10
+H001082,Kevin Hern,2026-03-05T00:00:00+00:00,2026-04-06T00:00:00+00:00,ICLR,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003796441,29
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,IVZ,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796442,17
+H001082,Kevin Hern,2026-03-16T00:00:00+00:00,2026-04-06T00:00:00+00:00,IQV,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796443,18
+H001082,Kevin Hern,2026-03-17T00:00:00+00:00,2026-04-06T00:00:00+00:00,KVUE,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796444,17
+H001082,Kevin Hern,2026-03-20T00:00:00+00:00,2026-04-06T00:00:00+00:00,MDT,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796445,14
+H001082,Kevin Hern,2026-03-16T00:00:00+00:00,2026-04-06T00:00:00+00:00,PRGS,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796446,18
+H001082,Kevin Hern,2026-03-20T00:00:00+00:00,2026-04-06T00:00:00+00:00,PLD,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003796447,14
+H001082,Kevin Hern,2026-03-20T00:00:00+00:00,2026-04-06T00:00:00+00:00,TROW,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796449,14
+H001082,Kevin Hern,2026-03-18T00:00:00+00:00,2026-04-06T00:00:00+00:00,TXN,us_equity,sell,500K–1M,750000.0,https://www.capitoltrades.com/trades/20003796450,16
+H001082,Kevin Hern,2026-01-07T00:00:00+00:00,2026-02-19T00:00:00+00:00,RY,us_equity,buy,250K–500K,375000.0,https://www.capitoltrades.com/trades/20003795320,42
+H001082,Kevin Hern,2025-12-23T00:00:00+00:00,2026-01-23T00:00:00+00:00,UNH,us_equity,sell,250K–500K,375000.0,https://www.capitoltrades.com/trades/20003795252,30
+H001082,Kevin Hern,2025-10-27T00:00:00+00:00,2025-11-17T00:00:00+00:00,ACN,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003794870,20
+H001082,Kevin Hern,2025-10-09T00:00:00+00:00,2025-11-17T00:00:00+00:00,BNPQY,us_equity,sell,250K–500K,375000.0,https://www.capitoltrades.com/trades/20003792774,38
+H001082,Kevin Hern,2025-10-09T00:00:00+00:00,2025-11-17T00:00:00+00:00,BNPQY,us_equity,sell,1M–5M,3000000.0,https://www.capitoltrades.com/trades/20003792775,38
+H001082,Kevin Hern,2025-10-28T00:00:00+00:00,2025-11-17T00:00:00+00:00,BSX,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792776,19
+H001082,Kevin Hern,2025-10-28T00:00:00+00:00,2025-11-17T00:00:00+00:00,CSX,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792777,19
+H001082,Kevin Hern,2025-10-06T00:00:00+00:00,2025-11-17T00:00:00+00:00,ETN,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792778,41
+H001082,Kevin Hern,2025-10-28T00:00:00+00:00,2025-11-17T00:00:00+00:00,HD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792779,19
+H001082,Kevin Hern,2025-10-23T00:00:00+00:00,2025-11-17T00:00:00+00:00,MCD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792780,24
+H001082,Kevin Hern,2025-10-23T00:00:00+00:00,2025-11-17T00:00:00+00:00,MCD,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792781,24
+H001082,Kevin Hern,2025-10-28T00:00:00+00:00,2025-11-17T00:00:00+00:00,MSFT,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792782,19
+H001082,Kevin Hern,2025-10-28T00:00:00+00:00,2025-11-17T00:00:00+00:00,ORLY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792783,19
+T000490,David Taylor,2026-03-24T00:00:00+00:00,2026-04-03T00:00:00+00:00,IBP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796433,9
+T000490,David Taylor,2026-03-24T00:00:00+00:00,2026-04-03T00:00:00+00:00,KR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796434,9
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,CVX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795758,8
+T000490,David Taylor,2026-03-11T00:00:00+00:00,2026-03-23T00:00:00+00:00,CVX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795759,9
+T000490,David Taylor,2026-03-11T00:00:00+00:00,2026-03-23T00:00:00+00:00,FITB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795760,9
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795761,8
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,IBP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795762,8
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,LRCX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795763,8
+T000490,David Taylor,2026-03-11T00:00:00+00:00,2026-03-23T00:00:00+00:00,MPC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795764,9
+T000490,David Taylor,2026-03-11T00:00:00+00:00,2026-03-23T00:00:00+00:00,MPC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795765,9
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,PH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795766,8
+T000490,David Taylor,2026-03-12T00:00:00+00:00,2026-03-23T00:00:00+00:00,RPM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795767,8
+T000490,David Taylor,2026-03-11T00:00:00+00:00,2026-03-23T00:00:00+00:00,RPM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795768,9
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795330,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795331,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,AEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795332,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,AMGN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795333,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,AAPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795334,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,T,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795335,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,AVGO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795336,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,CVX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795337,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,ETN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795338,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,LLY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795339,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,FITB,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795340,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,IBP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795341,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,IBM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795342,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,IBM,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795343,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,KR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795344,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,LRCX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795345,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,LRCX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795346,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,MPC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795347,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,MEDP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795348,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795349,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,PH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795350,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,PH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795351,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,PG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795352,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,PLD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795353,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,RPM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795354,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,CRM,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795355,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,CRM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795356,8
+T000490,David Taylor,2026-02-26T00:00:00+00:00,2026-03-09T00:00:00+00:00,V,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795357,8
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795270,11
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,LLY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795271,11
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795272,11
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,PH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795273,11
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,PG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795274,11
+T000490,David Taylor,2026-02-10T00:00:00+00:00,2026-02-23T00:00:00+00:00,PGR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795275,10
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,CRM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795276,11
+T000490,David Taylor,2026-02-09T00:00:00+00:00,2026-02-23T00:00:00+00:00,V,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795277,11
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,GOOGL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794937,17
+T000490,David Taylor,2026-01-29T00:00:00+00:00,2026-02-03T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794938,4
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,AEP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794939,17
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,AMGN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794940,17
+T000490,David Taylor,2026-01-29T00:00:00+00:00,2026-02-03T00:00:00+00:00,AMGN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794941,4
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,AAPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794942,17
+T000490,David Taylor,2026-01-29T00:00:00+00:00,2026-02-03T00:00:00+00:00,T,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794943,4
+T000490,David Taylor,2026-01-29T00:00:00+00:00,2026-02-03T00:00:00+00:00,AVGO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794944,4
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,AVGO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794945,17
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,ETN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794946,17
+T000490,David Taylor,2026-01-16T00:00:00+00:00,2026-02-03T00:00:00+00:00,LLY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794947,17
+D000626,Warren Davidson,2026-03-23T00:00:00+00:00,2026-03-26T00:00:00+00:00,GEHC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795785,2
+M001236,Tim Moore,2026-03-23T00:00:00+00:00,2026-03-25T00:00:00+00:00,CBRL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795776,1
+M001236,Tim Moore,2026-03-12T00:00:00+00:00,2026-03-25T00:00:00+00:00,HOG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795777,12
+M001236,Tim Moore,2026-03-17T00:00:00+00:00,2026-03-25T00:00:00+00:00,DNUT,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795778,7
+M001236,Tim Moore,2026-03-18T00:00:00+00:00,2026-03-25T00:00:00+00:00,LGIH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795779,6
+M001236,Tim Moore,2026-03-19T00:00:00+00:00,2026-03-25T00:00:00+00:00,LGIH,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795780,5
+M001236,Tim Moore,2026-03-20T00:00:00+00:00,2026-03-25T00:00:00+00:00,LGIH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795781,4
+M001236,Tim Moore,2026-03-12T00:00:00+00:00,2026-03-25T00:00:00+00:00,LGIH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795782,12
+M001236,Tim Moore,2026-01-30T00:00:00+00:00,2026-02-23T00:00:00+00:00,T,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795262,21
+M001236,Tim Moore,2026-02-18T00:00:00+00:00,2026-02-23T00:00:00+00:00,COIN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795263,2
+M001236,Tim Moore,2026-02-05T00:00:00+00:00,2026-02-23T00:00:00+00:00,GNPX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795264,15
+M001236,Tim Moore,2026-01-23T00:00:00+00:00,2026-02-23T00:00:00+00:00,HOG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795265,28
+M001236,Tim Moore,2026-02-12T00:00:00+00:00,2026-02-23T00:00:00+00:00,DNUT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795266,8
+M001236,Tim Moore,2026-01-30T00:00:00+00:00,2026-02-23T00:00:00+00:00,VZ,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795269,21
+M001236,Tim Moore,2026-01-09T00:00:00+00:00,2026-01-26T00:00:00+00:00,T,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794891,15
+M001236,Tim Moore,2026-01-05T00:00:00+00:00,2026-01-26T00:00:00+00:00,CBRL,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794892,19
+M001236,Tim Moore,2025-12-31T00:00:00+00:00,2026-01-26T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794893,24
+M001236,Tim Moore,2026-01-05T00:00:00+00:00,2026-01-26T00:00:00+00:00,HY,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794894,19
+M001236,Tim Moore,2025-12-31T00:00:00+00:00,2026-01-08T00:00:00+00:00,CBRL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794339,7
+M001236,Tim Moore,2025-12-18T00:00:00+00:00,2026-01-08T00:00:00+00:00,GNPX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794340,20
+M001236,Tim Moore,2025-12-18T00:00:00+00:00,2026-01-08T00:00:00+00:00,HOG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794341,20
+M001236,Tim Moore,2025-12-09T00:00:00+00:00,2025-12-22T00:00:00+00:00,CBRL,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794266,10
+M001236,Tim Moore,2025-12-16T00:00:00+00:00,2025-12-22T00:00:00+00:00,CBRL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794267,3
+M001236,Tim Moore,2025-12-10T00:00:00+00:00,2025-12-22T00:00:00+00:00,CBRL,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794268,9
+M001236,Tim Moore,2025-12-09T00:00:00+00:00,2025-12-22T00:00:00+00:00,HOG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794269,10
+M001236,Tim Moore,2025-12-03T00:00:00+00:00,2025-12-22T00:00:00+00:00,HY,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003794270,16
+M001236,Tim Moore,2025-12-10T00:00:00+00:00,2025-12-22T00:00:00+00:00,VZ,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794271,9
+M001236,Tim Moore,2025-11-20T00:00:00+00:00,2025-12-03T00:00:00+00:00,CBRL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793497,12
+M001236,Tim Moore,2025-11-28T00:00:00+00:00,2025-12-03T00:00:00+00:00,CBRL,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793498,4
+M001236,Tim Moore,2025-11-07T00:00:00+00:00,2025-12-03T00:00:00+00:00,GNPX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793499,25
+M001236,Tim Moore,2025-11-28T00:00:00+00:00,2025-12-03T00:00:00+00:00,HOG,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793500,4
+M001236,Tim Moore,2025-11-21T00:00:00+00:00,2025-12-03T00:00:00+00:00,HOG,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793501,11
+M001236,Tim Moore,2025-11-20T00:00:00+00:00,2025-12-03T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793502,12
+M001236,Tim Moore,2025-11-12T00:00:00+00:00,2025-12-03T00:00:00+00:00,HY,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003793503,20
+M001236,Tim Moore,2025-11-14T00:00:00+00:00,2025-12-03T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793504,18
+M001236,Tim Moore,2025-11-03T00:00:00+00:00,2025-12-03T00:00:00+00:00,HY,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003793505,29
+M001236,Tim Moore,2025-11-05T00:00:00+00:00,2025-12-03T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793506,27
+M001236,Tim Moore,2025-11-04T00:00:00+00:00,2025-12-03T00:00:00+00:00,LGIH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793507,28
+M001236,Tim Moore,2025-11-05T00:00:00+00:00,2025-12-03T00:00:00+00:00,LGIH,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003793508,27
+M001236,Tim Moore,2025-11-05T00:00:00+00:00,2025-12-03T00:00:00+00:00,VZ,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793509,27
+M001236,Tim Moore,2025-11-19T00:00:00+00:00,2025-12-03T00:00:00+00:00,VZ,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003793510,13
+M001236,Tim Moore,2025-10-29T00:00:00+00:00,2025-11-12T00:00:00+00:00,GNPX,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792407,14
+M001236,Tim Moore,2025-10-24T00:00:00+00:00,2025-11-12T00:00:00+00:00,HY,us_equity,sell,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792408,19
+M001236,Tim Moore,2025-10-08T00:00:00+00:00,2025-11-12T00:00:00+00:00,HY,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003792409,35
+M001236,Tim Moore,2025-10-10T00:00:00+00:00,2025-11-12T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792410,33
+M001236,Tim Moore,2025-10-14T00:00:00+00:00,2025-11-12T00:00:00+00:00,HY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792411,29
+M001236,Tim Moore,2025-10-22T00:00:00+00:00,2025-11-12T00:00:00+00:00,DNUT,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003792412,21
+M001236,Tim Moore,2025-10-30T00:00:00+00:00,2025-11-12T00:00:00+00:00,LGIH,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792413,13
+M001236,Tim Moore,2025-10-31T00:00:00+00:00,2025-11-12T00:00:00+00:00,VZ,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792414,12
+M001236,Tim Moore,2025-10-07T00:00:00+00:00,2025-11-12T00:00:00+00:00,VZ,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003792415,36
+M001236,Tim Moore,2025-10-10T00:00:00+00:00,2025-11-12T00:00:00+00:00,VZ,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792416,33
+B001236,John Boozman,2026-03-20T00:00:00+00:00,2026-04-14T00:00:00+00:00,TPYP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064896,25
+B001236,John Boozman,2026-03-19T00:00:00+00:00,2026-04-14T00:00:00+00:00,JNJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064897,26
+B001236,John Boozman,2026-03-19T00:00:00+00:00,2026-04-14T00:00:00+00:00,BBEU,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064898,26
+B001236,John Boozman,2026-03-19T00:00:00+00:00,2026-04-14T00:00:00+00:00,VEA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064890,26
+B001236,John Boozman,2026-03-20T00:00:00+00:00,2026-04-14T00:00:00+00:00,SPYM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064891,25
+B001236,John Boozman,2026-03-19T00:00:00+00:00,2026-04-14T00:00:00+00:00,NVDA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064892,26
+B001236,John Boozman,2026-03-05T00:00:00+00:00,2026-04-14T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064893,40
+B001236,John Boozman,2026-03-19T00:00:00+00:00,2026-04-14T00:00:00+00:00,FTGC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064894,26
+B001236,John Boozman,2026-03-13T00:00:00+00:00,2026-04-14T00:00:00+00:00,ARES,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064895,32
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,UBER,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064712,28
+B001236,John Boozman,2026-02-27T00:00:00+00:00,2026-03-06T00:00:00+00:00,NTAP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064713,7
+B001236,John Boozman,2026-02-13T00:00:00+00:00,2026-03-06T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064714,21
+B001236,John Boozman,2026-02-26T00:00:00+00:00,2026-03-06T00:00:00+00:00,KR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064715,8
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,IEF,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064716,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,TLH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064717,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,EMB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064718,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,CMBS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064719,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,GIGB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064720,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,XTWO,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064721,28
+B001236,John Boozman,2026-02-19T00:00:00+00:00,2026-03-06T00:00:00+00:00,UNP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064703,15
+B001236,John Boozman,2026-02-26T00:00:00+00:00,2026-03-06T00:00:00+00:00,PG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064704,8
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,JMBS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064705,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,SHY,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000064706,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,MBB,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064707,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,AGZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064708,28
+B001236,John Boozman,2026-02-06T00:00:00+00:00,2026-03-06T00:00:00+00:00,DBLEX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064709,28
+B001236,John Boozman,2026-02-27T00:00:00+00:00,2026-03-06T00:00:00+00:00,AMAT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064710,7
+B001236,John Boozman,2026-02-13T00:00:00+00:00,2026-03-06T00:00:00+00:00,ADBE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064711,21
+B001236,John Boozman,2026-01-15T00:00:00+00:00,2026-02-15T00:00:00+00:00,V,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064605,31
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,VNQI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064606,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,TPYP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064607,23
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,PYPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064609,17
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,RNWGX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064610,23
+B001236,John Boozman,2026-01-08T00:00:00+00:00,2026-02-15T00:00:00+00:00,NFLX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064611,38
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,JMBS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064612,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,IVV,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064613,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,CMBS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064614,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,MBB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064615,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,TBLL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064616,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,GIGB,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064617,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,GEM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064618,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,FTGC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064619,23
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,EIPI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064620,23
+B001236,John Boozman,2026-01-08T00:00:00+00:00,2026-02-15T00:00:00+00:00,XOM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064621,38
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,ETN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064622,17
+B001236,John Boozman,2026-01-08T00:00:00+00:00,2026-02-15T00:00:00+00:00,DIS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064623,38
+B001236,John Boozman,2026-01-26T00:00:00+00:00,2026-02-15T00:00:00+00:00,DXCM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064624,20
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,CVS,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064625,17
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,CAT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064626,17
+B001236,John Boozman,2026-01-15T00:00:00+00:00,2026-02-15T00:00:00+00:00,AAPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064627,31
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,UNP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064591,17
+B001236,John Boozman,2026-01-23T00:00:00+00:00,2026-02-15T00:00:00+00:00,MDY,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064593,23
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,OMC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064594,17
+B001236,John Boozman,2026-01-15T00:00:00+00:00,2026-02-15T00:00:00+00:00,OMC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064595,31
+B001236,John Boozman,2026-01-26T00:00:00+00:00,2026-02-15T00:00:00+00:00,MU,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064596,20
+B001236,John Boozman,2026-01-08T00:00:00+00:00,2026-02-15T00:00:00+00:00,MU,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064597,38
+B001236,John Boozman,2026-01-08T00:00:00+00:00,2026-02-15T00:00:00+00:00,LRCX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064598,38
+B001236,John Boozman,2026-01-29T00:00:00+00:00,2026-02-15T00:00:00+00:00,IVW,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064599,17
+J000309,Jonathan Jackson,2026-03-09T00:00:00+00:00,2026-04-09T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796677,30
+J000309,Jonathan Jackson,2026-03-20T00:00:00+00:00,2026-04-09T00:00:00+00:00,BP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796678,19
+J000309,Jonathan Jackson,2026-03-19T00:00:00+00:00,2026-04-09T00:00:00+00:00,BP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796679,20
+J000309,Jonathan Jackson,2026-03-19T00:00:00+00:00,2026-04-09T00:00:00+00:00,ORLY,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796680,20
+J000309,Jonathan Jackson,2026-02-05T00:00:00+00:00,2026-03-13T00:00:00+00:00,AMZN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795526,35
+J000309,Jonathan Jackson,2026-02-11T00:00:00+00:00,2026-03-13T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795527,29
+J000309,Jonathan Jackson,2026-02-04T00:00:00+00:00,2026-03-13T00:00:00+00:00,BRCM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795528,36
+J000309,Jonathan Jackson,2026-02-04T00:00:00+00:00,2026-03-13T00:00:00+00:00,C,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795529,36
+J000309,Jonathan Jackson,2026-02-11T00:00:00+00:00,2026-03-13T00:00:00+00:00,C,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795530,29
+J000309,Jonathan Jackson,2026-02-05T00:00:00+00:00,2026-03-13T00:00:00+00:00,C,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795531,35
+J000309,Jonathan Jackson,2026-02-17T00:00:00+00:00,2026-03-13T00:00:00+00:00,IBM,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795532,23
+J000309,Jonathan Jackson,2026-02-17T00:00:00+00:00,2026-03-13T00:00:00+00:00,IBM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795533,23
+J000309,Jonathan Jackson,2026-02-05T00:00:00+00:00,2026-03-13T00:00:00+00:00,PANW,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795534,35
+J000309,Jonathan Jackson,2026-02-03T00:00:00+00:00,2026-03-13T00:00:00+00:00,SHOP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795535,37
+J000309,Jonathan Jackson,2026-02-11T00:00:00+00:00,2026-03-13T00:00:00+00:00,THC,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795536,29
+J000309,Jonathan Jackson,2026-02-17T00:00:00+00:00,2026-03-13T00:00:00+00:00,BK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795537,23
+J000309,Jonathan Jackson,2026-02-17T00:00:00+00:00,2026-03-13T00:00:00+00:00,BK,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795538,23
+J000309,Jonathan Jackson,2026-02-11T00:00:00+00:00,2026-03-13T00:00:00+00:00,WELL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795539,29
+J000309,Jonathan Jackson,2026-01-30T00:00:00+00:00,2026-02-24T00:00:00+00:00,C,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795282,24
+J000309,Jonathan Jackson,2026-01-30T00:00:00+00:00,2026-02-24T00:00:00+00:00,GEV,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795284,24
+J000309,Jonathan Jackson,2026-01-20T00:00:00+00:00,2026-02-24T00:00:00+00:00,JPM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795285,34
+J000309,Jonathan Jackson,2026-01-16T00:00:00+00:00,2026-02-24T00:00:00+00:00,PLTR,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795286,38
+J000309,Jonathan Jackson,2026-01-20T00:00:00+00:00,2026-02-24T00:00:00+00:00,HOOD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795287,34
+J000309,Jonathan Jackson,2026-01-30T00:00:00+00:00,2026-02-24T00:00:00+00:00,SHOP,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795288,24
+J000309,Jonathan Jackson,2026-01-13T00:00:00+00:00,2026-02-24T00:00:00+00:00,TMUS,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795289,41
+J000309,Jonathan Jackson,2026-01-22T00:00:00+00:00,2026-02-24T00:00:00+00:00,VSAT,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795290,32
+J000309,Jonathan Jackson,2026-01-13T00:00:00+00:00,2026-02-24T00:00:00+00:00,WMT,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795291,41
+J000309,Jonathan Jackson,2025-12-10T00:00:00+00:00,2026-01-09T00:00:00+00:00,MELI,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794344,29
+J000309,Jonathan Jackson,2025-12-08T00:00:00+00:00,2026-01-09T00:00:00+00:00,NFLX,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794345,31
+J000309,Jonathan Jackson,2025-12-22T00:00:00+00:00,2026-01-09T00:00:00+00:00,PLTR,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794346,17
+J000309,Jonathan Jackson,2025-12-22T00:00:00+00:00,2026-01-09T00:00:00+00:00,HOOD,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794347,17
+J000309,Jonathan Jackson,2025-12-08T00:00:00+00:00,2026-01-09T00:00:00+00:00,SHOP,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794348,31
+J000309,Jonathan Jackson,2025-12-10T00:00:00+00:00,2026-01-09T00:00:00+00:00,THC,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794349,29
+J000309,Jonathan Jackson,2025-11-06T00:00:00+00:00,2025-12-08T00:00:00+00:00,DOCS,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793521,29
+J000309,Jonathan Jackson,2025-11-11T00:00:00+00:00,2025-12-08T00:00:00+00:00,META,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793522,24
+J000309,Jonathan Jackson,2025-11-06T00:00:00+00:00,2025-12-08T00:00:00+00:00,HOOD,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793523,29
+J000309,Jonathan Jackson,2025-11-11T00:00:00+00:00,2025-12-08T00:00:00+00:00,STT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793524,24
+J000309,Jonathan Jackson,2025-11-11T00:00:00+00:00,2025-12-08T00:00:00+00:00,TMUS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793525,24
+J000309,Jonathan Jackson,2025-10-08T00:00:00+00:00,2025-11-11T00:00:00+00:00,MCK,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792190,33
+J000309,Jonathan Jackson,2025-10-08T00:00:00+00:00,2025-11-11T00:00:00+00:00,HOOD,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792191,33
+J000309,Jonathan Jackson,2025-10-08T00:00:00+00:00,2025-11-11T00:00:00+00:00,SHOP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792192,33
+J000309,Jonathan Jackson,2025-10-06T00:00:00+00:00,2025-11-11T00:00:00+00:00,SHOP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792193,35
+D000032,Byron Donalds,2026-03-20T00:00:00+00:00,2026-04-09T00:00:00+00:00,NFLX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796653,19
+D000032,Byron Donalds,2026-03-20T00:00:00+00:00,2026-04-09T00:00:00+00:00,NFLX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796654,19
+D000032,Byron Donalds,2026-03-13T00:00:00+00:00,2026-04-09T00:00:00+00:00,PYPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796655,26
+D000032,Byron Donalds,2026-03-13T00:00:00+00:00,2026-04-09T00:00:00+00:00,PYPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796656,26
+D000032,Byron Donalds,2026-03-20T00:00:00+00:00,2026-04-09T00:00:00+00:00,TTD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796657,19
+D000032,Byron Donalds,2026-03-20T00:00:00+00:00,2026-04-09T00:00:00+00:00,TTD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796658,19
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,BRO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795322,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,BRO,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795323,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,PYPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795324,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,PYPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795325,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,NOW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795326,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,NOW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795327,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,TTD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795328,24
+D000032,Byron Donalds,2026-02-10T00:00:00+00:00,2026-03-09T00:00:00+00:00,TTD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795329,24
+D000032,Byron Donalds,2026-01-08T00:00:00+00:00,2026-02-13T00:00:00+00:00,HWM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795083,35
+D000032,Byron Donalds,2026-01-08T00:00:00+00:00,2026-02-13T00:00:00+00:00,PH,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795084,35
+D000032,Byron Donalds,2026-01-08T00:00:00+00:00,2026-02-13T00:00:00+00:00,TTD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795085,35
+D000032,Byron Donalds,2026-01-08T00:00:00+00:00,2026-02-13T00:00:00+00:00,TTD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795086,35
+D000032,Byron Donalds,2025-12-04T00:00:00+00:00,2026-01-08T00:00:00+00:00,ABT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794332,34
+D000032,Byron Donalds,2025-12-04T00:00:00+00:00,2026-01-08T00:00:00+00:00,ABT,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794333,34
+D000032,Byron Donalds,2025-12-04T00:00:00+00:00,2026-01-08T00:00:00+00:00,FIX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794334,34
+D000032,Byron Donalds,2025-12-04T00:00:00+00:00,2026-01-08T00:00:00+00:00,FIX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794335,34
+D000032,Byron Donalds,2025-10-09T00:00:00+00:00,2025-11-19T00:00:00+00:00,BRO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794336,40
+D000032,Byron Donalds,2025-10-24T00:00:00+00:00,2025-11-19T00:00:00+00:00,BRO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792941,25
+D000032,Byron Donalds,2025-10-09T00:00:00+00:00,2025-11-19T00:00:00+00:00,BRO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792942,40
+D000032,Byron Donalds,2025-10-09T00:00:00+00:00,2025-11-19T00:00:00+00:00,CCL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792943,40
+D000032,Byron Donalds,2025-10-09T00:00:00+00:00,2025-11-19T00:00:00+00:00,CCL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792944,40
+D000032,Byron Donalds,2025-10-09T00:00:00+00:00,2025-11-19T00:00:00+00:00,CMG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792945,40
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,ABT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796632,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,ADI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796633,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,ADI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796634,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,ADP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796635,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,ADP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796636,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,BLK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796637,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796638,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796639,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,JNJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796640,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,JNJ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796641,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,LHX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796642,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,LHX,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796643,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796644,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796645,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,NEE,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796646,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,UNH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796647,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,UNH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796648,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,MGK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796650,19
+M001218,Rich McCormick,2026-03-19T00:00:00+00:00,2026-04-08T00:00:00+00:00,MGK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796651,19
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,ABT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793544,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,APD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793545,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,AWK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793546,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,ADI,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793547,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,AAPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793548,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,ADP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793549,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,BLK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793550,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,CSCO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793551,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,COST,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793552,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,EMR,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793554,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,HD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793555,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,ITW,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793556,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,ICE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793557,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,JNJ,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793558,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,LHX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793559,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,MCD,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793560,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,MDT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793561,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793562,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,NEE,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793563,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,PEP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793564,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,PG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793565,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,UNH,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793567,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,V,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793568,34
+M001218,Rich McCormick,2025-11-05T00:00:00+00:00,2025-12-10T00:00:00+00:00,WMT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793569,34
+M001243,Dave McCormick,2026-03-10T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064795,15
+M001243,Dave McCormick,2026-03-03T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064796,22
+M001243,Dave McCormick,2026-02-25T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064801,28
+M001243,Dave McCormick,2026-02-25T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064802,28
+M001243,Dave McCormick,2026-02-24T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064803,29
+M001243,Dave McCormick,2026-02-23T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064804,30
+M001243,Dave McCormick,2026-02-23T00:00:00+00:00,2026-03-26T00:00:00+00:00,GS,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/10000064805,30
+F000110,Cleo Fields,2026-03-16T00:00:00+00:00,2026-04-08T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796629,22
+F000110,Cleo Fields,2026-03-12T00:00:00+00:00,2026-03-18T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795729,5
+F000110,Cleo Fields,2026-03-12T00:00:00+00:00,2026-03-18T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795730,5
+F000110,Cleo Fields,2026-02-03T00:00:00+00:00,2026-02-25T00:00:00+00:00,AMD,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003795292,21
+F000110,Cleo Fields,2026-02-03T00:00:00+00:00,2026-02-25T00:00:00+00:00,GOOGL,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003795293,21
+F000110,Cleo Fields,2026-02-12T00:00:00+00:00,2026-02-25T00:00:00+00:00,AAPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795294,12
+F000110,Cleo Fields,2026-02-03T00:00:00+00:00,2026-02-25T00:00:00+00:00,LRCX,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003795295,21
+F000110,Cleo Fields,2026-02-03T00:00:00+00:00,2026-02-25T00:00:00+00:00,META,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003795296,21
+F000110,Cleo Fields,2026-02-03T00:00:00+00:00,2026-02-25T00:00:00+00:00,MU,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003795297,21
+F000110,Cleo Fields,2026-01-12T00:00:00+00:00,2026-02-04T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794973,22
+F000110,Cleo Fields,2026-01-20T00:00:00+00:00,2026-02-04T00:00:00+00:00,GOOGL,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003794974,14
+F000110,Cleo Fields,2026-01-20T00:00:00+00:00,2026-02-04T00:00:00+00:00,IREN,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794975,14
+F000110,Cleo Fields,2026-01-20T00:00:00+00:00,2026-02-04T00:00:00+00:00,META,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794976,14
+F000110,Cleo Fields,2026-01-20T00:00:00+00:00,2026-02-04T00:00:00+00:00,NFLX,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794977,14
+F000110,Cleo Fields,2026-01-08T00:00:00+00:00,2026-02-04T00:00:00+00:00,TSM,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794978,26
+F000110,Cleo Fields,2025-12-26T00:00:00+00:00,2026-01-19T00:00:00+00:00,GOOGL,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794830,21
+F000110,Cleo Fields,2025-12-26T00:00:00+00:00,2026-01-19T00:00:00+00:00,FIG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794831,21
+F000110,Cleo Fields,2025-12-26T00:00:00+00:00,2026-01-19T00:00:00+00:00,FIG,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794832,21
+F000110,Cleo Fields,2025-12-26T00:00:00+00:00,2026-01-19T00:00:00+00:00,IREN,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794833,21
+F000110,Cleo Fields,2025-12-26T00:00:00+00:00,2026-01-19T00:00:00+00:00,OPEN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794834,21
+F000110,Cleo Fields,2025-12-15T00:00:00+00:00,2025-12-18T00:00:00+00:00,GOOGL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794230,2
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,GOOGL,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003794231,6
+F000110,Cleo Fields,2025-12-09T00:00:00+00:00,2025-12-18T00:00:00+00:00,GOOGL,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794232,8
+F000110,Cleo Fields,2025-12-01T00:00:00+00:00,2025-12-18T00:00:00+00:00,GOOGL,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794233,16
+F000110,Cleo Fields,2025-12-15T00:00:00+00:00,2025-12-18T00:00:00+00:00,GOOGL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794234,2
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,ARM,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794235,6
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,T,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794236,6
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,CRWV,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794237,6
+F000110,Cleo Fields,2025-12-09T00:00:00+00:00,2025-12-18T00:00:00+00:00,IREN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794238,8
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794239,6
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794240,6
+F000110,Cleo Fields,2025-12-03T00:00:00+00:00,2025-12-18T00:00:00+00:00,NFLX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794241,14
+F000110,Cleo Fields,2025-12-03T00:00:00+00:00,2025-12-18T00:00:00+00:00,NFLX,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794242,14
+F000110,Cleo Fields,2025-12-15T00:00:00+00:00,2025-12-18T00:00:00+00:00,SOUN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794243,2
+F000110,Cleo Fields,2025-12-11T00:00:00+00:00,2025-12-18T00:00:00+00:00,UBER,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794244,6
+F000110,Cleo Fields,2025-11-20T00:00:00+00:00,2025-12-10T00:00:00+00:00,NFLX,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003793540,20
+F000110,Cleo Fields,2025-11-20T00:00:00+00:00,2025-12-10T00:00:00+00:00,NFLX,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003793541,20
+F000110,Cleo Fields,2025-11-13T00:00:00+00:00,2025-11-20T00:00:00+00:00,AAPL,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792971,6
+F000110,Cleo Fields,2025-11-03T00:00:00+00:00,2025-11-20T00:00:00+00:00,CLS,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792972,16
+F000110,Cleo Fields,2025-11-03T00:00:00+00:00,2025-11-20T00:00:00+00:00,NFLX,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792973,16
+F000110,Cleo Fields,2025-11-03T00:00:00+00:00,2025-11-20T00:00:00+00:00,NFLX,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792974,16
+F000110,Cleo Fields,2025-10-23T00:00:00+00:00,2025-11-13T00:00:00+00:00,GOOGL,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792419,20
+F000110,Cleo Fields,2025-10-29T00:00:00+00:00,2025-11-13T00:00:00+00:00,GOOGL,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003792420,14
+F000110,Cleo Fields,2025-10-30T00:00:00+00:00,2025-11-13T00:00:00+00:00,AAPL,us_equity,buy,250K–500K,375000.0,https://www.capitoltrades.com/trades/20003792421,13
+F000110,Cleo Fields,2025-10-23T00:00:00+00:00,2025-11-13T00:00:00+00:00,AAPL,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792422,20
+F000110,Cleo Fields,2025-10-31T00:00:00+00:00,2025-11-13T00:00:00+00:00,CLS,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792423,12
+F000110,Cleo Fields,2025-10-30T00:00:00+00:00,2025-11-13T00:00:00+00:00,CMG,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792424,13
+F000110,Cleo Fields,2025-10-31T00:00:00+00:00,2025-11-13T00:00:00+00:00,NFLX,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792425,12
+F000110,Cleo Fields,2025-10-30T00:00:00+00:00,2025-11-13T00:00:00+00:00,NVDA,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792426,13
+F000110,Cleo Fields,2025-10-30T00:00:00+00:00,2025-11-13T00:00:00+00:00,NVDA,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792427,13
+F000110,Cleo Fields,2025-10-23T00:00:00+00:00,2025-11-13T00:00:00+00:00,TSM,us_equity,buy,100K–250K,175000.0,https://www.capitoltrades.com/trades/20003792428,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,GOOGL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792143,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,GOOGL,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792144,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,CRWV,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792145,20
+F000110,Cleo Fields,2025-10-09T00:00:00+00:00,2025-10-31T00:00:00+00:00,CRWV,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792146,21
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,FIG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792147,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,IREN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792148,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,IREN,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003792149,20
+F000110,Cleo Fields,2025-10-10T00:00:00+00:00,2025-10-31T00:00:00+00:00,PLTR,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003792150,20
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796414,15
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,AAPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796415,15
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,T,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796416,15
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,DIA,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796417,15
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,QQQ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796418,15
+A000379,Mark Alford,2026-03-16T00:00:00+00:00,2026-04-01T00:00:00+00:00,PYPL,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796419,15
+M001234,Kelly Morrison,2026-03-08T00:00:00+00:00,2026-03-11T00:00:00+00:00,AJG,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003796432,2
+M001234,Kelly Morrison,2026-03-08T00:00:00+00:00,2026-03-11T00:00:00+00:00,AJG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795489,2
+M001234,Kelly Morrison,2026-03-08T00:00:00+00:00,2026-03-11T00:00:00+00:00,AJG,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795490,2
+P000048,August Pfluger,2026-02-10T00:00:00+00:00,2026-03-19T00:00:00+00:00,WBD,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797376,37
+P000048,August Pfluger,2026-01-12T00:00:00+00:00,2026-02-12T00:00:00+00:00,FNF,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797377,30
+P000048,August Pfluger,2026-01-13T00:00:00+00:00,2026-02-12T00:00:00+00:00,SIRI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797378,29
+P000048,August Pfluger,2025-07-01T00:00:00+00:00,2025-07-24T00:00:00+00:00,LLYVK,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797379,22
+P000048,August Pfluger,2025-07-01T00:00:00+00:00,2025-07-24T00:00:00+00:00,SIRI,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003797380,22
+S000250,Pete Sessions,2026-03-09T00:00:00+00:00,2026-03-10T00:00:00+00:00,VZ,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003795443,0
+S000250,Pete Sessions,2025-06-12T00:00:00+00:00,2025-06-23T00:00:00+00:00,DHR,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003791134,9
+S000250,Pete Sessions,2025-06-12T00:00:00+00:00,2025-06-23T00:00:00+00:00,JNJ,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003787263,9
+S000250,Pete Sessions,2024-12-18T00:00:00+00:00,2024-12-20T00:00:00+00:00,MSFT,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003787264,1
+S000250,Pete Sessions,2024-11-01T00:00:00+00:00,2024-11-04T00:00:00+00:00,NVDA,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003780408,0
+S000250,Pete Sessions,2024-05-21T00:00:00+00:00,2024-05-22T00:00:00+00:00,NVDA,us_equity,sell,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003777707,1
+S000250,Pete Sessions,2024-03-07T00:00:00+00:00,2024-03-08T00:00:00+00:00,GIS,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003777701,0
+B001327,Rob Bresnahan,2025-12-11T00:00:00+00:00,2025-12-22T00:00:00+00:00,K,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794248,8
+B001327,Rob Bresnahan,2025-11-19T00:00:00+00:00,2025-12-22T00:00:00+00:00,SPY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794251,30
+B001327,Rob Bresnahan,2025-11-19T00:00:00+00:00,2025-12-22T00:00:00+00:00,SPY,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794252,30
+B001327,Rob Bresnahan,2025-11-19T00:00:00+00:00,2025-12-22T00:00:00+00:00,SPY,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794253,30
+B001327,Rob Bresnahan,2025-11-19T00:00:00+00:00,2025-12-22T00:00:00+00:00,SPY,us_equity,buy,50K–100K,75000.0,https://www.capitoltrades.com/trades/20003794259,30
+B001327,Rob Bresnahan,2025-06-23T00:00:00+00:00,2025-07-09T00:00:00+00:00,AMZN,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791925,15
+B001327,Rob Bresnahan,2025-06-06T00:00:00+00:00,2025-07-09T00:00:00+00:00,APP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791926,32
+B001327,Rob Bresnahan,2025-06-03T00:00:00+00:00,2025-07-09T00:00:00+00:00,TEAM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791927,35
+B001327,Rob Bresnahan,2025-06-11T00:00:00+00:00,2025-07-09T00:00:00+00:00,TEAM,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003791928,27
+M000355,Mitch McConnell,2026-03-01T00:00:00+00:00,2026-03-19T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064784,18
+M000355,Mitch McConnell,2025-12-24T00:00:00+00:00,2026-01-13T00:00:00+00:00,LAZR,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064397,20
+M000355,Mitch McConnell,2025-12-01T00:00:00+00:00,2025-12-19T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000064314,18
+M000355,Mitch McConnell,2025-06-26T00:00:00+00:00,2025-07-07T00:00:00+00:00,LAZR,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/10000063957,11
+M000355,Mitch McConnell,2025-06-01T00:00:00+00:00,2025-06-19T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063600,18
+M000355,Mitch McConnell,2025-03-03T00:00:00+00:00,2025-03-12T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063539,9
+M000355,Mitch McConnell,2024-12-02T00:00:00+00:00,2025-01-05T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000063196,33
+M000355,Mitch McConnell,2024-06-04T00:00:00+00:00,2024-06-13T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000062888,9
+M000355,Mitch McConnell,2024-03-05T00:00:00+00:00,2024-03-19T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000062684,14
+M000355,Mitch McConnell,2023-12-05T00:00:00+00:00,2023-12-18T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000062449,13
+M000355,Mitch McConnell,2023-06-05T00:00:00+00:00,2023-06-14T00:00:00+00:00,WFC,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/10000061824,9
+M001217,Jared Moskowitz,2026-02-27T00:00:00+00:00,2026-03-31T00:00:00+00:00,ROP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796411,31
+M001217,Jared Moskowitz,2026-02-27T00:00:00+00:00,2026-03-31T00:00:00+00:00,ROP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796412,31
+M001217,Jared Moskowitz,2026-02-27T00:00:00+00:00,2026-03-31T00:00:00+00:00,ROP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003796413,31
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,ATO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794839,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,MCK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794840,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,MCK,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794841,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794842,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,PEP,us_equity,sell,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794843,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,PEP,us_equity,sell,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003794844,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,PEG,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794845,45
+M001217,Jared Moskowitz,2025-12-02T00:00:00+00:00,2026-01-19T00:00:00+00:00,SO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003794846,45
+M001217,Jared Moskowitz,2025-10-10T00:00:00+00:00,2025-11-24T00:00:00+00:00,AXP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793462,43
+M001217,Jared Moskowitz,2025-10-10T00:00:00+00:00,2025-11-24T00:00:00+00:00,AXP,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793463,43
+M001217,Jared Moskowitz,2025-10-10T00:00:00+00:00,2025-11-24T00:00:00+00:00,AXP,us_equity,buy,15K–50K,32500.0,https://www.capitoltrades.com/trades/20003793464,43
+M001217,Jared Moskowitz,2025-10-10T00:00:00+00:00,2025-11-24T00:00:00+00:00,AVGO,us_equity,buy,1K–15K,8000.0,https://www.capitoltrades.com/trades/20003793465,43

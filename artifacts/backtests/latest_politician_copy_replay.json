@@ -1,0 +1,8 @@
+{
+  "artifact_dir": "artifacts/backtests/politician_copy_replays/20260417-201248",
+  "generated_at": "2026-04-17T20:12:48.048167+00:00",
+  "replay_invalid_reasons": "unsafe_replay_source,missing_execution_price:TSLA,missing_execution_price:MSFT,missing_execution_price:ORCL,missing_execution_price:WFC",
+  "replay_valid": false,
+  "source": "alpaca",
+  "strategy": "politician_copy"
+}
