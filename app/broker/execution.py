@@ -38,8 +38,9 @@ class PaperExecutor:
         self._settings = settings
         self._broker = broker or AlpacaTradingAdapter(settings)
 
-    def _validate_entry_order(self, order: OrderIntent) -> None:
-        if order.symbol not in self._settings.symbol_list:
+    def _validate_entry_order(self, order: OrderIntent, allowed_symbols: set[str] | None = None) -> None:
+        symbols = allowed_symbols or set(self._settings.symbol_list)
+        if order.symbol not in symbols:
             raise ValueError(f"symbol {order.symbol} is not whitelisted")
         if order.qty <= 0:
             raise ValueError("order qty must be positive")
@@ -50,15 +51,16 @@ class PaperExecutor:
         if order.qty * order.close > self._settings.max_position_notional:
             raise ValueError("order exceeds max position notional")
 
-    def _validate_exit_order(self, order: OrderIntent) -> None:
-        if order.symbol not in self._settings.symbol_list:
+    def _validate_exit_order(self, order: OrderIntent, allowed_symbols: set[str] | None = None) -> None:
+        symbols = allowed_symbols or set(self._settings.symbol_list)
+        if order.symbol not in symbols:
             raise ValueError(f"symbol {order.symbol} is not whitelisted")
         if order.qty <= 0:
             raise ValueError("order qty must be positive")
 
-    def submit_orders(self, order: OrderIntent) -> list[ExecutionResult]:
+    def submit_orders(self, order: OrderIntent, allowed_symbols: set[str] | None = None) -> list[ExecutionResult]:
         orders = self.split_order_for_submit(order)
-        return [self.submit(chunk) for chunk in orders]
+        return [self.submit(chunk, allowed_symbols=allowed_symbols) for chunk in orders]
 
     def split_order_for_submit(self, order: OrderIntent) -> list[OrderIntent]:
         return self._chunk_exit_order(order) if order.side.lower() == "sell" else [order]
@@ -81,7 +83,7 @@ class PaperExecutor:
             remaining -= chunk_qty
         return chunks
 
-    def submit(self, order: OrderIntent) -> ExecutionResult:
+    def submit(self, order: OrderIntent, allowed_symbols: set[str] | None = None) -> ExecutionResult:
         intent_id = f"intent-{uuid.uuid4().hex[:20]}"
         client_order_id = f"codex-{uuid.uuid4().hex[:20]}"
         self._repo.log_order(
@@ -95,9 +97,9 @@ class PaperExecutor:
         )
         try:
             if order.side.lower() == "buy":
-                self._validate_entry_order(order)
+                self._validate_entry_order(order, allowed_symbols=allowed_symbols)
             else:
-                self._validate_exit_order(order)
+                self._validate_exit_order(order, allowed_symbols=allowed_symbols)
         except ValueError as exc:
             result = ExecutionResult(
                 status="blocked",

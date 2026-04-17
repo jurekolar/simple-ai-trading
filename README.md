@@ -36,11 +36,24 @@ python -m app.main --strategy breakout backtest
 Registered strategies live under [app/strategy](/Users/jurekolar/Code/simple-ai-trading/app/strategy). To add a new one, create a module that exposes a strategy object with `name` and `generate_signals(...)`, then register it in [app/strategy/__init__.py](/Users/jurekolar/Code/simple-ai-trading/app/strategy/__init__.py).
 Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; the example mean-reversion strategy uses its own `MEAN_REVERSION_*` settings.
 The new breakout strategy uses `BREAKOUT_ENTRY_WINDOW` / `BREAKOUT_EXIT_WINDOW` / `BREAKOUT_ATR_WINDOW`.
+`politician_copy` is allocation-based rather than bar-signal-based, so it supports `preview` and `paper`, but not `backtest` in v1.
 
 5. Run the paper-trading loop:
 
 ```bash
 python -m app.main paper
+```
+
+Preview the current politician-copy portfolio selection and target weights:
+
+```bash
+python -m app.main --strategy politician_copy preview
+```
+
+Run the politician-copy paper workflow:
+
+```bash
+python -m app.main --strategy politician_copy paper
 ```
 
 To force a deterministic paper-trade exit test on currently held symbols, set

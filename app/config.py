@@ -66,6 +66,70 @@ class Settings(BaseSettings):
     alert_on_stale_data: bool = Field(default=True, alias="ALERT_ON_STALE_DATA")
     alert_webhook_url: str = Field(default="", alias="ALERT_WEBHOOK_URL")
     alert_webhook_timeout_seconds: float = Field(default=5.0, alias="ALERT_WEBHOOK_TIMEOUT_SECONDS")
+    politician_copy_base_url: str = Field(
+        default="https://www.capitoltrades.com",
+        alias="POLITICIAN_COPY_BASE_URL",
+    )
+    politician_copy_scrape_timeout_seconds: float = Field(
+        default=10.0,
+        alias="POLITICIAN_COPY_SCRAPE_TIMEOUT_SECONDS",
+    )
+    politician_copy_user_agent: str = Field(
+        default="simple-ai-trading/0.1 politician-copy",
+        alias="POLITICIAN_COPY_USER_AGENT",
+    )
+    politician_copy_candidate_pages: int = Field(
+        default=3,
+        alias="POLITICIAN_COPY_CANDIDATE_PAGES",
+    )
+    politician_copy_max_profile_pages: int = Field(
+        default=4,
+        alias="POLITICIAN_COPY_MAX_PROFILE_PAGES",
+    )
+    politician_copy_ranking_lookback_days: int = Field(
+        default=180,
+        alias="POLITICIAN_COPY_RANKING_LOOKBACK_DAYS",
+    )
+    politician_copy_min_disclosures_per_politician: int = Field(
+        default=2,
+        alias="POLITICIAN_COPY_MIN_DISCLOSURES_PER_POLITICIAN",
+    )
+    politician_copy_num_politicians: int = Field(
+        default=3,
+        alias="POLITICIAN_COPY_NUM_POLITICIANS",
+    )
+    politician_copy_holding_window_days: int = Field(
+        default=90,
+        alias="POLITICIAN_COPY_HOLDING_WINDOW_DAYS",
+    )
+    politician_copy_max_disclosure_lag_days: int = Field(
+        default=45,
+        alias="POLITICIAN_COPY_MAX_DISCLOSURE_LAG_DAYS",
+    )
+    politician_copy_recency_half_life_days: float = Field(
+        default=30.0,
+        alias="POLITICIAN_COPY_RECENCY_HALF_LIFE_DAYS",
+    )
+    politician_copy_max_symbol_weight: float = Field(
+        default=0.25,
+        alias="POLITICIAN_COPY_MAX_SYMBOL_WEIGHT",
+    )
+    politician_copy_min_target_weight: float = Field(
+        default=0.02,
+        alias="POLITICIAN_COPY_MIN_TARGET_WEIGHT",
+    )
+    politician_copy_symbol_allowlist: str = Field(
+        default="",
+        alias="POLITICIAN_COPY_SYMBOL_ALLOWLIST",
+    )
+    politician_copy_symbol_blocklist: str = Field(
+        default="",
+        alias="POLITICIAN_COPY_SYMBOL_BLOCKLIST",
+    )
+    politician_copy_preview_limit: int = Field(
+        default=10,
+        alias="POLITICIAN_COPY_PREVIEW_LIMIT",
+    )
 
     @property
     def symbol_list(self) -> list[str]:
@@ -86,6 +150,22 @@ class Settings(BaseSettings):
     @property
     def live_trading_enabled(self) -> bool:
         return not self.alpaca_paper
+
+    @property
+    def politician_copy_symbol_allowlist_set(self) -> set[str]:
+        return {
+            symbol.strip().upper()
+            for symbol in self.politician_copy_symbol_allowlist.split(",")
+            if symbol.strip()
+        }
+
+    @property
+    def politician_copy_symbol_blocklist_set(self) -> set[str]:
+        return {
+            symbol.strip().upper()
+            for symbol in self.politician_copy_symbol_blocklist.split(",")
+            if symbol.strip()
+        }
 
 
 @lru_cache(maxsize=1)
