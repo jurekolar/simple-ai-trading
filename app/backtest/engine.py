@@ -33,9 +33,16 @@ def run_backtest(
     bars: pd.DataFrame,
     settings: Settings,
     strategy: TradingStrategy | None = None,
-) -> tuple[pd.DataFrame, dict[str, float]]:
+    *,
+    start_at: pd.Timestamp | None = None,
+    end_at: pd.Timestamp | None = None,
+) -> tuple[pd.DataFrame, dict[str, float | str]]:
     active_strategy = strategy or get_strategy("momentum")
     strategy_bars = _strategy_bars(bars, active_strategy.name, settings)
+    if start_at is not None:
+        strategy_bars = strategy_bars[pd.to_datetime(strategy_bars["timestamp"], utc=True) >= pd.Timestamp(start_at)]
+    if end_at is not None:
+        strategy_bars = strategy_bars[pd.to_datetime(strategy_bars["timestamp"], utc=True) <= pd.Timestamp(end_at)]
     signal_frame = active_strategy.generate_signals(strategy_bars, settings).sort_values(["timestamp", "symbol"])
     if signal_frame.empty:
         return pd.DataFrame(), summarize(pd.DataFrame(), pd.DataFrame(), initial_equity=BACKTEST_INITIAL_EQUITY)

@@ -8,6 +8,7 @@ Use this checklist before the first live-capital session and before any later sc
 - Parameter set is frozen and archived.
 - Symbol universe is frozen and archived.
 - Latest paper burn-in window is at least `3-4` clean calendar weeks.
+- Latest benchmark artifact set is archived and reviewed.
 - Expected live acceptance metrics are reviewed:
   - positive expectancy after fees/slippage assumptions
   - acceptable max drawdown

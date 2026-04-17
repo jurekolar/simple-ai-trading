@@ -9,7 +9,13 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 
-from app.backtest.compare import compare_strategies, format_strategy_comparison
+from app.backtest.compare import (
+    compare_strategies,
+    evaluate_strategy_research,
+    format_single_strategy_summary,
+    format_strategy_comparison,
+    write_benchmark_artifacts,
+)
 from app.backtest.engine import run_backtest
 from app.broker.alpaca_client import AlpacaTradingAdapter
 from app.broker.alpaca_client import BrokerClosePositionError, BrokerExposureSnapshot, ReconciliationSnapshot
@@ -495,14 +501,17 @@ def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     validation = validate_bars(loaded.bars, settings, active_strategy.name)
     if validation.failed_symbols:
         raise RuntimeError(f"required market data validation failed: {validation.failed_symbols}")
-    trades, metrics = run_backtest(validation.valid_bars, settings, strategy=active_strategy)
+    evaluation = evaluate_strategy_research(validation.valid_bars, settings, active_strategy.name)
+    trades = evaluation.combined_trade_log
+    metrics = evaluation.summary
     for _, trade in trades.iterrows():
-        repo.log_signal(str(trade["symbol"]), "long", float(trade["close"]))
+        repo.log_signal(str(trade["symbol"]), str(trade["signal"]), float(trade["close"]))
     repo.create_run(
         "backtest",
         "completed",
         details=f"strategy={active_strategy.name} source={loaded.source} metrics={metrics}",
     )
+    print(format_single_strategy_summary(metrics))
     LOGGER.info("backtest metrics %s", metrics)
 
 
@@ -510,8 +519,14 @@ def run_compare_command() -> None:
     settings = get_settings()
     loaded = load_bars_with_source(settings, "mean_reversion")
     validation = validate_bars(loaded.bars, settings, "mean_reversion")
+    results = [
+        evaluate_strategy_research(validation.valid_bars, settings, strategy_name)
+        for strategy_name in backtest_strategy_names()
+    ]
     summary = compare_strategies(validation.valid_bars, settings, strategy_names=backtest_strategy_names())
+    artifact_dir = write_benchmark_artifacts(summary, results, settings=settings, source=loaded.source)
     print(format_strategy_comparison(summary))
+    print(f"\nartifacts={artifact_dir}")
     LOGGER.info("compare metrics %s", summary.to_dict(orient="records"))
 
 

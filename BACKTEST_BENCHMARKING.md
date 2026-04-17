@@ -60,11 +60,22 @@ If you are using the repo venv explicitly:
 
 `compare` runs the same validated historical bar set through each backtest-supported strategy and prints one row per strategy.
 
+It also performs:
+
+- an in-sample / out-of-sample split
+- walk-forward validation when enough history is available
+- baseline comparison versus `SPY` buy-and-hold
+- baseline comparison versus equal-weight buy-and-hold of `SYMBOLS`
+- local artifact export under `BACKTEST_OUTPUT_DIR`
+
 Each row includes:
 
 - `rank`
 - `winner`
 - `strategy`
+- `recommendation`
+- `evaluation_mode`
+- `selection_score`
 - `risk_adjusted_score`
 - `sharpe_like`
 - `total_return`
@@ -80,11 +91,13 @@ Each row includes:
 - `gross_exposure`
 
 The `winner` column uses `*` for the top-ranked strategy.
+The `recommendation` column is `pass`, `review`, or `fail` based on the out-of-sample approval gates.
 
 ## How To Read The Output
 
 - Start with `rank` and `winner`.
-- Then inspect `risk_adjusted_score` and `sharpe_like` to see which strategy delivered the best return quality.
+- Start with `recommendation` and `evaluation_mode`.
+- Then inspect `selection_score`, out-of-sample metrics, and walk-forward metrics to see which strategy delivered the best validation result.
 - Check `max_drawdown` before trusting a high-return strategy.
 - Use `total_return` and `annualized_return` to compare growth.
 - Use `trades`, `closed_trades`, `avg_holding_days`, and `turnover` to understand operational behavior.
@@ -102,20 +115,38 @@ In practice:
 - The simulator is daily-bar and long-only.
 - Slippage is applied on both entries and exits.
 - The benchmark is a comparison of the current strategies under one shared config and one shared symbol universe.
-- This is not parameter optimization, walk-forward testing, or hyperparameter search.
+- Default ranking uses walk-forward risk-adjusted score when walk-forward folds are available, otherwise out-of-sample risk-adjusted score.
+- This is still not parameter optimization or hyperparameter search.
+
+## Artifact Output
+
+Each `compare` run writes a timestamped directory under `BACKTEST_OUTPUT_DIR` with:
+
+- `strategy_comparison.csv`
+- one combined trade log per strategy
+- one in-sample trade log per strategy
+- one out-of-sample trade log per strategy
+- one walk-forward trade log per strategy
+- `metadata.json`
+
+The CLI prints the artifact directory path after the comparison table.
 
 ## Recommended Workflow
 
 1. Confirm your `.env` symbol universe and strategy settings are what you actually want to test.
 2. Run a single-strategy backtest for the candidate you care about most.
 3. Run `python -m app.main compare`.
-4. Review the winner, then compare the top two strategies on:
-   - `risk_adjusted_score`
-   - `max_drawdown`
-   - `total_return`
+4. Review the recommendation status first.
+5. Compare the top two strategies on:
+   - `selection_score`
+   - out-of-sample `risk_adjusted_score`
+   - out-of-sample `max_drawdown`
+   - out-of-sample `total_return`
+   - walk-forward metrics when present
    - `turnover`
-5. Treat the compare output as a screening step.
-6. Paper-trade the leading candidate before making any live decision.
+6. Open the exported CSV and metadata files if you want a reproducible record of the run.
+7. Treat the compare output as a screening step.
+8. Paper-trade the leading candidate before making any live decision.
 
 ## Troubleshooting
 

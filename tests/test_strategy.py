@@ -944,8 +944,8 @@ def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies()
     assert summary.iloc[0]["winner"]
 
 
-def test_compare_command_prints_all_backtest_supported_bar_strategies(monkeypatch, capsys) -> None:
-    settings = Settings()
+def test_compare_command_prints_all_backtest_supported_bar_strategies(tmp_path, monkeypatch, capsys) -> None:
+    settings = Settings(BACKTEST_OUTPUT_DIR=str(tmp_path / "artifacts"))
     bars = load_bars(settings, "mean_reversion")
     loaded = type("LoadedBars", (), {"bars": bars, "source": "synthetic", "production_safe": True})()
     validation = type(

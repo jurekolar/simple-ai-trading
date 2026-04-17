@@ -80,6 +80,15 @@ class Settings(BaseSettings):
     max_atr_ratio: float = Field(default=0.12, alias="MAX_ATR_RATIO")
     lookback_days: int = Field(default=400, alias="LOOKBACK_DAYS")
     min_history_days: int = Field(default=120, alias="MIN_HISTORY_DAYS")
+    backtest_out_of_sample_fraction: float = Field(default=0.3, alias="BACKTEST_OUT_OF_SAMPLE_FRACTION")
+    backtest_walk_forward_train_days: int = Field(default=126, alias="BACKTEST_WALK_FORWARD_TRAIN_DAYS")
+    backtest_walk_forward_test_days: int = Field(default=63, alias="BACKTEST_WALK_FORWARD_TEST_DAYS")
+    backtest_min_closed_trades: int = Field(default=3, alias="BACKTEST_MIN_CLOSED_TRADES")
+    backtest_max_out_of_sample_drawdown: float = Field(
+        default=0.20,
+        alias="BACKTEST_MAX_OUT_OF_SAMPLE_DRAWDOWN",
+    )
+    backtest_output_dir: str = Field(default="artifacts/backtests", alias="BACKTEST_OUTPUT_DIR")
     allow_unsafe_data_fallback: bool = Field(default=False, alias="ALLOW_UNSAFE_DATA_FALLBACK")
     allow_partial_market_data: bool = Field(default=False, alias="ALLOW_PARTIAL_MARKET_DATA")
     force_exit_symbols: str = Field(default="", alias="FORCE_EXIT_SYMBOLS")
