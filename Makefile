@@ -25,13 +25,13 @@ burnin-report-7d:
 	.venv/bin/python scripts/burnin_report.py --days 7
 
 burnin-day:
-	STRATEGY=$(STRATEGY) ./scripts/run_burnin_day.sh
+	STRATEGY=$(STRATEGY) bash ./scripts/run_burnin_day.sh
 
 burnin-review:
-	./scripts/review_burnin_day.sh
+	bash ./scripts/review_burnin_day.sh
 
 stress-drill:
 	.venv/bin/python scripts/stress_drill.py --scenario $(SCENARIO)
 
 recover-unresolved:
-	./scripts/recover_unresolved_state.sh
+	bash ./scripts/recover_unresolved_state.sh
