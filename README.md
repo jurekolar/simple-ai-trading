@@ -164,6 +164,17 @@ make burnin-day STRATEGY=breakout
 make burnin-review
 ```
 
+To run the same workflow in GitHub Actions on a fixed US-market schedule instead of your local machine, use [.github/workflows/burnin.yml](/Users/jurekolar/Code/simple-ai-trading/.github/workflows/burnin.yml). It checks once per hour on US trading weekdays and only executes at these New York checkpoints:
+
+- 08:05 ET pre-market
+- 11:05 ET in market
+- 14:05 ET in market
+- 17:05 ET after-hours
+
+Set a repository secret named `PAPER_BURNIN_ENV` to the full contents of your burn-in `.env` file before enabling the workflow. A good starting point is [.env.paper_burnin.example](/Users/jurekolar/Code/simple-ai-trading/.env.paper_burnin.example) with your real Alpaca credentials and any webhook values filled in.
+
+You can also trigger the workflow manually from GitHub Actions and optionally override `strategy`; the default remains `momentum`.
+
 To record and rehearse a named non-production stress drill against the paper burn-in profile:
 
 ```bash

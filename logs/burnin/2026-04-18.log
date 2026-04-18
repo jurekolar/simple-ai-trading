@@ -1,0 +1,134 @@
+===== Burn-In Review 2026-04-18 =====
+Config profile: paper
+Git commit: 2ff21a7
+
+[1/3] 1-day summary
+Burn-In Summary (1d)
+Window start: 2026-04-17T10:09:35.212494+00:00
+Config profile: default
+Broker mode: paper
+Strategy: reconcile
+Paper runs: 6
+Orders: 4
+Blocked orders: 4
+Error orders: 0
+Skipped existing/open-order events: 0
+Unresolved orders now: 0
+Duplicate client_order_ids: 0
+Duplicate broker_order_ids: 0
+Reconciliation events: 0
+Kill-switch events: 0
+Broker error events: 0
+Alert events: 8
+Alert delivery failures: 0
+Latest equity: 100875.55
+Latest buying power: 175342.08
+Latest cash: 74466.53
+Gross exposure now: 26409.02
+Unrealized PnL now: 748.22
+
+Alert Delivery Status
+- sent: 4
+- skipped: 4
+
+Assessment
+- no immediate red flags in the selected window
+
+[2/3] 7-day summary
+Burn-In Summary (7d)
+Window start: 2026-04-11T10:09:35.488855+00:00
+Config profile: default
+Broker mode: paper
+Strategy: reconcile
+Paper runs: 21
+Orders: 15
+Blocked orders: 8
+Error orders: 0
+Skipped existing/open-order events: 0
+Unresolved orders now: 0
+Duplicate client_order_ids: 0
+Duplicate broker_order_ids: 0
+Reconciliation events: 0
+Kill-switch events: 0
+Broker error events: 0
+Alert events: 8
+Alert delivery failures: 0
+Latest equity: 100875.55
+Latest buying power: 175342.08
+Latest cash: 74466.53
+Gross exposure now: 26409.02
+Unrealized PnL now: 748.22
+
+Alert Delivery Status
+- sent: 4
+- skipped: 4
+
+Assessment
+- no immediate red flags in the selected window
+
+[3/3] operator report
+Daily Operator Report
+generated_at=2026-04-18T10:09:36.109020+00:00
+profile=default
+broker_mode=paper
+strategy=momentum
+primary_live_strategy=breakout
+symbols=SPY,IWM,EFA,EEM,EWZ,XLF,KRE,AMZN,NVDA,BAC,QQQ,AAPL,MSFT,META,AMD,GOOGL,AVGO,TSLA,ORCL
+latest_benchmark_candidate=none
+latest_benchmark_generated_at=missing
+latest_benchmark_valid=False
+latest_benchmark_ready=False
+active_strategy_matches_benchmark=False
+
+Operator Summary
+paper_runs_1d=6
+recent_runs=10
+orders_1d=4
+submitted_orders_1d=0
+blocked_orders_1d=4
+error_orders_1d=0
+reconciliation_events_1d=0
+kill_switch_events_1d=0
+broker_errors_1d=0
+blocked_order_reasons=max_gross_exposure:4
+kill_switch_reasons=none
+politician_copy_rejected_disclosures=0
+politician_copy_selected=0
+politician_copy_targets=0
+
+Portfolio Snapshot
+latest_equity=100875.55
+buying_power=175342.08
+cash=74466.53
+gross_exposure=26409.02
+unrealized_pnl=748.22
+realized_pnl=127.34
+portfolio_profit_loss=440.88
+portfolio_profit_loss_pct=0.0044
+tracked_positions=2
+top_positions=QQQ:14274.70, IWM:12134.32
+
+Strategy Performance
+matched_trades=7
+win_rate=100.00%
+average_win=18.19
+average_loss=0.00
+expectancy=18.19
+turnover=0.59
+average_holding_days=1.00
+max_drawdown_pct=0.00%
+realized_by_symbol=SPY:127.34
+
+Operational Reliability
+unresolved_orders=0
+unresolved_order_oldest_minutes=0.00
+alert_delivery=sent:4, skipped:4
+alert_failures_1d=0
+stale_data_incidents_1d=0
+broker_error_operations=none
+operator_actions_1d=0
+operator_action_changes=none
+
+Burn-In Scorecard
+scorecard=7d=pass (clean); 14d=pass (clean); 30d=pass (clean)
+
