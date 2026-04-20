@@ -171,9 +171,15 @@ To run the same workflow in GitHub Actions on a fixed US-market schedule instead
 - 14:05 ET in market
 - 17:05 ET after-hours
 
+The workflow also queries Alpaca's market calendar before each scheduled run, so US market holidays and other non-trading days are skipped automatically. Manual `workflow_dispatch` runs bypass that gate for testing.
+
 Set a repository secret named `PAPER_BURNIN_ENV` to the full contents of your burn-in `.env` file before enabling the workflow. A good starting point is [.env.paper_burnin.example](/Users/jurekolar/Code/simple-ai-trading/.env.paper_burnin.example) with your real Alpaca credentials and any webhook values filled in.
 
-You can also trigger the workflow manually from GitHub Actions and optionally override `strategy`; the default remains `momentum`.
+If `ALERT_WEBHOOK_URL` is set in that secret, workflow failures will post a short alert message to the same webhook target used by the app.
+
+Each successful GitHub run uploads a richer artifact bundle with the captured `burnin-day` output, `burnin-review` output, run metadata, the generated `logs/burnin/` directory, and the current `trading_burnin.db` snapshot when present. The workflow also writes a short markdown summary into the GitHub Actions job summary panel.
+
+You can trigger the workflow manually from GitHub Actions and optionally override `strategy`; the default remains `momentum`.
 
 To record and rehearse a named non-production stress drill against the paper burn-in profile:
 
