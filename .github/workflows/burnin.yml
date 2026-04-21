@@ -11,7 +11,7 @@ on:
     - cron: "5 12-22 * * 1-5"
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: burnin
@@ -216,6 +216,28 @@ jobs:
             cp trading_burnin.db "${ARTIFACT_DIR}/trading_burnin.db"
           fi
 
+      - name: Commit burn-in logs to repository
+        if: always() && steps.schedule.outputs.should_run == 'true' && steps.market_day.outputs.is_market_day == 'true'
+        id: commit_logs
+        shell: bash
+        env:
+          STRATEGY: ${{ github.event.inputs.strategy || 'momentum' }}
+          SLOT: ${{ steps.schedule.outputs.slot }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add logs/burnin
+
+          if git diff --cached --quiet -- logs/burnin; then
+            echo "committed=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          git commit -m "chore: record burn-in logs for ${GITHUB_RUN_NUMBER} (${SLOT})"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+          echo "committed=true" >> "${GITHUB_OUTPUT}"
+
       - name: Publish job summary
         if: always() && steps.schedule.outputs.should_run == 'true'
         shell: bash
@@ -234,6 +256,7 @@ jobs:
             echo "| Strategy | ${STRATEGY} |"
             echo "| Market date | ${{ steps.market_day.outputs.market_date || 'n/a' }} |"
             echo "| Market day | ${{ steps.market_day.outputs.is_market_day || 'n/a' }} |"
+            echo "| Logs committed | ${{ steps.commit_logs.outputs.committed || 'false' }} |"
             echo "| Run | [#${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) |"
             echo
             if [[ -f "${ARTIFACT_DIR}/burnin-review.log" ]]; then

@@ -179,6 +179,8 @@ If `ALERT_WEBHOOK_URL` is set in that secret, workflow failures will post a shor
 
 Each successful GitHub run uploads a richer artifact bundle with the captured `burnin-day` output, `burnin-review` output, run metadata, the generated `logs/burnin/` directory, and the current `trading_burnin.db` snapshot when present. The workflow also writes a short markdown summary into the GitHub Actions job summary panel.
 
+Scheduled and manual GitHub Actions runs also stage and push changes under `logs/burnin/` back to the branch they ran on, so the repository history captures the same burn-in review logs you would get from a local manual run. The workflow does not commit `.env`, the database, or other generated files.
+
 You can trigger the workflow manually from GitHub Actions and optionally override `strategy`; the default remains `momentum`.
 
 To record and rehearse a named non-production stress drill against the paper burn-in profile:
