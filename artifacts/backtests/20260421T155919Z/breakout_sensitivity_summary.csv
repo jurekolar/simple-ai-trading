@@ -1,0 +1,4 @@
+strategy,variant,out_of_sample_risk_adjusted_score,out_of_sample_total_return,out_of_sample_max_drawdown
+breakout,base,2.46056125812627,0.002043719650000053,0.0004901981779629194
+breakout,entry_window_minus,2.4939181174890384,0.002214607500000021,0.00048801341691129263
+breakout,entry_window_plus,2.46056125812627,0.002043719650000053,0.0004901981779629194

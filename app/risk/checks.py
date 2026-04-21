@@ -14,6 +14,15 @@ class EntryRiskDecision:
     reason: str = ""
 
 
+def round_trade_qty(value: float, settings: Settings) -> float:
+    if value <= 0:
+        return 0.0
+    if settings.allow_fractional_shares:
+        scale = 10**max(settings.fractional_quantity_precision, 0)
+        return math.floor(value * scale) / scale
+    return float(math.floor(value))
+
+
 def filter_trade_candidates(signal_frame: pd.DataFrame, settings: Settings) -> pd.DataFrame:
     candidates = signal_frame[signal_frame["signal"] == "long"].copy()
     candidates = candidates[candidates["atr"].notna() & (candidates["atr"] > 0)].copy()
@@ -32,17 +41,15 @@ def filter_trade_candidates(signal_frame: pd.DataFrame, settings: Settings) -> p
     return rank_trade_candidates(candidates, settings)
 
 
-def compute_entry_qty(*, row: pd.Series, settings: Settings) -> int:
+def compute_entry_qty(*, row: pd.Series, settings: Settings) -> float:
     account_equity = float(row.get("account_equity", 0.0))
     risk_budget = max(settings.atr_risk_budget, account_equity * settings.risk_per_trade_fraction)
     atr = float(row.get("atr", 0.0))
     close = float(row.get("close", 0.0))
     if atr <= 0 or close <= 0:
-        return 0
-    return min(
-        math.floor(risk_budget / atr),
-        math.floor(settings.max_position_notional / close),
-    )
+        return 0.0
+    raw_qty = min(risk_budget / atr, settings.max_position_notional / close)
+    return round_trade_qty(raw_qty, settings)
 
 
 def rank_trade_candidates(candidates: pd.DataFrame, settings: Settings) -> pd.DataFrame:
@@ -77,7 +84,6 @@ def filter_exit_candidates(
 
     candidates["qty"] = candidates["symbol"].map(position_qty_by_symbol).fillna(0.0)
     candidates = candidates[candidates["qty"] > 0]
-    candidates["qty"] = candidates["qty"].astype(int)
     return candidates.reset_index(drop=True)
 
 
@@ -97,7 +103,7 @@ def protective_exit_candidates(
                 "symbol": symbol,
                 "signal": "protective_exit",
                 "close": float(position_price_by_symbol.get(symbol, 0.0)),
-                "qty": int(qty),
+                "qty": qty,
             }
         )
     return pd.DataFrame(rows)
@@ -160,7 +166,7 @@ def enforce_symbol_exposure_limit(
 def entry_risk_decision(
     *,
     symbol: str,
-    qty: int,
+    qty: float,
     close: float,
     active_symbols: set[str],
     symbol_exposure: float,
@@ -172,7 +178,7 @@ def entry_risk_decision(
     reserved_cash: float,
     settings: Settings,
 ) -> EntryRiskDecision:
-    order_notional = qty * close
+    order_notional = float(qty) * close
     for decision in (
         enforce_portfolio_limits(
             active_symbols=active_symbols,

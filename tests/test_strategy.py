@@ -24,6 +24,7 @@ from app.main import (
 from app.monitoring.alerts import send_alerts
 from app.reports.daily_report import build_daily_report
 from app.risk.checks import (
+    compute_entry_qty,
     entry_risk_decision,
     filter_exit_candidates,
     filter_trade_candidates,
@@ -88,6 +89,11 @@ def test_strategy_registry_lists_second_example_strategy() -> None:
     assert "mean_reversion" in strategy_names()
     assert "breakout" in strategy_names()
     assert "trend_trailing_stop" in strategy_names()
+
+
+def test_get_strategy_rejects_removed_strategy_name() -> None:
+    with pytest.raises(ValueError, match="unknown strategy 'politician_copy'"):
+        get_strategy("politician_copy")
 
 
 def test_mean_reversion_strategy_generates_entry_and_exit_signals() -> None:
@@ -929,8 +935,8 @@ def test_trend_trailing_stop_strategy_uses_dedicated_settings() -> None:
     assert signal_frame.iloc[3]["breakout_high"] == 103.0
 
 
-def test_compare_helper_excludes_politician_copy() -> None:
-    assert "politician_copy" not in backtest_strategy_names()
+def test_compare_helper_matches_registered_backtest_strategies() -> None:
+    assert backtest_strategy_names() == strategy_names()
 
 
 def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies() -> None:
@@ -940,7 +946,6 @@ def test_compare_helper_returns_rows_for_all_backtest_supported_bar_strategies()
     summary = compare_strategies(bars, settings)
 
     assert set(summary["strategy"]) == set(backtest_strategy_names())
-    assert "politician_copy" not in set(summary["strategy"])
     assert list(summary["rank"]) == [1, 2, 3, 4]
     assert summary.iloc[0]["winner"]
 
@@ -964,7 +969,6 @@ def test_compare_command_prints_all_backtest_supported_bar_strategies(tmp_path, 
 
     for strategy_name in backtest_strategy_names():
         assert strategy_name in output
-    assert "politician_copy" not in output
     assert format_strategy_comparison(compare_strategies(bars, settings))
 
 
@@ -1460,6 +1464,66 @@ def test_executor_returns_error_result_when_broker_submit_fails(tmp_path) -> Non
     assert any(order.status == "intent" for order in orders)
 
 
+def test_compute_entry_qty_supports_fractional_shares() -> None:
+    settings = Settings(
+        ALLOW_FRACTIONAL_SHARES=True,
+        FRACTIONAL_QUANTITY_PRECISION=4,
+        ATR_RISK_BUDGET=20.0,
+        MAX_POSITION_NOTIONAL=900.0,
+    )
+    row = pd.Series({"account_equity": 1_000.0, "atr": 15.0, "close": 300.0})
+
+    qty = compute_entry_qty(row=row, settings=settings)
+
+    assert qty == pytest.approx(1.3333)
+
+
+def test_executor_blocks_fractional_entry_when_symbol_is_not_fractionable(tmp_path) -> None:
+    settings = Settings(DRY_RUN=True, ALLOW_FRACTIONAL_SHARES=True)
+    repo = JournalRepo(create_session_factory(f"sqlite:///{tmp_path / 'journal.db'}"))
+    broker = object.__new__(AlpacaTradingAdapter)
+    broker._settings = settings
+    broker._client = object()
+    broker.supports_fractional_shares = lambda symbol: False
+    executor = PaperExecutor(repo, settings, broker=broker)
+
+    result = executor.submit(OrderIntent(symbol="SPY", qty=0.75, side="buy", close=100.0))
+
+    assert result.status == "blocked"
+    assert result.status_detail == "symbol SPY does not support fractional shares"
+
+
+def test_executor_submits_fractional_entry_when_supported(tmp_path) -> None:
+    settings = Settings(DRY_RUN=False, ALLOW_FRACTIONAL_SHARES=True)
+    repo = JournalRepo(create_session_factory(f"sqlite:///{tmp_path / 'journal.db'}"))
+    broker = object.__new__(AlpacaTradingAdapter)
+    broker._settings = settings
+    broker._client = object()
+    broker.supports_fractional_shares = lambda symbol: True
+
+    def submit_market_order(**kwargs: object) -> BrokerOrderSnapshot:
+        assert kwargs["qty"] == pytest.approx(0.75)
+        return BrokerOrderSnapshot(
+            id="broker-1",
+            client_order_id=str(kwargs["client_order_id"]),
+            symbol="SPY",
+            side="buy",
+            qty="0.75",
+            status="accepted",
+            filled_avg_price="",
+            filled_qty="0",
+            submitted_at=None,
+            filled_at=None,
+        )
+
+    broker.submit_market_order = submit_market_order
+    executor = PaperExecutor(repo, settings, broker=broker)
+
+    result = executor.submit(OrderIntent(symbol="SPY", qty=0.75, side="buy", close=100.0))
+
+    assert result.status == "accepted"
+
+
 def test_run_paper_command_skips_entry_when_symbol_has_open_order(tmp_path, monkeypatch) -> None:
     settings = Settings(DRY_RUN=True, DATABASE_URL=f"sqlite:///{tmp_path / 'journal.db'}", MIN_HISTORY_DAYS=1, SYMBOLS="SPY")
     bars = pd.DataFrame(
@@ -1547,6 +1611,7 @@ def test_run_paper_command_skips_entry_when_symbol_has_open_order(tmp_path, monk
     monkeypatch.setattr("app.main.generate_signals", lambda bars, settings: latest)
     monkeypatch.setattr("app.main.latest_signals", lambda frame: frame)
     monkeypatch.setattr("app.main.run_backtest", lambda bars, settings: (pd.DataFrame(), {"trades": 0.0}))
+    monkeypatch.setattr("app.main.data_is_stale", lambda bars, source=None: False)
     monkeypatch.setattr("app.main.build_daily_report", lambda repo: "report=ok")
     monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
     monkeypatch.setattr("app.main.PaperExecutor", FailIfCalledExecutor)
@@ -2368,6 +2433,7 @@ def test_run_paper_command_skips_entry_when_unresolved_order_exists_locally(tmp_
     monkeypatch.setattr("app.main.generate_signals", lambda bars, settings: latest)
     monkeypatch.setattr("app.main.latest_signals", lambda frame: frame)
     monkeypatch.setattr("app.main.run_backtest", lambda bars, settings: (pd.DataFrame(), {"trades": 0.0}))
+    monkeypatch.setattr("app.main.data_is_stale", lambda bars, source=None: False)
     monkeypatch.setattr("app.main.build_daily_report", lambda repo: "report=ok")
     monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
     monkeypatch.setattr("app.main.PaperExecutor", FailIfCalledExecutor)
@@ -2572,6 +2638,7 @@ def test_run_paper_command_blocks_live_entries_outside_safe_open_window(tmp_path
     monkeypatch.setattr("app.main.generate_signals", lambda bars, settings: latest)
     monkeypatch.setattr("app.main.latest_signals", lambda frame: frame)
     monkeypatch.setattr("app.main.run_backtest", lambda bars, settings: (pd.DataFrame(), {"trades": 0.0}))
+    monkeypatch.setattr("app.main.data_is_stale", lambda bars, source=None: False)
     monkeypatch.setattr("app.main.build_daily_report", lambda repo: "report=ok")
     monkeypatch.setattr("app.main.AlpacaTradingAdapter", FakeBroker)
     monkeypatch.setattr("app.main.PaperExecutor", FailIfCalledExecutor)

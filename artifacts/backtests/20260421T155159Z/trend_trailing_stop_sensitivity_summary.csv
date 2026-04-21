@@ -1,0 +1,4 @@
+strategy,variant,out_of_sample_risk_adjusted_score,out_of_sample_total_return,out_of_sample_max_drawdown
+trend_trailing_stop,base,0.0,0.0,0.0
+trend_trailing_stop,atr_multiplier_minus,0.0,0.0,0.0
+trend_trailing_stop,atr_multiplier_plus,0.0,0.0,0.0

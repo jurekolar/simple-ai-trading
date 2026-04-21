@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import math
 from collections import defaultdict, deque
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -44,13 +45,6 @@ from app.scheduler import should_run_trading_loop
 from app.strategy import backtest_strategy_names, get_strategy, strategy_names
 from app.strategy.base import TradingStrategy
 from app.strategy.momentum import generate_signals
-from app.strategy.politician_copy import AllocationPlan, politician_copy_strategy
-from app.strategy.politician_copy_replay import (
-    format_politician_copy_replay_summary,
-    load_politician_copy_replay_inputs,
-    run_politician_copy_replay,
-    write_politician_copy_replay_artifacts,
-)
 from app.strategy.signals import latest_signals
 
 LOGGER = logging.getLogger(__name__)
@@ -258,15 +252,19 @@ def _has_stuck_orders(open_orders: list[object], max_stuck_order_minutes: int) -
     return False
 
 
-def _fallback_split_exit_order(order: OrderIntent, max_qty: int) -> list[OrderIntent]:
+def _fallback_split_exit_order(order: OrderIntent, max_qty: int, precision: int = 6) -> list[OrderIntent]:
     if order.qty <= max_qty or max_qty <= 0:
         return [order]
-    remaining = int(order.qty)
+    remaining = float(order.qty)
     chunks: list[OrderIntent] = []
+    scale = 10**max(precision, 0)
     while remaining > 0:
-        chunk_qty = min(remaining, max_qty)
+        chunk_qty = min(remaining, float(max_qty))
+        chunk_qty = math.floor(chunk_qty * scale) / scale
+        if chunk_qty <= 0:
+            chunk_qty = remaining
         chunks.append(OrderIntent(symbol=order.symbol, qty=chunk_qty, side=order.side, close=order.close))
-        remaining -= chunk_qty
+        remaining = math.floor(max(remaining - chunk_qty, 0.0) * scale) / scale
     return chunks
 
 
@@ -473,67 +471,6 @@ def _process_flatten_with_close_position(
     return closed_positions
 
 
-def _build_politician_copy_plan(
-    *,
-    settings,
-    broker: AlpacaTradingAdapter | None = None,
-    positions: list[object] | None = None,
-) -> AllocationPlan:
-    broker = broker or AlpacaTradingAdapter(settings)
-    positions = positions or broker.list_positions()
-    account = broker.get_account_summary()
-    account_equity = float(account.equity or 0.0)
-    position_qty_by_symbol = {position.symbol: float(position.qty) for position in positions}
-    return politician_copy_strategy.build_allocation_plan(
-        settings=settings,
-        account_equity=account_equity,
-        position_qty_by_symbol=position_qty_by_symbol,
-    )
-
-
-def run_preview_command(strategy: TradingStrategy | None = None) -> None:
-    settings = get_settings()
-    active_strategy = strategy or get_strategy("momentum")
-    if active_strategy.name != politician_copy_strategy.name:
-        raise RuntimeError("preview is currently supported only for --strategy politician_copy")
-    plan = _build_politician_copy_plan(settings=settings)
-    print(plan.preview(limit=settings.politician_copy_preview_limit))
-
-
-def run_replay_command(strategy: TradingStrategy | None = None) -> None:
-    settings = get_settings()
-    active_strategy = strategy or get_strategy("momentum")
-    if active_strategy.name != politician_copy_strategy.name:
-        raise RuntimeError("replay is currently supported only for --strategy politician_copy")
-    repo = JournalRepo(create_session_factory(settings.database_url))
-    _log_runtime_config_snapshot(repo, settings=settings, run_type="replay", strategy_name=active_strategy.name)
-    repo.create_run("replay", "started")
-    disclosures, price_frame, source, production_safe = load_politician_copy_replay_inputs(settings)
-    result = run_politician_copy_replay(
-        disclosures=disclosures,
-        price_frame=price_frame,
-        settings=settings,
-        source=source,
-        production_safe=production_safe,
-    )
-    artifact_dir = write_politician_copy_replay_artifacts(result, settings=settings, disclosures=disclosures)
-    repo.create_run(
-        "replay",
-        "completed",
-        details=(
-            f"strategy={active_strategy.name} source={source} "
-            f"replay_valid={result.summary.get('replay_valid', False)} "
-            f"rebalances={result.summary.get('rebalances', 0.0)} "
-            f"trades={result.summary.get('trades', 0.0)} "
-            f"risk_adjusted_score={result.summary.get('risk_adjusted_score', 0.0)} "
-            f"invalid={result.summary.get('replay_invalid_reasons', '')}"
-        ),
-    )
-    print(format_politician_copy_replay_summary(result.summary))
-    print(f"artifacts={artifact_dir}")
-    LOGGER.info("politician_copy replay metrics %s", result.summary)
-
-
 def _executor_submit(executor, order: OrderIntent, allowed_symbols: set[str]):
     try:
         return executor.submit(order, allowed_symbols=allowed_symbols)
@@ -553,8 +490,6 @@ def _executor_submit_orders(executor, order: OrderIntent, allowed_symbols: set[s
 def run_backtest_command(strategy: TradingStrategy | None = None) -> None:
     settings = get_settings()
     active_strategy = strategy or get_strategy("momentum")
-    if active_strategy.name == politician_copy_strategy.name:
-        raise RuntimeError("politician_copy does not support historical backtest mode in v1")
     repo = JournalRepo(create_session_factory(settings.database_url))
     _log_runtime_config_snapshot(repo, settings=settings, run_type="backtest", strategy_name=active_strategy.name)
     repo.create_run("backtest", "started")
@@ -619,15 +554,13 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     partial_data_failure = False
     data_source = "alpaca"
     stale_data = False
-    plan: AllocationPlan | None = None
     latest = None
     trades = pd.DataFrame()
     metrics: dict[str, float] = {"trades": 0.0}
     allowed_symbols: set[str] = set(settings.symbol_list)
-    if active_strategy.name != politician_copy_strategy.name:
-        loaded, validation, stale_data = _load_and_validate_data(settings, active_strategy.name)
-        partial_data_failure = validation.has_partial_failure
-        data_source = loaded.source
+    loaded, validation, stale_data = _load_and_validate_data(settings, active_strategy.name)
+    partial_data_failure = validation.has_partial_failure
+    data_source = loaded.source
 
     account = broker.get_account_summary()
     safe_open_entries_allowed, safe_open_reason = _safe_open_allows_entries(settings)
@@ -660,37 +593,19 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         )
     unrealized_pnl = exposure_snapshot.unrealized_pnl
 
-    if active_strategy.name == politician_copy_strategy.name:
-        plan = politician_copy_strategy.build_allocation_plan(
-            settings=settings,
-            account_equity=float(account.equity or 0.0),
-            position_qty_by_symbol={position.symbol: float(position.qty) for position in open_positions},
+    if not stale_data:
+        signal_frame = (
+            active_strategy.generate_signals(validation.valid_bars, settings)
+            if strategy is not None
+            else generate_signals(validation.valid_bars, settings)
         )
-        data_source = plan.source
-        if settings.trading_mode_enabled and not plan.target_allocations:
-            raise RuntimeError("politician_copy found no tradable disclosures")
-        metrics = {
-            "politicians": float(len(plan.selected_politicians)),
-            "targets": float(len(plan.target_allocations)),
-            "orders": float(len(plan.planned_orders)),
-        }
-        allowed_symbols = {
-            target.symbol for target in plan.target_allocations
-        } | {position.symbol for position in open_positions} | {order.symbol for order in plan.planned_orders}
-    else:
-        if not stale_data:
-            signal_frame = (
-                active_strategy.generate_signals(validation.valid_bars, settings)
-                if strategy is not None
-                else generate_signals(validation.valid_bars, settings)
-            )
-            latest = latest_signals(signal_frame)
-            latest["account_equity"] = float(account.equity or 0.0)
-            trades = filter_trade_candidates(latest, settings)
-            if strategy is not None:
-                _, metrics = run_backtest(validation.valid_bars, settings, strategy=active_strategy)
-            else:
-                _, metrics = run_backtest(validation.valid_bars, settings)
+        latest = latest_signals(signal_frame)
+        latest["account_equity"] = float(account.equity or 0.0)
+        trades = filter_trade_candidates(latest, settings)
+        if strategy is not None:
+            _, metrics = run_backtest(validation.valid_bars, settings, strategy=active_strategy)
+        else:
+            _, metrics = run_backtest(validation.valid_bars, settings)
 
     reconciliation_snapshot, reconciliation_state = _compute_reconciliation_state(repo, broker)
     if reconciliation_state.enabled:
@@ -777,49 +692,13 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
     blocked_orders = 0
     skipped_existing = 0
     alert_messages: list[str] = []
-    if active_strategy.name == politician_copy_strategy.name and plan is not None:
-        if plan.rejected_disclosures:
-            alert_messages.append(f"politician_copy rejected_disclosures={len(plan.rejected_disclosures)}")
-    elif partial_data_failure:
+    if partial_data_failure:
         alert_messages.append("data validation failed")
     if kill_switch.enabled:
         alert_messages.append(f"kill switch active: {kill_switch.reason}")
     if settings.live_trading_enabled and settings.safe_open_enabled and not safe_open_entries_allowed:
         alert_messages.append(f"live entry gate active: {safe_open_reason}")
-    if active_strategy.name == politician_copy_strategy.name and plan is not None:
-        exit_candidates = pd.DataFrame(
-            [
-                {
-                    "symbol": order.symbol,
-                    "signal": "exit",
-                    "close": order.price,
-                    "qty": order.qty,
-                }
-                for order in plan.planned_orders
-                if order.side == "sell"
-            ]
-        )
-        entry_trades = pd.DataFrame(
-            [
-                {
-                    "symbol": order.symbol,
-                    "signal": "long",
-                    "close": order.price,
-                    "qty": order.qty,
-                    "target_weight": order.target_weight,
-                }
-                for order in plan.planned_orders
-                if order.side == "buy"
-            ]
-        )
-        if stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
-            if not exit_candidates.empty:
-                LOGGER.warning(
-                    "using politician_copy rebalance exits under unsafe data source=%s for symbols: %s",
-                    data_source,
-                    sorted(exit_candidates["symbol"].tolist()),
-                )
-    elif stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
+    if stale_data or (settings.trading_mode_enabled and data_source != "alpaca"):
         exit_candidates = protective_exit_candidates(position_qty_by_symbol, position_price_by_symbol)
         if not exit_candidates.empty:
             LOGGER.warning(
@@ -847,7 +726,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         repo.log_signal(str(trade["symbol"]), "exit", float(trade["close"]))
         base_order = OrderIntent(
             symbol=str(trade["symbol"]),
-            qty=int(trade["qty"]),
+            qty=float(trade["qty"]),
             side="sell",
             close=float(trade["close"]),
         )
@@ -865,7 +744,11 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         split_exit_orders = (
             executor.split_order_for_submit(base_order)
             if hasattr(executor, "split_order_for_submit")
-            else _fallback_split_exit_order(base_order, settings.max_order_qty)
+            else _fallback_split_exit_order(
+                base_order,
+                settings.max_order_qty,
+                settings.fractional_quantity_precision,
+            )
         )
         if hasattr(executor, "submit_orders"):
             execution_results = _executor_submit_orders(executor, base_order, allowed_symbols)
@@ -908,7 +791,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
         repo.log_signal(str(trade["symbol"]), "long", float(trade["close"]))
         order = OrderIntent(
             symbol=str(trade["symbol"]),
-            qty=int(trade["qty"]),
+            qty=float(trade["qty"]),
             side="buy",
             close=float(trade["close"]),
         )
@@ -961,7 +844,7 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
             continue
         decision = entry_risk_decision(
             symbol=order.symbol,
-            qty=int(order.qty),
+            qty=float(order.qty),
             close=float(order.close),
             active_symbols=active_symbols,
             symbol_exposure=position_notional_by_symbol.get(order.symbol, 0.0)
@@ -1054,16 +937,12 @@ def run_paper_command(strategy: TradingStrategy | None = None) -> None:
             f"safe_open_entries_allowed={safe_open_entries_allowed} "
             f"safe_open_reason={safe_open_reason} "
             f"submitted={submitted_orders} exits={exit_orders} blocked={blocked_orders} "
-            f"politician_copy_rejected_disclosures={len(plan.rejected_disclosures) if plan is not None else 0} "
-            f"politician_copy_selected={len(plan.selected_politicians) if plan is not None else 0} "
-            f"politician_copy_targets={len(plan.target_allocations) if plan is not None else 0} "
             f"skipped_existing={skipped_existing} skipped_exit={skipped_exit} "
             f"synced_orders={sync_summary['recent_orders']} "
             f"open_orders={sync_summary['open_orders']} positions={sync_summary['positions']} "
             f"pnl_points={sync_summary['pnl_points']} fills={sync_summary['fills']} "
             f"lot_matches={sync_summary['lot_matches']} "
             f"realized_symbols={sync_summary['realized_symbols']} "
-            f"preview={plan.preview(limit=3) if plan is not None else 'n/a'} "
             f"metrics={metrics} {report}"
         ),
     )
@@ -1105,7 +984,7 @@ def run_preflight_command(strategy: TradingStrategy | None = None) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Trading bot entrypoint")
-    parser.add_argument("command", choices=["backtest", "compare", "paper", "preview", "replay", "preflight", "reconcile", "report"])
+    parser.add_argument("command", choices=["backtest", "compare", "paper", "preflight", "reconcile", "report"])
     parser.add_argument(
         "--strategy",
         choices=strategy_names(),
@@ -1127,10 +1006,6 @@ def main() -> None:
         run_compare_command()
     elif args.command == "paper":
         run_paper_command(strategy)
-    elif args.command == "preview":
-        run_preview_command(strategy)
-    elif args.command == "replay":
-        run_replay_command(strategy)
     elif args.command == "preflight":
         run_preflight_command(strategy)
     elif args.command == "reconcile":

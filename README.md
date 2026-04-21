@@ -52,7 +52,6 @@ Registered strategies live under [app/strategy](/Users/jurekolar/Code/simple-ai-
 Momentum keeps using `TREND_WINDOW` / `EXIT_WINDOW` / `ATR_WINDOW`; `mean_reversion` now uses a benchmark-aware pullback model with its own `MEAN_REVERSION_*` settings and requires benchmark history for `MEAN_REVERSION_BENCHMARK_SYMBOL` (default `SPY`) even if that symbol is not in `SYMBOLS`.
 The `breakout` strategy is the repo's TradingView-aligned Donchian/Turtle breakout and uses `BREAKOUT_ENTRY_WINDOW` / `BREAKOUT_EXIT_WINDOW` / `BREAKOUT_ATR_WINDOW`.
 The `trend_trailing_stop` strategy uses `TREND_TRAILING_*` settings for its trend filter, breakout or pullback entries, and ATR or percent trailing stop exits.
-`politician_copy` is allocation-based rather than bar-signal-based, so it supports `preview` and `paper`, but not `backtest` in v1.
 
 The upgraded `mean_reversion` entry requires:
 
@@ -74,24 +73,6 @@ Run the non-trading startup validation first when you want the go/no-go checks w
 ```bash
 python -m app.main --strategy breakout preflight
 make preflight STRATEGY=breakout
-```
-
-Preview the current politician-copy portfolio selection and target weights:
-
-```bash
-python -m app.main --strategy politician_copy preview
-```
-
-Run the politician-copy paper workflow:
-
-```bash
-python -m app.main --strategy politician_copy paper
-```
-
-Run the historical disclosure replay validator for `politician_copy`:
-
-```bash
-python -m app.main --strategy politician_copy replay
 ```
 
 To force a deterministic paper-trade exit test on currently held symbols, set

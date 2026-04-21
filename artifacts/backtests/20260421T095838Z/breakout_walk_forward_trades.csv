@@ -1,0 +1,2 @@
+timestamp,symbol,side,qty,close,fill_price,notional,realized_pnl,holding_days,signal,walk_forward_fold
+2025-12-04 05:00:00+00:00,EWZ,buy,25.921658,34.72,34.737359999999995,900.44996574288,0.0,0.0,long,1

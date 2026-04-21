@@ -38,6 +38,8 @@ class Settings(BaseSettings):
     )
     min_cash_buffer: float = Field(default=0.0, alias="MIN_CASH_BUFFER")
     max_order_qty: int = Field(default=25, alias="MAX_ORDER_QTY")
+    allow_fractional_shares: bool = Field(default=False, alias="ALLOW_FRACTIONAL_SHARES")
+    fractional_quantity_precision: int = Field(default=6, alias="FRACTIONAL_QUANTITY_PRECISION")
     max_open_orders: int = Field(default=8, alias="MAX_OPEN_ORDERS")
     max_stuck_order_minutes: int = Field(default=20, alias="MAX_STUCK_ORDER_MINUTES")
     max_broker_failures: int = Field(default=3, alias="MAX_BROKER_FAILURES")
@@ -109,83 +111,6 @@ class Settings(BaseSettings):
     safe_open_enabled: bool = Field(default=False, alias="SAFE_OPEN_ENABLED")
     safe_open_start_time: str = Field(default="09:35", alias="SAFE_OPEN_START_TIME")
     safe_open_end_time: str = Field(default="10:30", alias="SAFE_OPEN_END_TIME")
-    politician_copy_base_url: str = Field(
-        default="https://www.capitoltrades.com",
-        alias="POLITICIAN_COPY_BASE_URL",
-    )
-    politician_copy_scrape_timeout_seconds: float = Field(
-        default=10.0,
-        alias="POLITICIAN_COPY_SCRAPE_TIMEOUT_SECONDS",
-    )
-    politician_copy_user_agent: str = Field(
-        default="simple-ai-trading/0.1 politician-copy",
-        alias="POLITICIAN_COPY_USER_AGENT",
-    )
-    politician_copy_candidate_pages: int = Field(
-        default=3,
-        alias="POLITICIAN_COPY_CANDIDATE_PAGES",
-    )
-    politician_copy_max_profile_pages: int = Field(
-        default=4,
-        alias="POLITICIAN_COPY_MAX_PROFILE_PAGES",
-    )
-    politician_copy_ranking_lookback_days: int = Field(
-        default=180,
-        alias="POLITICIAN_COPY_RANKING_LOOKBACK_DAYS",
-    )
-    politician_copy_min_disclosures_per_politician: int = Field(
-        default=2,
-        alias="POLITICIAN_COPY_MIN_DISCLOSURES_PER_POLITICIAN",
-    )
-    politician_copy_num_politicians: int = Field(
-        default=3,
-        alias="POLITICIAN_COPY_NUM_POLITICIANS",
-    )
-    politician_copy_holding_window_days: int = Field(
-        default=90,
-        alias="POLITICIAN_COPY_HOLDING_WINDOW_DAYS",
-    )
-    politician_copy_max_disclosure_lag_days: int = Field(
-        default=45,
-        alias="POLITICIAN_COPY_MAX_DISCLOSURE_LAG_DAYS",
-    )
-    politician_copy_recency_half_life_days: float = Field(
-        default=30.0,
-        alias="POLITICIAN_COPY_RECENCY_HALF_LIFE_DAYS",
-    )
-    politician_copy_max_symbol_weight: float = Field(
-        default=0.25,
-        alias="POLITICIAN_COPY_MAX_SYMBOL_WEIGHT",
-    )
-    politician_copy_min_target_weight: float = Field(
-        default=0.02,
-        alias="POLITICIAN_COPY_MIN_TARGET_WEIGHT",
-    )
-    politician_copy_symbol_allowlist: str = Field(
-        default="",
-        alias="POLITICIAN_COPY_SYMBOL_ALLOWLIST",
-    )
-    politician_copy_symbol_blocklist: str = Field(
-        default="",
-        alias="POLITICIAN_COPY_SYMBOL_BLOCKLIST",
-    )
-    politician_copy_preview_limit: int = Field(
-        default=10,
-        alias="POLITICIAN_COPY_PREVIEW_LIMIT",
-    )
-    politician_copy_rebalance_frequency: str = Field(
-        default="W-FRI",
-        alias="POLITICIAN_COPY_REBALANCE_FREQUENCY",
-    )
-    politician_copy_replay_initial_equity: float = Field(
-        default=100_000.0,
-        alias="POLITICIAN_COPY_REPLAY_INITIAL_EQUITY",
-    )
-    politician_copy_replay_slippage_bps: float = Field(
-        default=10.0,
-        alias="POLITICIAN_COPY_REPLAY_SLIPPAGE_BPS",
-    )
-
     @property
     def symbol_list(self) -> list[str]:
         return [symbol.strip().upper() for symbol in self.symbols.split(",") if symbol.strip()]
@@ -220,6 +145,7 @@ class Settings(BaseSettings):
             "max_positions": self.max_positions,
             "max_symbols_per_run": self.max_symbols_per_run,
             "max_position_notional": self.max_position_notional,
+            "allow_fractional_shares": self.allow_fractional_shares,
             "max_gross_exposure": self.max_gross_exposure,
             "max_daily_loss": self.max_daily_loss,
             "max_unrealized_drawdown": self.max_unrealized_drawdown,
@@ -236,23 +162,6 @@ class Settings(BaseSettings):
             "database_url": self.database_url,
             "alert_webhook_configured": bool(self.alert_webhook_url),
         }
-
-    @property
-    def politician_copy_symbol_allowlist_set(self) -> set[str]:
-        return {
-            symbol.strip().upper()
-            for symbol in self.politician_copy_symbol_allowlist.split(",")
-            if symbol.strip()
-        }
-
-    @property
-    def politician_copy_symbol_blocklist_set(self) -> set[str]:
-        return {
-            symbol.strip().upper()
-            for symbol in self.politician_copy_symbol_blocklist.split(",")
-            if symbol.strip()
-        }
-
 
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:

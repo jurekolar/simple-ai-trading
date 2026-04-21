@@ -1,0 +1,3 @@
+timestamp,symbol,side,qty,close,fill_price,notional,realized_pnl,holding_days,signal
+2026-02-27 15:47:34.328272+00:00,SPY,buy,3.004005,149.8,149.8749,450.22494897449997,0.0,0.0,long
+2026-02-27 15:47:34.328272+00:00,IWM,buy,2.57437,174.8,174.8874,450.224875938,0.0,0.0,long

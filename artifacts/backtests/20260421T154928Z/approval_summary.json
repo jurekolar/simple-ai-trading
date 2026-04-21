@@ -1,0 +1,65 @@
+{
+  "benchmark_valid": false,
+  "config_profile": "default",
+  "decision_ready": false,
+  "generated_at": "2026-04-21T15:49:28.745148+00:00",
+  "lookback_days": 400,
+  "max_out_of_sample_drawdown": 0.2,
+  "max_symbol_concentration": 0.6,
+  "min_baseline_advantage": 0.0,
+  "min_closed_trades": 3,
+  "min_out_of_sample_days": 20,
+  "min_walk_forward_folds": 2,
+  "out_of_sample_fraction": 0.3,
+  "recommended_live_candidate": "",
+  "source": "alpaca",
+  "strategies": [
+    "breakout",
+    "mean_reversion",
+    "momentum",
+    "trend_trailing_stop"
+  ],
+  "strategy_statuses": [
+    {
+      "benchmark_invalid_reasons": "too_few_closed_trades,insufficient_advantage_vs_spy,insufficient_advantage_vs_equal_weight",
+      "benchmark_valid": false,
+      "recommendation": "fail",
+      "strategy": "mean_reversion"
+    },
+    {
+      "benchmark_invalid_reasons": "too_few_closed_trades,insufficient_advantage_vs_spy,insufficient_advantage_vs_equal_weight",
+      "benchmark_valid": false,
+      "recommendation": "fail",
+      "strategy": "trend_trailing_stop"
+    },
+    {
+      "benchmark_invalid_reasons": "too_few_closed_trades,excess_symbol_concentration",
+      "benchmark_valid": false,
+      "recommendation": "fail",
+      "strategy": "momentum"
+    },
+    {
+      "benchmark_invalid_reasons": "too_few_closed_trades,excess_symbol_concentration",
+      "benchmark_valid": false,
+      "recommendation": "fail",
+      "strategy": "breakout"
+    }
+  ],
+  "symbols": [
+    "SPY",
+    "IWM",
+    "EFA",
+    "EEM",
+    "EWZ",
+    "XLF",
+    "KRE",
+    "BAC",
+    "QQQ",
+    "AAPL",
+    "MSFT",
+    "AMD",
+    "ORCL"
+  ],
+  "walk_forward_test_days": 63,
+  "walk_forward_train_days": 126
+}

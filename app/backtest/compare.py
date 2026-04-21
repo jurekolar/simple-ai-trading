@@ -543,7 +543,11 @@ def write_benchmark_artifacts(
 
     approved_candidates = summary[summary["recommendation"] == "pass"]
     recommended_strategy = approved_candidates.iloc[0]["strategy"] if not approved_candidates.empty else ""
-    benchmark_valid = bool(summary["benchmark_valid"].all()) if not summary.empty else False
+    recommended_candidate_valid = False
+    if recommended_strategy:
+        recommended_row = summary.loc[summary["strategy"] == recommended_strategy].iloc[0]
+        recommended_candidate_valid = bool(recommended_row["benchmark_valid"])
+    benchmark_valid = recommended_candidate_valid
     manifest = {
         "generated_at": datetime.now(UTC).isoformat(),
         "config_profile": settings.config_profile,

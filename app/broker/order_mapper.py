@@ -6,6 +6,6 @@ from dataclasses import dataclass
 @dataclass(frozen=True)
 class OrderIntent:
     symbol: str
-    qty: int
+    qty: float
     side: str
     close: float

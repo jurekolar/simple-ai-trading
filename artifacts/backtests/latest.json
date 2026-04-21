@@ -1,0 +1,8 @@
+{
+  "artifact_dir": "artifacts/backtests/20260421T161208Z",
+  "benchmark_valid": true,
+  "decision_ready": true,
+  "generated_at": "2026-04-21T16:12:08.749941+00:00",
+  "recommended_live_candidate": "breakout",
+  "source": "alpaca"
+}

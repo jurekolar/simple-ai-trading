@@ -1,0 +1,2 @@
+timestamp,symbol,side,qty,close,fill_price,notional,realized_pnl,holding_days,signal
+2026-04-09 04:00:00+00:00,EWZ,buy,22.0,40.54,40.560269999999996,892.32594,0.0,0.0,long

@@ -215,6 +215,21 @@ def test_executor_chunks_large_exit_order_for_submit(tmp_path: Path) -> None:
     assert [order.qty for order in orders] == [25, 25, 10]
 
 
+def test_executor_chunks_fractional_exit_order_for_submit(tmp_path: Path) -> None:
+    settings = Settings(
+        MAX_ORDER_QTY=25,
+        DRY_RUN=True,
+        ALLOW_FRACTIONAL_SHARES=True,
+        FRACTIONAL_QUANTITY_PRECISION=4,
+    )
+    repo = _journal_repo(tmp_path)
+    executor = PaperExecutor(repo, settings)
+
+    orders = executor.split_order_for_submit(OrderIntent(symbol="SPY", qty=25.75, side="sell", close=100.0))
+
+    assert [order.qty for order in orders] == [25, 0.75]
+
+
 def test_process_flatten_logs_close_position_failure(tmp_path: Path) -> None:
     repo = _journal_repo(tmp_path)
     alerts: list[str] = []

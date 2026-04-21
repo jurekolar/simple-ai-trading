@@ -7,7 +7,7 @@ import pandas as pd
 from app.backtest.fills import fill_price_for_side
 from app.backtest.metrics import summarize
 from app.config import Settings
-from app.risk.checks import entry_risk_decision, filter_trade_candidates
+from app.risk.checks import entry_risk_decision, filter_trade_candidates, round_trade_qty
 from app.strategy import get_strategy
 from app.strategy.base import TradingStrategy
 
@@ -17,7 +17,7 @@ BACKTEST_INITIAL_EQUITY = 100_000.0
 
 @dataclass
 class BacktestPosition:
-    qty: int
+    qty: float
     entry_price: float
     entry_timestamp: pd.Timestamp
     last_price: float
@@ -118,7 +118,7 @@ def run_backtest_detailed(
                 continue
             decision = entry_risk_decision(
                 symbol=symbol,
-                qty=int(row.qty),
+                qty=float(row.qty),
                 close=float(row.close),
                 active_symbols=set(positions),
                 symbol_exposure=0.0,
@@ -133,23 +133,27 @@ def run_backtest_detailed(
             if not decision.allowed:
                 continue
             fill_price = fill_price_for_side(float(row.close), "buy")
-            notional = float(row.qty) * fill_price
+            qty = float(row.qty)
+            notional = qty * fill_price
             if notional > cash:
+                qty = round_trade_qty(cash / fill_price, settings)
+                notional = qty * fill_price
+            if qty <= 0 or notional > cash:
                 continue
             positions[symbol] = BacktestPosition(
-                qty=int(row.qty),
+                qty=qty,
                 entry_price=fill_price,
                 entry_timestamp=pd.Timestamp(timestamp),
                 last_price=float(row.close),
             )
             cash -= notional
-            gross_exposure += float(row.qty) * float(row.close)
+            gross_exposure += qty * float(row.close)
             trade_rows.append(
                 {
                     "timestamp": pd.Timestamp(timestamp),
                     "symbol": symbol,
                     "side": "buy",
-                    "qty": float(row.qty),
+                    "qty": qty,
                     "close": float(row.close),
                     "fill_price": fill_price,
                     "notional": notional,
@@ -171,6 +175,38 @@ def run_backtest_detailed(
                 "open_positions": float(len(positions)),
             }
         )
+
+    if positions and equity_rows:
+        final_timestamp = pd.Timestamp(equity_rows[-1]["timestamp"])
+        for symbol in sorted(positions):
+            position = positions[symbol]
+            fill_price = fill_price_for_side(float(position.last_price), "sell")
+            proceeds = float(position.qty) * fill_price
+            cash += proceeds
+            realized_pnl = float(position.qty) * (fill_price - position.entry_price)
+            holding_days = max((final_timestamp - position.entry_timestamp).days, 0)
+            trade_rows.append(
+                {
+                    "timestamp": final_timestamp,
+                    "symbol": symbol,
+                    "side": "sell",
+                    "qty": float(position.qty),
+                    "close": float(position.last_price),
+                    "fill_price": fill_price,
+                    "notional": proceeds,
+                    "realized_pnl": realized_pnl,
+                    "holding_days": float(holding_days),
+                    "signal": "window_close",
+                }
+            )
+        positions.clear()
+        equity_rows[-1] = {
+            "timestamp": final_timestamp,
+            "cash": float(cash),
+            "gross_exposure": 0.0,
+            "equity": float(cash),
+            "open_positions": 0.0,
+        }
 
     trade_log = pd.DataFrame(trade_rows)
     equity_curve = pd.DataFrame(equity_rows)

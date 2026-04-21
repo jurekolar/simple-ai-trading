@@ -1,0 +1,4 @@
+strategy,variant,out_of_sample_risk_adjusted_score,out_of_sample_total_return,out_of_sample_max_drawdown
+mean_reversion,base,0.0,0.0,0.0
+mean_reversion,entry_zscore_looser,0.0,0.0,0.0
+mean_reversion,entry_zscore_tighter,0.0,0.0,0.0

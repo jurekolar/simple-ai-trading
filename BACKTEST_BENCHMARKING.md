@@ -11,8 +11,6 @@ The benchmark workflow currently compares these strategies:
 - `breakout`
 - `trend_trailing_stop`
 
-`politician_copy` is excluded because it does not have a historical backtest model in this repo.
-
 The comparison is risk-adjusted first. Strategies are ranked by:
 
 1. `risk_adjusted_score`

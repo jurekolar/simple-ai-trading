@@ -7,6 +7,7 @@ import pandas as pd
 import pytest
 
 from app.backtest.compare import (
+    StrategyResearchResult,
     compare_strategies,
     evaluate_strategy_research,
     format_single_strategy_summary,
@@ -213,6 +214,28 @@ def test_run_backtest_handles_date_window() -> None:
     )
 
 
+def test_run_backtest_closes_open_positions_at_window_end() -> None:
+    settings = Settings(
+        SYMBOLS="SPY",
+        BREAKOUT_ENTRY_WINDOW=2,
+        BREAKOUT_EXIT_WINDOW=2,
+        BREAKOUT_ATR_WINDOW=2,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+        MAX_SYMBOLS_PER_RUN=1,
+        MAX_POSITION_NOTIONAL=10_000,
+        MAX_SYMBOL_EXPOSURE=10_000,
+        MAX_GROSS_EXPOSURE=10_000,
+    )
+    bars = pd.DataFrame(_daily_bars("SPY", [100.0, 101.0, 103.0, 104.0]))
+
+    trades, metrics = run_backtest(bars, settings, strategy=get_strategy("breakout"))
+
+    assert list(trades["side"]) == ["buy", "sell"]
+    assert trades.iloc[-1]["signal"] == "window_close"
+    assert metrics["closed_trades"] == 1.0
+
+
 def test_run_backtest_handles_no_signal_case() -> None:
     settings = Settings(
         SYMBOLS="SPY",
@@ -230,6 +253,32 @@ def test_run_backtest_handles_no_signal_case() -> None:
     assert trades.empty
     assert metrics["trades"] == 0.0
     assert metrics["total_return"] == 0.0
+
+
+def test_run_backtest_supports_fractional_entry_qty_for_small_account_profile() -> None:
+    settings = Settings(
+        SYMBOLS="SPY",
+        TREND_WINDOW=2,
+        EXIT_WINDOW=2,
+        ATR_WINDOW=2,
+        MIN_AVERAGE_DAILY_VOLUME=100,
+        MAX_ATR_RATIO=1.0,
+        MAX_SYMBOLS_PER_RUN=1,
+        MAX_POSITION_NOTIONAL=900,
+        MAX_SYMBOL_EXPOSURE=900,
+        MAX_GROSS_EXPOSURE=900,
+        ALLOW_FRACTIONAL_SHARES=True,
+        FRACTIONAL_QUANTITY_PRECISION=4,
+        ATR_RISK_BUDGET=20.0,
+    )
+    bars = pd.DataFrame(_daily_bars("SPY", [1000.0, 1001.0, 1002.0, 999.0]))
+
+    trades, metrics = run_backtest(bars, settings, strategy=get_strategy("momentum"))
+
+    assert not trades.empty
+    buy_trade = trades[trades["side"] == "buy"].iloc[0]
+    assert float(buy_trade["qty"]) == pytest.approx(0.8991)
+    assert metrics["trades"] >= 1
 
 
 def test_evaluate_strategy_research_includes_validation_windows_and_recommendation(tmp_path) -> None:
@@ -372,6 +421,53 @@ def test_write_benchmark_artifacts_writes_csvs_and_metadata(tmp_path) -> None:
     assert metadata["config_profile"] == settings.config_profile
     latest_index = load_latest_benchmark_index(settings)
     assert latest_index["artifact_dir"] == str(artifact_dir)
+
+
+def test_write_benchmark_artifacts_marks_latest_index_ready_for_valid_recommended_candidate(tmp_path) -> None:
+    settings = _research_settings(tmp_path)
+    summary = pd.DataFrame(
+        [
+            {
+                "strategy": "breakout",
+                "recommendation": "pass",
+                "benchmark_valid": True,
+                "benchmark_invalid_reasons": "",
+                "selection_score": 0.91,
+            },
+            {
+                "strategy": "momentum",
+                "recommendation": "fail",
+                "benchmark_valid": False,
+                "benchmark_invalid_reasons": "insufficient_advantage_vs_equal_weight",
+                "selection_score": -999.0,
+            },
+        ]
+    )
+    result = StrategyResearchResult(
+        strategy="breakout",
+        summary={"strategy": "breakout"},
+        combined_trade_log=pd.DataFrame(),
+        combined_equity_curve=pd.DataFrame(),
+        in_sample_trade_log=pd.DataFrame(),
+        in_sample_equity_curve=pd.DataFrame(),
+        out_of_sample_trade_log=pd.DataFrame(),
+        out_of_sample_equity_curve=pd.DataFrame(),
+        walk_forward_trade_log=pd.DataFrame(),
+        regime_summary=pd.DataFrame(),
+        quarter_summary=pd.DataFrame(),
+        sensitivity_summary=pd.DataFrame(),
+    )
+
+    artifact_dir = write_benchmark_artifacts(summary, [result], settings=settings, source="alpaca")
+
+    metadata = json.loads((artifact_dir / "metadata.json").read_text(encoding="utf-8"))
+    latest_index = load_latest_benchmark_index(settings)
+    assert metadata["recommended_live_candidate"] == "breakout"
+    assert metadata["benchmark_valid"] is True
+    assert metadata["decision_ready"] is True
+    assert latest_index["recommended_live_candidate"] == "breakout"
+    assert latest_index["benchmark_valid"] is True
+    assert latest_index["decision_ready"] is True
 
 
 def test_invalid_benchmark_detection_fails_fallback_source(tmp_path) -> None:

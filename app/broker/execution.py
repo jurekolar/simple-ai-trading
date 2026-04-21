@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import uuid
 from dataclasses import dataclass
 
@@ -11,6 +12,17 @@ from app.config import Settings
 from app.db.repo import JournalRepo
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _is_fractional_qty(qty: float) -> bool:
+    return not math.isclose(float(qty), round(float(qty)), abs_tol=1e-9)
+
+
+def _round_down_qty(value: float, precision: int) -> float:
+    if value <= 0:
+        return 0.0
+    scale = 10**max(precision, 0)
+    return math.floor(value * scale) / scale
 
 
 @dataclass(frozen=True)
@@ -44,6 +56,11 @@ class PaperExecutor:
             raise ValueError(f"symbol {order.symbol} is not whitelisted")
         if order.qty <= 0:
             raise ValueError("order qty must be positive")
+        if _is_fractional_qty(order.qty):
+            if not self._settings.allow_fractional_shares:
+                raise ValueError("fractional shares are disabled")
+            if not self._broker.supports_fractional_shares(order.symbol):
+                raise ValueError(f"symbol {order.symbol} does not support fractional shares")
         if order.qty > self._settings.max_order_qty:
             raise ValueError(
                 f"order qty {order.qty} exceeds MAX_ORDER_QTY={self._settings.max_order_qty}"
@@ -68,10 +85,14 @@ class PaperExecutor:
     def _chunk_exit_order(self, order: OrderIntent) -> list[OrderIntent]:
         if order.qty <= self._settings.max_order_qty or self._settings.max_order_qty <= 0:
             return [order]
-        remaining = int(order.qty)
+        remaining = float(order.qty)
         chunks: list[OrderIntent] = []
+        precision = self._settings.fractional_quantity_precision
         while remaining > 0:
-            chunk_qty = min(remaining, self._settings.max_order_qty)
+            chunk_qty = min(remaining, float(self._settings.max_order_qty))
+            chunk_qty = _round_down_qty(chunk_qty, precision)
+            if chunk_qty <= 0:
+                chunk_qty = remaining
             chunks.append(
                 OrderIntent(
                     symbol=order.symbol,
@@ -80,7 +101,7 @@ class PaperExecutor:
                     close=order.close,
                 )
             )
-            remaining -= chunk_qty
+            remaining = _round_down_qty(max(remaining - chunk_qty, 0.0), precision)
         return chunks
 
     def submit(self, order: OrderIntent, allowed_symbols: set[str] | None = None) -> ExecutionResult:

@@ -1,0 +1,4 @@
+strategy,variant,out_of_sample_risk_adjusted_score,out_of_sample_total_return,out_of_sample_max_drawdown
+momentum,base,13.349587163383376,0.00040829975087497417,4.499999124996101e-06
+momentum,trend_window_minus,16.834421953017365,0.0005264890812699541,4.499998729978749e-06
+momentum,trend_window_plus,10.371971231275278,0.00029302239743400627,4.4999985659988084e-06

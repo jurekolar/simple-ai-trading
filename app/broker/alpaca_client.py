@@ -125,6 +125,7 @@ class AlpacaTradingAdapter:
     def __init__(self, settings: Settings) -> None:
         self._settings = settings
         self._client = None
+        self._fractionable_by_symbol: dict[str, bool] = {}
         if TradingClient is not None:
             self._client = TradingClient(
                 api_key=settings.alpaca_api_key,
@@ -178,6 +179,20 @@ class AlpacaTradingAdapter:
             submitted_at=getattr(order, "submitted_at", None),
             filled_at=getattr(order, "filled_at", None),
         )
+
+    def supports_fractional_shares(self, symbol: str) -> bool:
+        normalized_symbol = symbol.upper()
+        if normalized_symbol in self._fractionable_by_symbol:
+            return self._fractionable_by_symbol[normalized_symbol]
+        if self._client is None:
+            return False
+        try:
+            asset = self._client.get_asset(normalized_symbol)
+        except Exception:  # pragma: no cover - depends on external service state
+            return False
+        fractionable = bool(getattr(asset, "fractionable", False))
+        self._fractionable_by_symbol[normalized_symbol] = fractionable
+        return fractionable
 
     @staticmethod
     def normalize_order_status(status: str) -> str:
